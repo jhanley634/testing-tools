@@ -27,7 +27,7 @@ using PyCall
 
 import_re = r"^import(\s+static|)\s+([\w\.]*\w)"
 
-function get_edges(src_files, ignores)
+function get_edges(src_files)
     Task() do
         for fspec in src_files
             fspec1 = replace(basename(fspec), ".java", "")
@@ -43,13 +43,30 @@ function get_edges(src_files, ignores)
     end
 end
 
-function report(out_file, src_files, ignores)
-    g = pydot.Dot()
-    # println(pybuiltin("dir")(g))
 
-    for (src, dst) in get_edges(src_files, ignores)
-        println(src, " - ", dst)
-        e = pydot.Edge(src, dst)
+ignore_re = r"^java\.util\."
+
+function get_filtered_edges(src_files)
+    Task() do
+        for (src, dst) in get_edges(src_files)
+            if !ismatch(ignore_re, dst)
+                produce(src, dst)
+            end
+        end
+    end
+end
+
+
+function abbrev(class)
+    replace(class, r".*\.", "")
+end
+
+function report(out_file, src_files, ignores)
+    g = pydot.Dot(rankdir="LR")
+
+    for (src, dst) in get_filtered_edges(src_files)
+        println(src, " ", dst)
+        e = pydot.Edge(src, abbrev(dst))
         g[:add_edge](e)
     end
     g[:write](out_file)
