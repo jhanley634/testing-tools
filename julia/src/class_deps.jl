@@ -44,7 +44,7 @@ function get_edges(src_files)
 end
 
 
-ignore_re = r"^java\.util\."
+ignore_re = r"^(javax?|android|org\.slf4j|com\.google)\.|^org.apache.commons.lang3.(StringUtils|time.FastDateFormat)|\.util\.(Util|LoggerBg|STException)$|\.R$"
 
 function get_filtered_edges(src_files)
     Task() do
