@@ -44,7 +44,14 @@ function get_edges(src_files)
 end
 
 
-ignore_re = r"^(javax?|android|org\.slf4j|com\.google)\.|^org.apache.commons.lang3.(StringUtils|time.FastDateFormat)|\.util\.(Util|LoggerBg|STException)$|\.R$"
+macro p_str(s) s end
+
+ignore_re = Regex(join([
+    p"^(javax?|android|org\.slf4j|com\.google)\.",
+    p"^org.apache.commons.lang3.(StringUtils|builder.HashCodeBuilder|time.FastDateFormat)",
+    p"\.util\.(Util|CardValue|Clock|LoggerBg|STException)$",
+    p"APP_VERSION|\.R$"
+], "|"))
 
 function get_filtered_edges(src_files)
     Task() do
