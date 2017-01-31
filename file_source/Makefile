@@ -1,0 +1,35 @@
+
+FILE_SOURCE = /tmp/file_source
+FS = $(FILE_SOURCE)
+
+PKGS = `cat $(FS)/pkgs.txt | egrep '^[bg]zip'`
+
+OUT = \
+ $(FS)/pkgs.txt \
+ $(FS)/du-xk.txt \
+ $(FS)/find.txt \
+
+all: $(OUT)
+
+$(FS)/dpkg-l.txt:
+	mkdir -p $(FS)/pkg
+	dpkg -l | egrep '^ii ' > $(FS)/dpkg-l.txt
+
+# Suffixes like ':amd64' will not appear in pkgs.txt.
+$(FS)/pkgs.txt: $(FS)/dpkg-l.txt
+	test -r $@ || touch $@
+	mv $@ $@~
+	tr ':' ' ' < $< | awk '{print $$2}' | sort > $@
+	diff -u $@~ $@ || true
+
+$(FS)/du-xk.txt:
+	du -xk / > $@ || true
+	test -r $@~ || cp -p $@ $@~
+
+$(FS)/find.txt:
+	find / -xdev -printf "%CY-%Cm-%Cd %CH:%CM %T@ %M %7u %3n %7i  %p %l\n" > $@ || true
+	test -r $@~ || cp -p $@ $@~
+	for PKG in $(PKGS); do ./pkg_to_db.sh $(FS) $$PKG; done
+
+clean:
+	rm -rf $(FS)
