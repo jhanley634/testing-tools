@@ -25,10 +25,37 @@
 
 using SQLite
 
+function create_tables(db)
+    create = "create table file_source(pathname  string primary key, src  string not null, pkg string)"
+    SQLite.query(db, create)
+    tbls = SQLite.tables(db)
+    println(tbls)
+end
+
 function store(db, listing)
-    println(db, listing)
+    ins = SQLite.Stmt(db, "insert into file_source  values (?, 'dpkg', ?)")
+    SQLite.bind!(ins, 3, pkg_name(listing))
+    open(listing) do fin
+        for line in eachline(fin)
+            fspec = rstrip(line)
+            if ! isfile(fspec)
+                continue
+            end
+            SQLite.bind!(ins, 1, fspec)
+            SQLite.execute!(ins)
+        end
+    end
+end
+
+# "/a/b/c/def.txt" -> "def"
+function pkg_name(listing)
+    m = match(r".*/([^/]+)\.txt$", listing)
+    return m.captures[1]
 end
 
 
-db, listing = ARGS
-store(db, listing)
+db_fspec, listing = ARGS
+if (!isfile(db_fspec))
+    create_tables(SQLite.DB(db_fspec))
+end
+store(SQLite.DB(db_fspec), listing)
