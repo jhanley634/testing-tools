@@ -30,10 +30,11 @@ using SQLite
 
 function file_source(db, qpath)
     sel = "select src, pkg  from file_source  where pathname = ?"
-    return SQLite.query(db, sel; values=[qpath])
+    return get(SQLite.query(db, sel; values=[qpath])[1, 2])
 end
 
 
 qpath, = ARGS  # the filepath we are querying
 db = SQLite.DB("/tmp/file_source/pkg_contents.sqlite")
-println(file_source(db, qpath))
+src = file_source(db, qpath)
+println(src)
