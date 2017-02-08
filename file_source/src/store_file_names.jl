@@ -33,8 +33,9 @@ function create_tables(db)
 end
 
 function store(db, listing)
-    ins = SQLite.Stmt(db, "insert into file_source  values (?, 'dpkg', ?)")
-    SQLite.bind!(ins, 3, pkg_name(listing))
+    SQLite.transaction(db)
+    ins = SQLite.Stmt(db, "insert into file_source  values (?, 'DEB', ?)")
+    SQLite.bind!(ins, 2, pkg_name(listing))
     open(listing) do fin
         for line in eachline(fin)
             fspec = rstrip(line)
@@ -45,6 +46,7 @@ function store(db, listing)
             SQLite.execute!(ins)
         end
     end
+    SQLite.commit(db)
 end
 
 # "/a/b/c/def.txt" -> "def"

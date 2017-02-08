@@ -2,7 +2,7 @@
 FILE_SOURCE = /tmp/file_source
 FS = $(FILE_SOURCE)
 
-PKGS = `cat $(FS)/pkgs.txt | egrep '^[bg]zip'`
+PKGS = `cat $(FS)/pkgs.txt`
 
 OUT = \
  $(FS)/pkgs.txt \

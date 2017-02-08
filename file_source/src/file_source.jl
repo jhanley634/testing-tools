@@ -23,3 +23,17 @@
 #     src/file_source /some/path [ more paths ...]
 #
 # Output shall be one of "DEB pkg_name", "URL url", or "UNKNOWN".
+
+
+using SQLite
+
+
+function file_source(db, qpath)
+    sel = "select src, pkg  from file_source  where pathname = ?"
+    return SQLite.query(db, sel; values=[qpath])
+end
+
+
+qpath, = ARGS  # the filepath we are querying
+db = SQLite.DB("/tmp/file_source/pkg_contents.sqlite")
+println(file_source(db, qpath))
