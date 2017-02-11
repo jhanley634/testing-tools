@@ -8,6 +8,7 @@ OUT = \
  $(FS)/pkgs.txt \
  $(FS)/du-xk.txt \
  $(FS)/find.txt \
+ $(FS)/git_repos.txt \
 
 all: $(OUT)
 
@@ -30,6 +31,11 @@ $(FS)/find.txt:
 	find / -xdev -printf "%CY-%Cm-%Cd %CH:%CM %T@ %M %7u %3n %7i  %p %l\n" > $@ || true
 	test -r $@~ || cp -p $@ $@~
 	for PKG in $(PKGS); do ./pkg_to_db.sh $(FS) $$PKG; done
+
+$(FS)/git_repos.txt: $(FS)/find.txt
+	cat $< | awk '/\/.git ?$$/ {print $$8}' | sed 's;/.git$$;;' > $@
+	./store_working_file_names.py $(FS) '[clean]'
+	for REPO in `cat $@`; do ./store_working_file_names.py $(FS) $$REPO; done
 
 clean:
 	rm -rf $(FS)

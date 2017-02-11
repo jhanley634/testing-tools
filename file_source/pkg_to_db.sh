@@ -31,4 +31,4 @@ set -x
 
 dpkg -L $PKG > $LISTING
 
-src/store_file_names.jl $DIR/pkg_contents.sqlite $LISTING
+src/store_pkg_file_names.jl $DIR/pkg_contents.sqlite $LISTING
