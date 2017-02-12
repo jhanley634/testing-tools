@@ -27,8 +27,10 @@ $(FS)/du-xk.txt:
 	du -xk / > $@ || true
 	test -r $@~ || cp -p $@ $@~
 
+EXCLUDE='\.pyc ?$$|\.elc ?$$| /boot/swap[1500M]* ?$$| /boot/initrd.img-.*-generic ?$$| /boot/grub/i386-pc/.*\.mod ?$$| /var/log/installer/cdebconf/templates.dat ?$$| /var/log/btmp ?$$| /tmp/file_source/.*|/.julia/.cache/.*| /var/lib/dpkg/info/.*| /var/lib/apt/lists/.*| /var/cache/.*'
+
 $(FS)/find.txt:
-	find / -xdev -printf "%CY-%Cm-%Cd %CH:%CM %T@ %M %7u %3n %7i  %p %l\n" > $@ || true
+	find / -xdev -printf "%CY-%Cm-%Cd %CH:%CM %T@ %M %7u %3n %7i  %p %l\n" | egrep -v $(EXCLUDE) > $@
 	test -r $@~ || cp -p $@ $@~
 	for PKG in $(PKGS); do ./pkg_to_db.sh $(FS) $$PKG; done
 
