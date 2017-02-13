@@ -9,6 +9,7 @@ OUT = \
  $(FS)/du-xk.txt \
  $(FS)/find.txt \
  $(FS)/git_repos.txt \
+ $(FS)/full.tar \
 
 all: $(OUT)
 
@@ -38,6 +39,12 @@ $(FS)/git_repos.txt: $(FS)/find.txt
 	cat $< | awk '/\/.git ?$$/ {print $$8}' | sed 's;/.git$$;;' > $@
 	./store_working_file_names.py $(FS) '[clean]'
 	for REPO in `cat $@`; do ./store_working_file_names.py $(FS) $$REPO; done
+
+$(FS)/files_to_backup.txt: $(FS)/git_repos.txt
+	src/backup_report.jl | sed 's/^.//' | sort > $@
+
+$(FS)/full.tar: $(FS)/files_to_backup.txt
+	tar cf $@ -C / --files-from $<
 
 clean:
 	rm -rf $(FS)

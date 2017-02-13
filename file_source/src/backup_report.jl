@@ -29,6 +29,7 @@ using SQLite
 
 
 function all_files(fspec)
+    uid = ccall((:getuid, "libc"), Int32, ())
     pat = Regex("^([\\d-]+ \\d{2}:\\d{2})\\s+"
                 * "([\\.\\d]+)\\s+"
                 * "([rwx\\w-]+)\\s+"
@@ -43,12 +44,24 @@ function all_files(fspec)
                 if ! (m === nothing)
                     mtime, ctime, perm, owner, links, size, file = m.captures
                     if isfile(file)
-                        produce(file)
+                        st = stat(file)
+                        # Mine, or world read, or (ordinary) group read.
+                        isreadable = (st.uid == uid) ||
+                            (stat(file).mode & 0o004) > 0 ||
+                            ((stat(file).mode & 0o040) > 0 && !is_security_group(st.gid))
+                        if isreadable
+                            produce(file)
+                        end
                     end
                 end
             end
         end
     end
+end
+
+function is_security_group(gid)
+    return gid == 42 ||  # shadow
+        gid == 107       # mlocate
 end
 
 function report(db, all_files)
