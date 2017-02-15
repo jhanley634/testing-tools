@@ -4,14 +4,7 @@ FS = $(FILE_SOURCE)
 
 PKGS = `cat $(FS)/pkgs.txt`
 
-OUT = \
- $(FS)/pkgs.txt \
- $(FS)/du-xk.txt \
- $(FS)/find.txt \
- $(FS)/git_repos.txt \
- $(FS)/full.tar \
-
-all: $(OUT)
+all:  $(FS)/full.tar.gz
 
 $(FS)/dpkg-l.txt:
 	mkdir -p $(FS)/pkg
@@ -28,7 +21,7 @@ $(FS)/du-xk.txt:
 	du -xk / > $@ || true
 	test -r $@~ || cp -p $@ $@~
 
-EXCLUDE='\.pyc ?$$|\.elc ?$$| /boot/swap[1500M]* ?$$| /boot/initrd.img-.*-generic ?$$| /boot/grub/i386-pc/.*\.mod ?$$| /var/log/installer/cdebconf/templates.dat ?$$| /var/log/btmp ?$$| /tmp/file_source/.*|/.julia/.cache/.*| /var/lib/dpkg/info/.*| /var/lib/apt/lists/.*| /var/cache/.*'
+EXCLUDE='\.pyc ?$$|\.elc ?$$| /boot/swap[1500M]* ?$$| /boot/initrd.img-.*-generic ?$$| /boot/grub/i386-pc/.*\.mod ?$$| /var/log/installer/cdebconf/templates.dat ?$$| /var/lib/texmf/web2c/luatex/.*.fmt ?$$| /boot/grub/.*unicode.pf2 ?$$| /usr/lib/locale/locale-archive ?$$| /lib/modules/.*\.(alias|bin) ?$$| /lib/udev/hwdb.bin ?$$| /var/log/btmp ?$$| /tmp/file_source/.*|/.julia/.cache/.*| /var/lib/dpkg/info/.*| /var/lib/apt/lists/.*| /var/cache/.*'
 
 $(FS)/find.txt:
 	find / -xdev -printf "%CY-%Cm-%Cd %CH:%CM %T@ %M %7u %3n %7i  %p %l\n" | egrep -v $(EXCLUDE) > $@
@@ -42,9 +35,13 @@ $(FS)/git_repos.txt: $(FS)/find.txt
 
 $(FS)/files_to_backup.txt: $(FS)/git_repos.txt
 	src/backup_report.jl | sed 's/^.//' | sort > $@
+	test -r $@~ || cp -p $@ $@~
 
-$(FS)/full.tar: $(FS)/files_to_backup.txt
-	tar cf $@ -C / --files-from $<
+$(FS)/full.tar.gz: $(FS)/files_to_backup.txt
+	GZIP='--rsyncable' tar zcf $@ -C / --files-from $<
+	tar ztf $@ | diff -wu $< -
+	test -r $@~ || cp -p $@ $@~
+	ls -l $@*
 
 clean:
 	rm -rf $(FS)
