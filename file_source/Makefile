@@ -4,7 +4,7 @@ FS = $(FILE_SOURCE)
 
 PKGS = `cat $(FS)/pkgs.txt`
 
-all:  $(FS)/full.tar.gz
+all:  $(FS)/full.tar.gz $(FS)/du-xk.txt
 
 $(FS)/dpkg-l.txt:
 	mkdir -p $(FS)/pkg
@@ -23,14 +23,14 @@ $(FS)/du-xk.txt:
 
 EXCLUDE='\.pyc ?$$|\.elc ?$$| /boot/swap[1500M]* ?$$| /boot/initrd.img-.*-generic ?$$| /boot/grub/i386-pc/.*\.mod ?$$| /var/log/installer/cdebconf/templates.dat ?$$| /var/lib/texmf/web2c/luatex/.*.fmt ?$$| /boot/grub/.*unicode.pf2 ?$$| /usr/lib/locale/locale-archive ?$$| /lib/modules/.*\.(alias|bin) ?$$| /lib/udev/hwdb.bin ?$$| /var/log/btmp ?$$| /tmp/file_source/.*|/.julia/.cache/.*| /var/lib/dpkg/info/.*| /var/lib/apt/lists/.*| /var/cache/.*'
 
-$(FS)/find.txt:
+$(FS)/find.txt: $(FS)/pkgs.txt
 	find / -xdev -printf "%CY-%Cm-%Cd %CH:%CM %T@ %M %7u %3n %7i  %p %l\n" | egrep -v $(EXCLUDE) > $@
 	test -r $@~ || cp -p $@ $@~
 	for PKG in $(PKGS); do ./pkg_to_db.sh $(FS) $$PKG; done
 
 $(FS)/git_repos.txt: $(FS)/find.txt
 	cat $< | awk '/\/.git ?$$/ {print $$8}' | sed 's;/.git$$;;' > $@
-	./store_working_file_names.py $(FS) '[clean]'
+	@./store_working_file_names.py $(FS) '[clean]'
 	for REPO in `cat $@`; do ./store_working_file_names.py $(FS) $$REPO; done
 
 $(FS)/files_to_backup.txt: $(FS)/git_repos.txt
