@@ -9,6 +9,7 @@ all:  $(FS)/full.tar.gz $(FS)/du-xk.txt
 $(FS)/dpkg-l.txt:
 	mkdir -p $(FS)/pkg
 	dpkg -l | egrep '^ii ' > $(FS)/dpkg-l.txt
+	src/install_modules.jl
 
 # Suffixes like ':amd64' will not appear in pkgs.txt.
 $(FS)/pkgs.txt: $(FS)/dpkg-l.txt
