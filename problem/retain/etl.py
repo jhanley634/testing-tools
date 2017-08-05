@@ -33,14 +33,14 @@ Session = scoped_session(sessionmaker())
 
 class Order(Base):
     __tablename__ = 's_order'
-    order_date = Column('order_date', DATE())
-    category_name = Column('category_name', VARCHAR(length=80))
-    product_name = Column('product_name', VARCHAR(length=80))
-    order_sequence = Column('order_sequence', INTEGER())
-    revenue = Column('revenue', DECIMAL(precision=9, scale=2))
-    units = Column('units', INTEGER())
-    customer_id = Column('customer_id', INTEGER())
-    order_id = Column('order_id', INTEGER(), primary_key=True)
+    order_date = Column(DATE())
+    category_name = Column(VARCHAR(length=80))
+    product_name = Column(VARCHAR(length=80))
+    order_sequence = Column(INTEGER())
+    revenue = Column(DECIMAL(precision=9, scale=2))
+    units = Column(INTEGER())
+    customer_id = Column(INTEGER())
+    order_id = Column(INTEGER(), primary_key=True)
 
 
 def get_db_connection(section='retain', cfg_file='~/.db_cred.ini'):
@@ -52,7 +52,7 @@ def get_db_connection(section='retain', cfg_file='~/.db_cred.ini'):
     engine = sqlalchemy.create_engine(cs)  # at end, could engine.dispose()
     Session.remove()
     Session.configure(bind=engine, autoflush=False, expire_on_commit=False)
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)   # this would drop s_order
     Base.metadata.create_all(engine)
     return engine.connect(), engine, sqlalchemy.MetaData(bind=engine)
 
