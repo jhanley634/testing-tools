@@ -56,9 +56,15 @@ class Canvas:
         #             for y in self._range()])
 
     def __str__(self):
+
+        def wider(text):
+            for ch in text:
+                yield ch
+                # yield ch  # Optionally make aspect ratio twice as wide.
+
         def line(y):
-            return ''.join([self.grid[self._coord(x, y)]
-                            for x in self._range()])
+            return ''.join(wider([self.grid[self._coord(x, y)]
+                                  for x in self._range()]))
         return '\n'.join([line(-y)
                           for y in self._range()])
 
@@ -74,6 +80,18 @@ class Canvas:
         assert x < self.size, x
         assert y < self.size, y
         self.grid[self._coord(x, y)] = color
+
+    def is_in_bounds(self, x, y):
+        size = self.size
+        return (True
+                and -size < x < size
+                and -size < y < size)
+
+    def color_at(self, x, y):
+        return self.grid[self._coord(x, y)]
+
+    def is_empty(self, x, y):
+        return self.color_at(x, y) in Canvas.BG_INK
 
     def line(self, point0, point1, color='X'):
         '''Draw a line between two points.'''
@@ -102,6 +120,27 @@ class Canvas:
             assert im <= 1
             for i in range_(delta_y):
                 self.point(x0 + im * i, y0 + i, color)
+
+    def circle(self, center_point, r, color='c'):
+        '''https://en.wikipedia.org/wiki/Midpoint_circle_algorithm#C_example'''
+        x0, y0 = center_point
+        x = r - 1
+        y = 0
+        dx = dy = 1
+        err = dx - 2 * r
+
+        while x >= y:
+            for x_off, y_off in [(x, y), (y, x), (-y, x), (-x, y),
+                                 (-x, -y), (-y, -x), (y, -x), (x, -y)]:
+                self.point(x0 + x_off, y0 + y_off, color=color)
+            if err <= 0:
+                y += 1
+                err += dy
+                dy += 2
+            if err > 0:
+                x -= 1
+                dx += 2
+                err += -2 * r + dx
 
 
 def gcd(a, b):
@@ -132,7 +171,11 @@ class CanvasTest(unittest.TestCase):
         check(6, (24, 42.0))
 
     def test_canvas(self):
-        c = Canvas(6)
+        c = Canvas(6 + 12)
+        self.assertFalse(c.is_in_bounds(c.size, c.size))
+        self.assertTrue(c.is_in_bounds(0, 0))
+        self.assertTrue(c.is_empty(0, 0))
+        self.assertEqual('o', c.color_at(0, 0))
         self.assertEqual(0, c.num_points())
 
         c.line((0, 0), (0, -4), color='!')
@@ -146,6 +189,10 @@ class CanvasTest(unittest.TestCase):
 
         c.line((4, -4), (1, -1), color='\\')
         self.assertEqual(15, c.num_points())
+
+        for r in range(42):
+            c.circle((0, 0), 16 + r / 20.0)
+        self.assertEqual(339, c.num_points())
 
         with open('/tmp/canvas.txt', 'w') as fout:
             fout.write(str(c) + '\n')
