@@ -23,11 +23,12 @@ import glob
 import json
 import re
 import sys
+import time
 
 import sqlalchemy.ext.declarative
 from sqlalchemy import Table
 
-sys.path.append('.')
+# sys.path.append('.')
 import dbcred
 
 Base = sqlalchemy.ext.declarative.declarative_base()
@@ -40,7 +41,8 @@ def etl_many(files):
         assert m, file
         file_no = int(m.group(1))
         with open(file) as fin:
-            etl1(file_no, json.loads(fin.read()))
+            if file_no >= 19:
+                etl1(file_no, json.loads(fin.read()))
 
 
 def etl1(file_no, d, user='2002'):
@@ -62,7 +64,54 @@ def etl1(file_no, d, user='2002'):
     if end < start:
         assert end == 0, end  # Four trips exhibit this corrupted end time.
 
-    insert(file_no, d['tripPoints'])
+    insert(file_no, start, d['tripPoints'])
+
+
+def insert(file_no, start, points):
+    prev = '1970-01'  # Time began in Murray Hill, NJ in January 1970.
+    trip_point = Table('trip_point', META, autoload=True, autoload_with=ENGINE)
+    CONN.execute(trip_point.delete().where('file_no=%d' % file_no))
+    print('\n%d' % file_no)
+    n = 1
+    t0 = time.time()
+    expected = set('bearing edgeId lat lng'
+                   ' rpm speed timeStamp timeZone'.split())
+    for point in points:
+        assert expected == point.keys()
+        assert 0 == point['timeZone']
+        assert 0 <= point['bearing'] < 360, point['bearing']
+        assert 0 <= point['rpm'] < 4200
+        assert 0 <= point['speed'] < 600
+        stamp = iso8601(point['timeStamp'])
+        assert prev <= stamp  # Breadcrumb stamps are monotonic.
+        if prev == stamp:  # On trip 3 oversampling occurred just twice.
+            # Trip 3's elapsed: 1786.941, 1787.892, 1789.683, 1789.918
+            # Trip 5 has eight oversample events, but it's frequent on 4 & 12.
+            print('\nSuppressing closely spaced reading at', stamp)
+            continue  # Avoid trouble with unique index.
+        prev = stamp
+
+        print('.', end='')
+        sys.stdout.flush()
+        n += 1
+        CONN.execute(trip_point.insert().values(
+            file_no=file_no,
+            stamp=stamp,
+            elapsed=(point['timeStamp'] - start) / 1e3,
+            lng=point['lng'],
+            lat=point['lat'],
+            bearing=round10(point['bearing']),
+            edge_id=point['edgeId'],
+            rpm=point['rpm'],
+            speed=point['speed'],
+            ))
+    CONN.execute('commit')
+    tput = n / (time.time() - t0)
+    print('%.1f rows/sec' % tput)
+
+
+def ms_to_date(msec):
+    return datetime.datetime.utcfromtimestamp(msec / 1e3)
 
 
 def round10(n, k=10):
@@ -74,44 +123,6 @@ def iso8601(msec):
     return d.strftime('%Y-%m-%d %H:%M:%S')
 
 
-def insert(file_no, points):
-    stamp = 0
-    trip_point = Table('crumb_trip_point',
-                       META, autoload=True, autoload_with=ENGINE)
-    CONN.execute(trip_point.delete().where('file_no=%d' % file_no))
-    print('\n%d' % file_no)
-    expected = set('bearing edgeId lat lng'
-                   ' rpm speed timeStamp timeZone'.split())
-    for point in points:
-        assert expected == point.keys()
-        assert 0 == point['timeZone']
-        assert 0 <= point['rpm'] < 4200
-        assert 0 <= point['speed'] < 600
-        assert stamp < point['timeStamp']  # Breadcrumb stamps are monotonic.
-        stamp = point['timeStamp']
-
-        print('.', end='')
-        sys.stdout.flush()
-        CONN.execute(trip_point.insert().values(
-            file_no=file_no,
-            stamp=iso8601(stamp),
-            lng=point['lng'],
-            lat=point['lat'],
-            bearing=round10(point['bearing']),
-            edge_id=point['edgeId'],
-            rpm=point['rpm'],
-            speed=point['speed'],
-            ))
-    CONN.execute('commit')
-
-
-
-def ms_to_date(msec):
-    return datetime.datetime.utcfromtimestamp(msec / 1e3)
-
-
 if __name__ == '__main__':
     CONN, ENGINE, META = dbcred.get_cem('breadcrumb')
-    dbcred.SESSION.configure(bind=ENGINE, autoflush=False,
-                             expire_on_commit=False)
     etl_many(glob.glob('/tmp/2002/*.json'))

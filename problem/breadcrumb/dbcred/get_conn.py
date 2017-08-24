@@ -24,7 +24,7 @@ import sqlalchemy
 import sqlalchemy.orm
 
 SESSION = sqlalchemy.orm.scoped_session(
-          sqlalchemy.orm.sessionmaker())
+          sqlalchemy.orm.sessionmaker(autocommit=False))
 
 
 def get_cem(section, cfg_file='~/.db_cred.ini'):
@@ -38,7 +38,9 @@ def get_cem(section, cfg_file='~/.db_cred.ini'):
     params = [cfg[section][name]
               for name in 'user password server db'.split()]
     cs = 'mysql://%s:%s@%s/%s' % (tuple(params))  # JDBC connect string
-    engine = sqlalchemy.create_engine(cs)  # at end, could engine.dispose()
+    no_auto = {'autocommit': False}
+    engine = sqlalchemy.create_engine(
+        cs, execution_options=no_auto)  # at end, could engine.dispose()
     SESSION.remove()
     SESSION.configure(bind=engine, autoflush=False, expire_on_commit=False)
     return engine.connect(), engine, sqlalchemy.MetaData(bind=engine)

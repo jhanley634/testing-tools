@@ -17,16 +17,8 @@
 -- arising from, out of or in connection with the software or the use or
 -- other dealings in the software.
 
-drop table  if exists  trip_point;
-create table trip_point (
-  file_no  integer        not null,
-  stamp    timestamp      not null,
-  elapsed  decimal(10, 3) not null  comment 'seconds since tripStart',
-  lng      float          not null,
-  lat      float          not null,
-  bearing  decimal(5, 1)  not null,
-  edge_id  integer        not null,
-  rpm      integer        not null  comment 'never exceeds 4200',
-  speed    float          not null  comment 'm/s',
-  primary key (file_no, stamp)
-);
+drop view  if exists  tp;
+create view tp as
+  select  file_no, stamp, elapsed, lng, lat
+  from    trip_point
+;
