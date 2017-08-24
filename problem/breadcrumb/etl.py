@@ -22,17 +22,28 @@ import datetime
 import glob
 import json
 import re
+import sys
+
+import sqlalchemy.ext.declarative
+from sqlalchemy import Table
+
+sys.path.append('.')
+import dbcred
+
+Base = sqlalchemy.ext.declarative.declarative_base()
 
 
 def etl_many(files):
     '''Extract, transform, & load a collection of JSON files.'''
     for file in files:
-        assert file.endswith('.json'), file
+        m = re.search(r'(\d+)\.json$', file)
+        assert m, file
+        file_no = int(m.group(1))
         with open(file) as fin:
-            etl1(json.loads(fin.read()))
+            etl1(file_no, json.loads(fin.read()))
 
 
-def etl1(d, user='2002'):
+def etl1(file_no, d, user='2002'):
     '''Parse the input dictionary d.'''
     # print(json.dumps(d, sort_keys=True, indent=4))
     assert(d['userId'] == user)
@@ -41,22 +52,34 @@ def etl1(d, user='2002'):
                       for k in 'tripStart tripEnd tripId'.split()]
     assert 0 <= start - id < 80, start - id  # id is assigned within 80 msec
 
-    two_sec = 2 * 1e3
     six_sec = 6 * 1e3
     assert 0 < d['tripPoints'][0]['timeStamp'] - start < six_sec
     if end != 0:
-        assert 0 < end - d['tripPoints'][-1]['timeStamp'] < two_sec
+        assert 0 < end - d['tripPoints'][-1]['timeStamp'] < six_sec
 
     longest_journey = 6 * 3600 * 1000  # six hours
     assert end - start < longest_journey, end - start
     if end < start:
         assert end == 0, end  # Four trips exhibit this corrupted end time.
 
-    parse(d['tripPoints'])
+    insert(file_no, d['tripPoints'])
 
 
-def parse(points):
+def round10(n, k=10):
+    return float(round(n * k)) / k
+
+
+def iso8601(msec):
+    d = datetime.datetime.utcfromtimestamp(msec / 1e3)
+    return d.strftime('%Y-%m-%d %H:%M:%S')
+
+
+def insert(file_no, points):
     stamp = 0
+    trip_point = Table('crumb_trip_point',
+                       META, autoload=True, autoload_with=ENGINE)
+    CONN.execute(trip_point.delete().where('file_no=%d' % file_no))
+    print('\n%d' % file_no)
     expected = set('bearing edgeId lat lng'
                    ' rpm speed timeStamp timeZone'.split())
     for point in points:
@@ -67,10 +90,28 @@ def parse(points):
         assert stamp < point['timeStamp']  # Breadcrumb stamps are monotonic.
         stamp = point['timeStamp']
 
+        print('.', end='')
+        sys.stdout.flush()
+        CONN.execute(trip_point.insert().values(
+            file_no=file_no,
+            stamp=iso8601(stamp),
+            lng=point['lng'],
+            lat=point['lat'],
+            bearing=round10(point['bearing']),
+            edge_id=point['edgeId'],
+            rpm=point['rpm'],
+            speed=point['speed'],
+            ))
+    CONN.execute('commit')
+
+
 
 def ms_to_date(msec):
     return datetime.datetime.utcfromtimestamp(msec / 1e3)
 
 
 if __name__ == '__main__':
+    CONN, ENGINE, META = dbcred.get_cem('breadcrumb')
+    dbcred.SESSION.configure(bind=ENGINE, autoflush=False,
+                             expire_on_commit=False)
     etl_many(glob.glob('/tmp/2002/*.json'))
