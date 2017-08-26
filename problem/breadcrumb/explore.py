@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # Copyright 2017 John Hanley.
 #
@@ -22,7 +22,7 @@ import os
 import sys
 import unittest
 
-import mapnik  # brew install mapnik; pip install mapnik2
+import mapnik
 import simplekml
 
 import dbcred
