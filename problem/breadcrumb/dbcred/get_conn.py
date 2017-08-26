@@ -35,6 +35,7 @@ def get_cem(section, cfg_file='~/.db_cred.ini'):
     '''
     cfg = configparser.ConfigParser()
     cfg.read(os.path.expanduser(cfg_file))
+    assert cfg[section]  # Give an informative diagnostic if it doesn't exist.
     params = [cfg[section][name]
               for name in 'user password server db'.split()]
     cs = 'mysql://%s:%s@%s/%s' % (tuple(params))  # JDBC connect string

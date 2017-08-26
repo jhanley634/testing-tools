@@ -55,5 +55,7 @@ def make_world_map():  # Well, hello, world! Pleased to meet you.
 
 
 if __name__ == '__main__':
+    # DatasourceCache plugins:
+    #   csv gdal geojson ogr pgraster postgis raster shape sqlite topojson
     os.chdir('/tmp')
     make_world_map()

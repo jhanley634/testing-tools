@@ -2,6 +2,8 @@
 OUT = \
  TAGS \
  /tmp/ne_110m_admin_0_countries.shp \
+ /tmp/california-latest.osm.pbf \
+
 
 all: $(OUT)
 
@@ -12,6 +14,7 @@ TAGS:
 etl:
 	cat schema.sql views.sql | mysql -v -p breadcrumb
 	./etl.py
+	psql osm -c 'create extension postgis;'
 
 DATA_DIR = https://github.com/mapnik/mapnik/wiki/data/
 
@@ -21,6 +24,11 @@ DATA_DIR = https://github.com/mapnik/mapnik/wiki/data/
 
 /tmp/ne_110m_admin_0_countries.shp:  /tmp/110m-admin-0-countries.zip
 	cd /tmp && time unzip -u $<
+
+FABRIK_US = http://download.geofabrik.de/north-america/us/
+
+%.pbf:
+	cp -p $@~ $@ || wget -nv -O $@ $(FABRIK_US)$(notdir $@)
 
 clean:
 	rm -rf $(OUT) dbcred/__pycache__/

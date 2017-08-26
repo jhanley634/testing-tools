@@ -81,6 +81,7 @@ def result_single_row(query):
         ret = row
     return ret
 
+
 def to_mph(meter_per_sec):
     return meter_per_sec * 2.236936
 
