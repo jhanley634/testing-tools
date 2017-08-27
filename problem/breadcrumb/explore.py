@@ -19,10 +19,8 @@
 # other dealings in the software.
 
 import os
-import sys
 import unittest
 
-import mapnik
 import simplekml
 
 import dbcred

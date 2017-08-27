@@ -20,7 +20,6 @@
 
 from sqlalchemy import Table
 import matplotlib.pyplot as plt
-import numpy as np
 import os
 
 import dbcred
@@ -33,39 +32,48 @@ def get_one(i, coords):
 
 
 def get_x(coords):
-    return list(get_one(0, coords))
+    return [x for x in get_one(0, coords)]
 
 
 def get_y(coords):
-    return [y for y in get_one(1, coords)]
+    return list(get_one(1, coords))
 
 
-def markup_peninsula_map(sess):
+def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
+    '''Pass in DB session, and center coords of map.'''
 
     img = plt.imread('topoquest-peninsula.jpg')
-    left, top = willow_101 = -122.156, 37.471  # the Willow / 101 interchange
-    right, bottom = pruneyard_17 = -121.918, 37.285
+    # Deltas are valid for 1280 sq px map, at 32m/px, near San Jose.
+    left, top = c_lng - d_lng, c_lat + d_lat
+    right, bottom = c_lng + d_lng, c_lat - d_lat
     bias = 0
     # bias = 100  # This conveniently suppresses scientific notation on x-axis.
     extent = (bias + left, bias + right, bottom, top)
     fig, ax = plt.subplots()
-    ax.imshow(img, alpha=0.2, extent=extent)
+    ax.imshow(img, alpha=0.3, extent=extent)
 
     crumbs = set()  # This will suppress duplicates.
     tp = Table('trip_point_local_journey',
                META, autoload=True, autoload_with=ENGINE)
-    for row in sess.query(tp).filter(tp.c.file_no < 77):
-        crumbs.add((row.lng, row.lat))
-    ax.scatter(get_x(crumbs), get_y(crumbs), linewidth=1, color='darkblue')
+    file_nos = [file_no
+                for file_no, in sess.query('distinct file_no from %s' % tp)]
+    for file_no in sorted(file_nos):
+        for row in sess.query(tp).filter(tp.c.file_no < file_no):
+            if left < row.lng < right and bottom < row.lat < top:  # in bbox
+                crumbs.add((row.lng, row.lat))
+        crumbs = sorted(crumbs)
+        ax.scatter(get_x(crumbs), get_y(crumbs), linewidth=1, color='darkblue')
 
-    plt.show()
+        print(file_no)
+        if (file_no % 5 == 0):
+            plt.show()
 
 
 if __name__ == '__main__':
     CONN, ENGINE, META = dbcred.get_cem('breadcrumb')
     os.chdir('/tmp')
-    # http://bit.ly/2wSVY4K
-    # https://www.topoquest.com/map.php?lat=37.37826&lon=-122.04088
-    # USGS Map Name:  Mountain View, CA    Map MRC: 37122D1
-    # Map Center:  N37.37826°  W122.04088°    Datum: NAD27    Zoom: 16m/pixel
-    markup_peninsula_map(dbcred.SESSION)
+    # http://bit.ly/2vtB20t
+    # https://www.topoquest.com/map.php?lat=37.35236&lon=-122.01234&datum=nad83
+    # USGS Map Name:  Cupertino, CA    Map MRC: 37122C1
+    # Map Center:  N37.35236°  W122.01234°    Datum: NAD83    Zoom: 32m/pixel
+    markup_peninsula_map(dbcred.SESSION, -122.012, 37.352)
