@@ -21,8 +21,22 @@
 from sqlalchemy import Table
 import matplotlib.pyplot as plt
 import os
+import sys
 
 import dbcred
+
+
+def cities():
+    '''Returns some south-bay landmarks. Coordinates come from wikipedia.'''
+    return [
+        (-122.0819, 37.389444),  # Mountain View
+        (-122.0375, 37.371111),  # Sunnyvale
+        (-121.9692, 37.354444),  # Santa Clara
+        (-121.9000, 37.333333),  # San Jose
+        (-121.8167, 37.303095),  # 101 & El Camino in S.J.
+        (-121.8950, 37.434722),  # Milpitas
+        (-121.9617, 37.236111),  # Los Gatos
+        ]
 
 
 def get_one(i, coords):
@@ -32,11 +46,16 @@ def get_one(i, coords):
 
 
 def get_x(coords):
-    return [x for x in get_one(0, coords)]
+    return list(get_one(0, coords))
 
 
 def get_y(coords):
     return list(get_one(1, coords))
+
+
+def approx(n, k=400):
+    '''Returns approximately n, that is, discretized to coarser resolution.'''
+    return round(n * k) / k
 
 
 def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
@@ -46,27 +65,35 @@ def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
     # Deltas are valid for 1280 sq px map, at 32m/px, near San Jose.
     left, top = c_lng - d_lng, c_lat + d_lat
     right, bottom = c_lng + d_lng, c_lat - d_lat
-    bias = 0
-    # bias = 100  # This conveniently suppresses scientific notation on x-axis.
-    extent = (bias + left, bias + right, bottom, top)
-    fig, ax = plt.subplots()
-    ax.imshow(img, alpha=0.3, extent=extent)
+    extent = (left, right, bottom, top)
 
-    crumbs = set()  # This will suppress duplicates.
     tp = Table('trip_point_local_journey',
                META, autoload=True, autoload_with=ENGINE)
     file_nos = [file_no
                 for file_no, in sess.query('distinct file_no from %s' % tp)]
     for file_no in sorted(file_nos):
-        for row in sess.query(tp).filter(tp.c.file_no < file_no):
+        print(file_no, end=', ')
+        sys.stdout.flush()
+        first = last = None
+        crumbs = set()  # This will suppress duplicates.
+        for row in sess.query(tp).filter(tp.c.file_no == file_no):
             if left < row.lng < right and bottom < row.lat < top:  # in bbox
-                crumbs.add((row.lng, row.lat))
+                crumb = approx(row.lng), approx(row.lat)
+                crumbs.add(crumb)
+                if first is None:
+                    first = crumb
+                last = crumb
         crumbs = sorted(crumbs)
-        ax.scatter(get_x(crumbs), get_y(crumbs), linewidth=1, color='darkblue')
-
-        print(file_no)
-        if (file_no % 5 == 0):
-            plt.show()
+        fig, ax = plt.subplots()
+        ax.imshow(img, alpha=0.3, extent=extent)
+        ax.scatter(get_x(crumbs), get_y(crumbs), marker='.', color='darkblue')
+        ax.scatter(get_x(cities()), get_y(cities()), color='green')
+        if first:
+            ax.scatter(first[0], first[1], marker='s', color='lime')
+            ax.scatter(last[0], last[1], marker='x', color='red')
+        ax.ticklabel_format(useOffset=False)  # suppress scientific notation
+        plt.savefig('trip_%03d.pdf' % file_no)
+        plt.close()
 
 
 if __name__ == '__main__':

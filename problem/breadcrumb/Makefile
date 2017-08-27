@@ -16,6 +16,9 @@ etl:
 	./etl.py
 	psql osm -c 'create extension postgis;'
 
+/tmp/all_trips.pdf: /tmp/trip_001.pdf
+	pdftk /tmp/trip_*.pdf cat output $@
+
 DATA_DIR = https://github.com/mapnik/mapnik/wiki/data/
 
 %.zip:
