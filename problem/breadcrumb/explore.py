@@ -30,7 +30,7 @@ import dbcred
 
 def explore():
     # from https://stackoverflow.com/questions/15691525/mapnik-example
-    bbox = [37.2, 37.6, -122.5, -121.7]
+    bbox = [37.2, 37.6, -122.7, -121.5]
     coords = [(bbox[i], bbox[j])
               for i, j in [(0, 2), (0, 3), (1, 2), (1, 3)]]
     kml = simplekml.Kml()

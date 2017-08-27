@@ -29,6 +29,7 @@ FABRIK_US = http://download.geofabrik.de/north-america/us/
 
 %.pbf:
 	cp -p $@~ $@ || wget -nv -O $@ $(FABRIK_US)$(notdir $@)
+	@echo osm2pgsql -cGs -d osm -S /usr/share/osm2pgsql/default.style $@
 
 clean:
 	rm -rf $(OUT) dbcred/__pycache__/
