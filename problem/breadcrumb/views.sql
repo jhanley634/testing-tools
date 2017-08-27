@@ -22,3 +22,12 @@ create view tp as
   select  file_no, stamp, elapsed, lng, lat
   from    trip_point
 ;
+
+
+-- This elides a few road trips, e.g. down I-5.
+drop view  if exists  trip_point_local_journey;
+create view trip_point_local_journey as
+  select  file_no, stamp, elapsed, lng, lat
+  from    trip_point
+  where   not file_no in (38, 77, 93, 89)
+;

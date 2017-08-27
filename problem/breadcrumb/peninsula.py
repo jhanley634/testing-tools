@@ -18,27 +18,54 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from sqlalchemy import Table
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 
+import dbcred
 
-def markup_peninsula_map():
+
+def get_one(i, coords):
+    # Project a sequence of number pairs down to just a sequence of numbers.
+    for coord in coords:
+        yield coord[i]
+
+
+def get_x(coords):
+    return list(get_one(0, coords))
+
+
+def get_y(coords):
+    return [y for y in get_one(1, coords)]
+
+
+def markup_peninsula_map(sess):
 
     img = plt.imread('topoquest-peninsula.jpg')
-    willow_101 = -122.156, 37.471  # the Willow / 101 interchange
-    pruneyard_17 = -121.918, 37.285
-    extent = (100 + willow_101[0], 100 + pruneyard_17[0],
-              pruneyard_17[1], willow_101[1])
+    left, top = willow_101 = -122.156, 37.471  # the Willow / 101 interchange
+    right, bottom = pruneyard_17 = -121.918, 37.285
+    bias = 0
+    # bias = 100  # This conveniently suppresses scientific notation on x-axis.
+    extent = (bias + left, bias + right, bottom, top)
     fig, ax = plt.subplots()
-    ax.imshow(img, extent=extent)
-    print(fig, ax)
+    ax.imshow(img, alpha=0.2, extent=extent)
+
+    crumbs = set()  # This will suppress duplicates.
+    tp = Table('trip_point_local_journey',
+               META, autoload=True, autoload_with=ENGINE)
+    for row in sess.query(tp).filter(tp.c.file_no < 77):
+        crumbs.add((row.lng, row.lat))
+    ax.scatter(get_x(crumbs), get_y(crumbs), linewidth=1, color='darkblue')
+
     plt.show()
 
 
 if __name__ == '__main__':
+    CONN, ENGINE, META = dbcred.get_cem('breadcrumb')
     os.chdir('/tmp')
     # http://bit.ly/2wSVY4K
     # https://www.topoquest.com/map.php?lat=37.37826&lon=-122.04088
     # USGS Map Name:  Mountain View, CA    Map MRC: 37122D1
     # Map Center:  N37.37826°  W122.04088°    Datum: NAD27    Zoom: 16m/pixel
-    markup_peninsula_map()
+    markup_peninsula_map(dbcred.SESSION)
