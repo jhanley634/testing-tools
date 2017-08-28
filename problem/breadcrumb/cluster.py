@@ -45,6 +45,8 @@ def cluster(df, k=2, verbose=False,
             bottom=37.166, y_size=.372):
     '''Pass in a trip_summary dataframe and desired # of clusters.'''
 
+    places = []  # trip sources, or destinations
+
     for i, row in df.iterrows():
         places.append((row.end_lng, row.end_lat))
 
@@ -92,5 +94,4 @@ def cluster(df, k=2, verbose=False,
 
 if __name__ == '__main__':
     os.chdir('/tmp')
-    places = []  # trip sources, or destinations
     cluster(pandas.read_csv('trip_summary.csv'))
