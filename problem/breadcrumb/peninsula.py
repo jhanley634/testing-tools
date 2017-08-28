@@ -19,8 +19,12 @@
 # other dealings in the software.
 
 from sqlalchemy import Table
+import collections
+import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+import numpy as np
 import os
+import pandas
 import sys
 
 import dbcred
@@ -66,12 +70,15 @@ def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
     left, top = c_lng - d_lng, c_lat + d_lat
     right, bottom = c_lng + d_lng, c_lat - d_lat
     extent = (left, right, bottom, top)
+    heat = collections.defaultdict(int)
 
     tp = Table('trip_point_local_journey',
                META, autoload=True, autoload_with=ENGINE)
     file_nos = [file_no
                 for file_no, in sess.query('distinct file_no from %s' % tp)]
     for file_no in sorted(file_nos):
+        if file_no > 100:
+            continue
         print(file_no, end=', ')
         sys.stdout.flush()
         first = last = None
@@ -93,7 +100,40 @@ def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
             ax.scatter(last[0], last[1], marker='x', color='red')
         ax.ticklabel_format(useOffset=False)  # suppress scientific notation
         plt.savefig('trip_%03d.pdf' % file_no)
+        plt.savefig('trip_%03d.png' % file_no)
         plt.close()
+        for crumb in crumbs:
+            heat[crumb] += 1
+    heatmap(heat, left, right - left, bottom, top - bottom)
+
+
+def heatmap(heat, left, x_size, bottom, y_size, k=300, floor=3):
+    # based on https://stackoverflow.com/questions/2369492/generate-a-heatmap
+    X, Y = np.meshgrid(np.linspace(left, left + x_size, k),
+                       np.linspace(bottom, bottom + y_size, k))
+    Z = np.zeros((k, k))
+
+    bright = max(heat.values())
+    for lng, lat in cities():
+        heat[(approx(lng), approx(lat))] = -1
+
+    for (lng, lat), count in heat.items():
+        lng -= left
+        lat -= bottom
+        count = -bright if count < 0 else max(count, floor)
+        Z[int(lat * k / y_size),
+          int(lng * k / x_size)] = count
+    plt.subplot(111)
+    plt.hexbin(X.ravel(),
+               Y.ravel(),
+               C=Z.ravel(),
+               gridsize=60, cmap=cm.cool, bins=None)
+    plt.axis([X.min(), X.max(), Y.min(), Y.max()])
+    cb = plt.colorbar()
+    cb.set_label('grid counts')
+    plt.ticklabel_format(useOffset=False)
+    plt.savefig('heatmap_of_trips.pdf')
+    plt.savefig('heatmap_of_trips.png')
 
 
 if __name__ == '__main__':
