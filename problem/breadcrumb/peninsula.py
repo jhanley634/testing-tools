@@ -20,11 +20,12 @@
 
 from sqlalchemy import Table
 import collections
+import csv
+import datetime
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import pandas
 import sys
 
 import dbcred
@@ -62,8 +63,25 @@ def approx(n, k=400):
     return round(n * k) / k
 
 
-def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
-    '''Pass in DB session, and center coords of map.'''
+def round10(n, k=10):
+    '''Round to 1/10ths.'''
+    return approx(n, k)
+
+
+def dow(stamp):
+    '''Day of Week, returns 0..6 for Sun..Sat.'''
+    return int(stamp.strftime('%w'))
+
+
+def hour_of_day(stamp):
+    return int(stamp.strftime('%H'))  # 0..23
+
+
+def markup_peninsula_map(sess, wr, c_lng, c_lat, d_lng=.238, d_lat=.186):
+    '''Pass in DB session, CSV writer, and center coords of map.'''
+
+    wr.writerow('file_no dow hour_of_day elapsed'
+                ' start_lng start_lat end_lng end_lat'.split())
 
     img = plt.imread('topoquest-peninsula.jpg')
     # Deltas are valid for 1280 sq px map, at 32m/px, near San Jose.
@@ -81,6 +99,7 @@ def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
             continue
         print(file_no, end=', ')
         sys.stdout.flush()
+        elapsed = 0
         first = last = None
         crumbs = set()  # This will suppress duplicates.
         for row in sess.query(tp).filter(tp.c.file_no == file_no):
@@ -90,12 +109,18 @@ def markup_peninsula_map(sess, c_lng, c_lat, d_lng=.238, d_lat=.186):
                 if first is None:
                     first = crumb
                 last = crumb
+                elapsed = max(elapsed, row.elapsed)
+
         crumbs = sorted(crumbs)
         fig, ax = plt.subplots()
         ax.imshow(img, alpha=0.3, extent=extent)
         ax.scatter(get_x(crumbs), get_y(crumbs), marker='.', color='darkblue')
         ax.scatter(get_x(cities()), get_y(cities()), color='green')
         if first:
+            stmp = datetime.datetime.utcfromtimestamp(row.stamp.timestamp())
+            wr.writerow([file_no,
+                         dow(stmp), hour_of_day(stmp), round10(elapsed),
+                         first[0], first[1], last[0], last[1]])
             ax.scatter(first[0], first[1], marker='s', color='lime')
             ax.scatter(last[0], last[1], marker='x', color='red')
         ax.ticklabel_format(useOffset=False)  # suppress scientific notation
@@ -143,4 +168,7 @@ if __name__ == '__main__':
     # https://www.topoquest.com/map.php?lat=37.35236&lon=-122.01234&datum=nad83
     # USGS Map Name:  Cupertino, CA    Map MRC: 37122C1
     # Map Center:  N37.35236°  W122.01234°    Datum: NAD83    Zoom: 32m/pixel
-    markup_peninsula_map(dbcred.SESSION, -122.012, 37.352)
+    with open('trip_summary.csv', 'w') as csvfile:
+        markup_peninsula_map(
+            dbcred.SESSION, csv.writer(csvfile, quoting=csv.QUOTE_MINIMAL),
+            -122.012, 37.352)
