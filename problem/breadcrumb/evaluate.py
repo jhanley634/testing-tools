@@ -58,6 +58,7 @@ def evaluate(df, verbose=False):
         pandas.Series(predictions, name='Predicted'))
     print('')
     print(df_confusion)
+    print(df_confusion / df_confusion.sum(axis=1))
 
 
 if __name__ == '__main__':
