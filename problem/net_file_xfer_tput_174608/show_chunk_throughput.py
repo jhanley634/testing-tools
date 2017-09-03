@@ -50,7 +50,7 @@ def hms(stamp):
 
 
 def get_chunks(url='https://pastebin.com/ehncSeqD'):
-    chunk_re = re.compile(r'^(\d{2}:\d{2}:\d{2})\s+.\s+Chunk (\d+) of (\d+)')
+    chunk_re = re.compile(r'^(\d{2}:\d{2}:\d{2}) - Chunk (\d+) of (\d+)')
     for line in get_cached_pastebin_text(url):
         m = chunk_re.search(line)
         if m:
