@@ -19,9 +19,11 @@
 # other dealings in the software.
 
 from bs4 import BeautifulSoup
+import collections
 import datetime
 import matplotlib.pyplot as plt
 import os
+import pprint
 import re
 import requests
 
@@ -70,18 +72,33 @@ def get_progress(chunk_size, url='https://pastebin.com/ehncSeqD'):
                   cur_chunk * chunk_size + int(m.group(2)))
 
 
+def delete_singletons(d, thresh=2):
+    '''Given a dictionary of counts, suppresses counts below some threshold.'''
+    return {k: v
+            for k, v in d.items()
+            if v >= thresh}
+
+
 def plot_tput(chunk_size=2e5, verbose=False):
     prog = {}  # maps elapsed time to download progress (in bytes)
+    size_hist = collections.defaultdict(int)  # histogram, maps pkt size to cnt
+    prev_bytes = 0
     start = None
     for stamp, bytes in get_progress(int(chunk_size)):
         if start:
             elapsed = int((stamp - start).total_seconds())
             # With limited resolution (1sec) timestamps, last measurement wins.
             prog[elapsed] = bytes
+            size = bytes - prev_bytes
+            prev_bytes = bytes
+            size_hist[size] += 1
             if verbose:
-                print(elapsed, bytes)
+                print(elapsed, size, bytes)
         else:
             start = stamp
+
+    print('pkt_size: count')
+    pprint.pprint(delete_singletons(size_hist))
 
     x = [p[0] for p in prog.items()]
     y = [p[1] / 1024.0 for p in prog.items()]  # total KBytes downloaded so far
