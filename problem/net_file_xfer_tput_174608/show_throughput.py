@@ -59,7 +59,7 @@ def get_chunks(url='https://pastebin.com/ehncSeqD'):
                    int(m.group(3)))
 
 
-def show_tput(chunk_size=2e4):
+def show_tput(chunk_size=2e5):
     sentinel = hms('00:00:00')
     prev = sentinel
     for stamp, i, _ in get_chunks():
