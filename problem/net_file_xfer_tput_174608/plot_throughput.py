@@ -99,6 +99,7 @@ def plot_tput(chunk_size=2e5, verbose=False):
 
     print('pkt_size: count')
     pprint.pprint(delete_singletons(size_hist))
+    print('\nThroughput is %.1f bytes / sec.' % (bytes / elapsed))
 
     x = [p[0] for p in prog.items()]
     y = [p[1] / 1024.0 for p in prog.items()]  # total KBytes downloaded so far
