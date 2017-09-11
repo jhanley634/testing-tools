@@ -34,14 +34,14 @@ import dbcred
 def cities():
     '''Returns some south-bay landmarks. Coordinates come from wikipedia.'''
     return [
-        (-122.0819, 37.389444),  # Mountain View
-        (-122.0375, 37.371111),  # Sunnyvale
-        (-121.9692, 37.354444),  # Santa Clara
-        (-121.9000, 37.333333),  # San Jose
-        (-121.8167, 37.303095),  # 101 & El Camino in S.J.
-        (-121.8950, 37.434722),  # Milpitas
-        (-121.9617, 37.236111),  # Los Gatos
-        ]
+        (-122.0819, 37.38944),  # Mountain View
+        (-122.0375, 37.37111),  # Sunnyvale
+        (-121.9692, 37.35444),  # Santa Clara
+        (-121.9000, 37.33333),  # San Jose
+        (-121.8167, 37.30310),  # 101 & El Camino in S.J.
+        (-121.8950, 37.43472),  # Milpitas
+        (-121.9617, 37.23611),  # Los Gatos
+    ]
 
 
 def get_one(i, coords):

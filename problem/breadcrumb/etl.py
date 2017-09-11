@@ -104,7 +104,7 @@ def insert(file_no, start, points):
             edge_id=point['edgeId'],
             rpm=point['rpm'],
             speed=point['speed'],
-            ))
+        ))
     CONN.execute('commit')
     tput = n / (time.time() - t0)
     print('%.1f rows/sec' % tput)

@@ -45,7 +45,7 @@ class ExploreGpsBreadcrumbsTest(unittest.TestCase):
         # Though trip 89 was most extensive, trips 55 & 59 were longer.
         for extreme, dimension in [
                 ('min', 'lng'), ('max', 'lng'), ('min', 'lat'), ('max', 'lat'),
-                ]:
+        ]:
             query = ('select round(%s(%s), 1)  from trip_point  where'
                      ' not file_no in %s' % (extreme, dimension, road_trips))
             self.assertIn(result1(query), [-122.4, -121.8, 37.3, 37.5])
