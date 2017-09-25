@@ -30,7 +30,6 @@ class PermutationsTest(unittest.TestCase):
 
     def test_size(self):
         word = 'abcdefghij'
-        word = 'abcdef'
         for i in range(1, len(word)):
             self.assertEqual(factorial(i), len(list(permutations(word[:i]))))
             self.assertEqual(2 ** i, len(powerset(word[:i])))
