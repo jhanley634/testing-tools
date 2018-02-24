@@ -23,10 +23,41 @@
 Suitable for rapidly locating a user input search term in a corpus,
 as the user may type just a short prefix.
 """
+import collections
+import random
 import unittest
 
 
+class OrderedSet:
+    """Feeding pre-sorted input data to an OrderedSet may reduce sort() work.
+    """
+
+    def __init__(self, iterable):
+        self.d = collections.OrderedDict()
+        for item in iterable:
+            self.d[item] = 1
+
+    def __iter__(self):
+        return iter(self.d.keys())
+
+
+def _verify_strictly_increasing(haystack):
+    """Haystack items shall be strictly increasing - no dups."""
+    for i in range(len(haystack) - 1):
+        assert haystack[i] < haystack[i + 1], (i, haystack[i])
+
+
+def _verify_monotonic(haystack):
+    """Haystack items shall be non-descending. Dups are OK."""
+    prev = haystack[0]
+    for item in haystack:
+        assert item >= prev, item
+        prev = item
+
+
 def _find_match_linear(needle, sorted_haystack):  # Slow, but correct.
+    # If haystack contains dups, only 1st occurrence will be accessible.
+    _verify_monotonic(sorted_haystack)
     for i, entry in enumerate(sorted_haystack):
         if entry >= needle:
             if (len(entry) >= len(needle)
@@ -44,6 +75,8 @@ def find_match(needle, sorted_haystack, lo=0, hi=None):
     or if it is the smallest (first) entry for which needle is a prefix.
     """
     haystack = sorted_haystack
+    _verify_strictly_increasing(haystack)
+
     i = find_exact_match(needle, haystack)
     assert 0 <= i < len(haystack), i
     entry = haystack[i]
@@ -79,7 +112,7 @@ def find_exact_match(needle, sorted_haystack, lo=0, hi=None):
 class BinarySearchTest(unittest.TestCase):
 
     def setUp(self):
-        self.haystack = sorted(self.get_chaff())
+        self.haystack = sorted(OrderedSet(self.get_chaff()))
 
     def get_chaff(self, max_length=6, infile='/usr/share/dict/words'):
         # get_hay(?)
@@ -89,6 +122,20 @@ class BinarySearchTest(unittest.TestCase):
                 word = line.rstrip()
                 if len(word) <= max_length:
                     yield word.lower()
+
+    def test_dups_ok(self):
+        hstack = 'ape bat cat cat cat dog'.split()
+        self.assertEqual(0, _find_match_linear('', hstack))
+        self.assertEqual(0, _find_match_linear('a', hstack))
+        self.assertIsNone(_find_match_linear('aardvark', hstack))
+        self.assertEqual(2, _find_match_linear('cat', hstack))
+        self.assertEqual(5, _find_match_linear('dog', hstack))
+        self.assertIsNone(_find_match_linear('elephant', hstack))
+
+    def test_dups_not_allowed(self):
+        hstack = 'ape bat cat cat cat dog'.split()
+        with self.assertRaises(AssertionError):
+            find_match('bat', hstack)
 
     def test_linear_search(self):
         self.assertEqual(640, BinarySearchTest.maxDiff)
@@ -101,7 +148,7 @@ class BinarySearchTest(unittest.TestCase):
         #         print(word)
         #     seen.add(word)
 
-        self.assertGreaterEqual(len(self.haystack), 34000)
+        self.assertGreaterEqual(len(self.haystack), 33000)
 
         self.assertNotIn('yuc', self.haystack)
         self.assertIn('yuck', self.haystack)
@@ -109,37 +156,65 @@ class BinarySearchTest(unittest.TestCase):
         self.assertNotIn('yuckz', self.haystack)
 
         i = _find_match_linear('yuc', self.haystack)
-        self.assertEqual(34574, i)
+        self.assertEqual(33625, i)
         self.assertEqual('yuca', self.haystack[i])
 
         i = _find_match_linear('yuck', self.haystack)
-        self.assertEqual(34578, i)
+        self.assertEqual(33628, i)
         self.assertEqual('yuck', self.haystack[i])
 
         self.assertIsNone(_find_match_linear('yuckz', self.haystack))
 
     def test_binary_exact_search(self):
+
+        self.assertEqual(0, find_exact_match('', self.haystack))
+        self.assertEqual(0, find_exact_match('7', self.haystack))
+        self.assertEqual('a', self.haystack[0])
+
+        i = find_exact_match('conf', self.haystack)
+        self.assertEqual('cone coned coneen coner cones confab',
+                         ' '.join(self.haystack[i - 4 : i + 2]))
+        self.assertEqual(6521, i)
+
         i = find_exact_match('yuc', self.haystack)
         self.assertEqual('yuca', self.haystack[i + 1])
-        self.assertEqual(34573, i)
+        self.assertEqual(33624, i)
 
         i = find_exact_match('yuck', self.haystack)
         self.assertEqual('yuck', self.haystack[i])
-        self.assertEqual(34578, i)
+        self.assertEqual(33628, i)
 
         i = find_exact_match('yuckz', self.haystack)
         self.assertEqual('yucky', self.haystack[i])
         self.assertEqual('yuechi', self.haystack[i + 1])
-        self.assertEqual(34582, i)
+        self.assertEqual(33632, i)
+
+        i = find_exact_match('~', self.haystack)
+        self.assertEqual('zythum', self.haystack[i])
+        self.assertEqual(len(self.haystack) - 1, i)
 
     def test_binary_search(self):
         self.assertIsNone(find_match('yuc', self.haystack))
 
         i = find_match('yuck', self.haystack)
         self.assertEqual('yuck', self.haystack[i])
-        self.assertEqual(34578, i)
+        self.assertEqual(33628, i)
 
         self.assertIsNone(find_match('yuckz', self.haystack))
+
+    def test_many_binary_search_terms(self):
+        random.seed(42)
+        for _ in range(100):
+            i = random.randrange(len(self.haystack))
+            needle = self.haystack[i].lower()
+            self.assertEqual(i, find_match(needle, self.haystack))
+            self.assertIsNone(find_match(needle + 'xyzzy', self.haystack))
+
+            while len(needle) > 0:
+                j = find_exact_match(needle, self.haystack)
+                self.assertLessEqual(j, i)
+                i = j
+                needle = needle[:-1]
 
 
 if __name__ == '__main__':
