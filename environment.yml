@@ -1,0 +1,10 @@
+name: testing-tools
+channels:
+- defaults
+- conda-forge
+dependencies:
+- requests
+- sqlalchemy
+- pip:
+  - sqlacodegen
+  - uszipcode

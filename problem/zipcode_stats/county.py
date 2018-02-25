@@ -20,19 +20,94 @@
 
 """Finds demographic statistics based on zipcode.
 """
+import io
+import os
 import unittest
+import zipfile
 
+import requests
+import sqlalchemy
+import sqlalchemy.engine.url
+import sqlalchemy.exc
 import uszipcode
+
+# from places_table import t_places
+import place_table
 
 
 class ZipcodeStats:
 
-    def __init__(self):
+    def __init__(self, places_mgr=None):
+        if places_mgr is None:
+            places_mgr = Places2kMgr()
+        self.places_mgr = places_mgr
         self.zse = uszipcode.ZipcodeSearchEngine()
 
     def get_city_state(self, zipcode):
         r = self.zse.by_zipcode(zipcode)
         return '{} {}'.format(r['City'], r['State'])
+
+    def get_county(self):
+        pass
+
+
+class Places2kMgr:
+    """Manages a sqlite DB originally drawn from
+    http://www.census.gov/tiger/tms/gazetteer/places2k.txt.
+    """
+
+    def __init__(self, dir='/tmp',
+                 db_file='places.db', in_file='places2k.txt'):
+        self.engine = None
+        db_file, in_file = [os.path.join(dir, f) for f in [db_file, in_file]]
+
+        os.unlink(db_file)
+
+        self.db_url = sqlalchemy.engine.url.URL(
+            **dict(drivername='sqlite', database=db_file))
+        engine = sqlalchemy.create_engine(self.db_url)
+        if not os.path.exists(db_file):
+            if not os.path.exists(in_file):
+                self._download(in_file)
+            with open(in_file) as fin:
+                self._create_database(db_file, fin, engine)
+
+    def _create_database(self, db_file, fin, engine):
+        self._ensure_table_exists(engine)
+        return engine
+
+    def _ensure_table_exists(self, engine):
+        query = 'select *  from place  where 1 > 2'  # Sqlite lacks 'False'.
+        try:
+            engine.execute(query).fetchall()
+        except sqlalchemy.exc.OperationalError:
+            meta = sqlalchemy.MetaData(bind=engine)
+            meta.create_all(tables=[place_table.t_places])
+            engine.execute(query).fetchall()
+
+
+    def _download(self, out_file, zip_url='https://www.cs.rutgers.edu/~pxk'
+                                          '/rutgers/hw/places.zip'):
+        # Another candidate download location might be
+        # https://github.com/petewarden/crunchcrawl/raw/master/places2k.txt
+        # but it uses some variant Latin1 encoding for Puerto Rico place names.
+        req = requests.get(zip_url)
+        assert 200 == req.status_code
+        assert 1110384 == int(req.headers['Content-Length'])
+        assert 'application/zip' == req.headers['Content-Type']
+        content = io.BytesIO(req.content)
+
+        zf = zipfile.ZipFile(content)
+        fl = zf.filelist
+        assert 'places2k.txt' == fl[0].filename
+        assert 4212250 == fl[0].file_size
+        assert 1507489281 == fl[0].CRC
+        assert (2009, 3, 18, 15, 37, 52) == fl[0].date_time
+
+        with zf.open(fl[0].filename) as places, open(out_file, 'w') as fout:
+            fout.write(places.read().decode('latin1'))
+
+        assert 4212304 == os.path.getsize(out_file)  # UTF-8 expands slightly.
 
 
 class ZipcodeStatsTest(unittest.TestCase):
@@ -43,6 +118,8 @@ class ZipcodeStatsTest(unittest.TestCase):
     def test_city_state(self):
         self.assertEqual('Beverly Hills CA', self.zc.get_city_state('90210'))
 
+    def test_places(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
