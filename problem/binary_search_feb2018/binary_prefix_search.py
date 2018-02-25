@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# Copyright 2017 John Hanley.
+# Copyright 2018 John Hanley.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -173,7 +173,7 @@ class BinarySearchTest(unittest.TestCase):
 
         i = find_exact_match('conf', self.haystack)
         self.assertEqual('cone coned coneen coner cones confab',
-                         ' '.join(self.haystack[i - 4 : i + 2]))
+                         ' '.join(self.haystack[i - 4:i + 2]))
         self.assertEqual(6521, i)
 
         i = find_exact_match('yuc', self.haystack)
