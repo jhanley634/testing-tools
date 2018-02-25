@@ -29,6 +29,8 @@ import requests
 import sqlalchemy
 import sqlalchemy.engine.url
 import sqlalchemy.exc
+import sqlalchemy.ext.automap
+import sqlalchemy.orm.session
 import uszipcode
 
 # from places_table import t_places
@@ -47,8 +49,12 @@ class ZipcodeStats:
         r = self.zse.by_zipcode(zipcode)
         return '{} {}'.format(r['City'], r['State'])
 
-    def get_county(self):
+    def get_lat_lng(self):
         pass
+
+
+class Place:
+    __table__ = 'place'
 
 
 class Places2kMgr:
@@ -63,27 +69,57 @@ class Places2kMgr:
 
         os.unlink(db_file)
 
-        self.db_url = sqlalchemy.engine.url.URL(
+        db_url = sqlalchemy.engine.url.URL(
             **dict(drivername='sqlite', database=db_file))
-        engine = sqlalchemy.create_engine(self.db_url)
+        self.engine = sqlalchemy.create_engine(db_url)
         if not os.path.exists(db_file):
             if not os.path.exists(in_file):
                 self._download(in_file)
             with open(in_file) as fin:
-                self._create_database(db_file, fin, engine)
+                self._create_database(db_file, fin)
 
-    def _create_database(self, db_file, fin, engine):
-        self._ensure_table_exists(engine)
-        return engine
+    def _create_database(self, db_file, fin):
+        meta = self._ensure_table_exists()
+        meta.reflect()
+        # meta.reflect(self.engine, only=['place'])
+        base = sqlalchemy.ext.automap.automap_base(metadata=meta)
+        base.prepare()
+        assert 1 == len(base.metadata.sorted_tables)
+        place = base.metadata.sorted_tables[0]
 
-    def _ensure_table_exists(self, engine):
+        sess = sqlalchemy.orm.session.sessionmaker()()
+        # Now populate the table.
+        for row in self._get_text_file_fields(fin):
+            state, fips, name = row[:3]
+            ins = place.insert()
+
+    def _get_text_file_fields(self, fin):
+        # Columns 1-2: United States Postal Service State Abbreviation
+        # Columns 3-4: State Federal Information Processing Standard FIPS code
+        # Columns 5-9: Place FIPS Code
+        for line in fin:
+            state = line[:2]
+            fips = line[2:9]  # First 2 characters give the state FIPS code.
+            name = line[9:73].rstrip()
+            pop2k = int(line[73:82])
+            homes2k = int(line[82:91])  # ignore land area m^2, water, & sq mi
+            assert line[143] == ' ', line[143:]  # northern hemisphere
+            lat = float(line[143:153])
+            lng = float(line[153:164])
+            assert lat > 0
+            assert lng < 0 or name.startswith('Attu ')  # western hemisphere
+            yield state, fips, name, pop2k, homes2k, lat, lng
+
+
+    def _ensure_table_exists(self):
+        meta = sqlalchemy.MetaData(bind=self.engine)
         query = 'select *  from place  where 1 > 2'  # Sqlite lacks 'False'.
         try:
-            engine.execute(query).fetchall()
+            self.engine.execute(query).fetchall()
         except sqlalchemy.exc.OperationalError:
-            meta = sqlalchemy.MetaData(bind=engine)
             meta.create_all(tables=[place_table.t_places])
-            engine.execute(query).fetchall()
+            self.engine.execute(query).fetchall()
+        return meta
 
 
     def _download(self, out_file, zip_url='https://www.cs.rutgers.edu/~pxk'
