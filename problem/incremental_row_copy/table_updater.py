@@ -25,6 +25,13 @@ class TableUpdater:
     Dest table will have same columns as src, plus `active` & `epoch` columns.
     """
 
+    def __init__(self, src_table, dest_table):
+        self.src_table = src_table
+        self.dest_table = dest_table
+
+    def update(self):
+        pass
+
 
 # if __name__ == '__main__':
 #     main()

@@ -26,7 +26,9 @@ import unittest
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
+from problem.incremental_row_copy.table_updater import TableUpdater
 from problem.incremental_row_copy.tbl_event_log import EventLog
+from problem.incremental_row_copy.tbl_event_log_copy import EventLogCopy
 
 
 def gen_events(engine: sa.engine.Engine, n):
@@ -53,14 +55,25 @@ class TableUpdaterTest(unittest.TestCase):
             db_file.unlink()  # We start afresh each time.
         self.db_url = f'sqlite:///{db_file}'
         self.engine = sa.create_engine(self.db_url)
+        self.tables=(
+            EventLog.__table__,
+            EventLogCopy.__table__,
+        )
         meta = sa.MetaData(bind=self.engine)
-        meta.create_all(tables=[EventLog.__table__])
+        meta.create_all(tables=self.tables)
 
     def test_update(self):
-        tbl = EventLog.__tablename__
-        self.assertEqual(0, num_rows(self.engine, tbl))
+        dest_name = EventLogCopy.__tablename__
+        src_name = EventLog.__tablename__
+        self.assertEqual(0, num_rows(self.engine, dest_name))
+        self.assertEqual(0, num_rows(self.engine, src_name))
+
         gen_events(self.engine, 7)
-        self.assertEqual(7, num_rows(self.engine, tbl))
+        self.assertEqual(7, num_rows(self.engine, src_name))
+
+        upd = TableUpdater(*self.tables)
+        upd.update()
+        self.assertEqual(7, num_rows(self.engine, src_name))
 
 
 if __name__ == '__main__':
