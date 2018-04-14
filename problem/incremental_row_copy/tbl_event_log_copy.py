@@ -1,5 +1,5 @@
 # coding: utf-8
-from sqlalchemy import Boolean, Column, DateTime, Integer, Text, text
+from sqlalchemy import Boolean, Column, DateTime, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 
 

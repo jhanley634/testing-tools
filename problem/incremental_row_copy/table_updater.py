@@ -18,6 +18,10 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+import sqlalchemy.schema as schema
+
 
 class TableUpdater:
     """Performs incremental dest updates as src rows are updated / inserted.
@@ -25,13 +29,32 @@ class TableUpdater:
     Dest table will have same columns as src, plus `active` & `epoch` columns.
     """
 
-    def __init__(self, src_table, dest_table):
+    def __init__(self,
+                 engine: sa.engine.Engine,
+                 src_table: schema.Table,
+                 dest_table: schema.Table):
+        self.engine = engine
         self.src_table = src_table
         self.dest_table = dest_table
 
     def update(self):
-        pass
+        self.copy()
 
+    def copy(self):
+        sess = orm.sessionmaker(bind=self.engine)()
+        self.dest_table.__table__.delete()
+
+        for src_row in sess.query(self.src_table):
+            dest_row = self.dest_table(
+                is_active=True,
+                stamp=src_row.stamp,
+                id=src_row.id,
+                epoch=1,
+                event=src_row.event,
+            )
+            sess.add(dest_row)
+
+        sess.commit()
 
 # if __name__ == '__main__':
 #     main()

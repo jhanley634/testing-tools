@@ -55,12 +55,12 @@ class TableUpdaterTest(unittest.TestCase):
             db_file.unlink()  # We start afresh each time.
         self.db_url = f'sqlite:///{db_file}'
         self.engine = sa.create_engine(self.db_url)
-        self.tables=(
+        tables = (
             EventLog.__table__,
             EventLogCopy.__table__,
         )
         meta = sa.MetaData(bind=self.engine)
-        meta.create_all(tables=self.tables)
+        meta.create_all(tables=tables)
 
     def test_update(self):
         dest_name = EventLogCopy.__tablename__
@@ -71,9 +71,10 @@ class TableUpdaterTest(unittest.TestCase):
         gen_events(self.engine, 7)
         self.assertEqual(7, num_rows(self.engine, src_name))
 
-        upd = TableUpdater(*self.tables)
+        upd = TableUpdater(self.engine, EventLog, EventLogCopy)
         upd.update()
         self.assertEqual(7, num_rows(self.engine, src_name))
+        self.assertEqual(7, num_rows(self.engine, dest_name))
 
 
 if __name__ == '__main__':
