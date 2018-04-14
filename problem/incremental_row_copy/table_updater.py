@@ -41,20 +41,30 @@ class TableUpdater:
         self.copy()
 
     def copy(self):
-        sess = orm.sessionmaker(bind=self.engine)()
-        self.dest_table.__table__.delete()
+        sess = self._get_session()
 
-        for src_row in sess.query(self.src_table):
-            dest_row = self.dest_table(
-                is_active=True,
-                stamp=src_row.stamp,
-                id=src_row.id,
-                epoch=1,
-                event=src_row.event,
-            )
-            sess.add(dest_row)
+        delete = str(self.dest_table.__table__.delete())
+        sess.execute(delete)
+
+        for row in sess.query(self.src_table):
+            sess.add(self._dest_table_row_copy(row))
 
         sess.commit()
+
+    def _get_session(self):
+        return orm.sessionmaker(bind=self.engine)()
+
+    def _dest_table_row_copy(self, row, is_active=True, epoch=1):
+        """Adds two columns to a source row: is_active & epoch."""
+        def col_name(col):
+            t_name, sep, c_name = str(col).partition('.')
+            return c_name
+
+        d = {col_name(col): getattr(row, col_name(col))
+             for col in row.__table__.columns}
+        d = dict(d, is_active=is_active, epoch=epoch)
+        return self.dest_table(**d)
+
 
 # if __name__ == '__main__':
 #     main()
