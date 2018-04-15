@@ -18,13 +18,10 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-from sqlalchemy.sql.expression import select, insert, delete
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 import sqlalchemy.schema as schema
-
-# from problem.incremental_row_copy.tbl_event_log import EventLog
-from problem.incremental_row_copy.tbl_event_log_copy import EventLogCopy
+import sqlalchemy.sql as sql
 
 
 class TableUpdater:
@@ -44,10 +41,10 @@ class TableUpdater:
 
     def update(self):
         self.prev_stamp = list(self.sess.query(
-            sa.func.max(EventLogCopy.stamp)))[0][0]
+            sa.func.max(self.dest_table.stamp)))[0][0]
 
-        if self.prev_stamp is None:  # zero rows
-            return self._copy_all_rows()
+        if self.prev_stamp is None:  # zero rows in dest table
+            self._copy_all_rows()
         else:
             self._update_recently_modified_rows()
             self._copy_new_rows()
@@ -55,14 +52,36 @@ class TableUpdater:
         self.sess.commit()
 
     def _update_recently_modified_rows(self):
-        pass
+        """Inserts copies of recent rows, with epoch in PK bumped by +1."""
+        prev_epoch = list(self.sess.query(
+            sa.func.max(self.dest_table.epoch)))[0][0]
+
+        src_rows = list(self.sess.query(self.src_table).filter(
+            self.src_table.stamp > self.prev_stamp))
+        pk_to_src_row = {src_row: (src_row.stamp, src_row.id)
+                         for src_row in src_rows}
+
+        dst_rows = list(self.sess.query(self.dest_table).filter(
+            self.dest_table.stamp > self.prev_stamp))
+        pk_to_dst_row = {dst_row: (dst_row.stamp, dst_row.id)
+                         for dst_row in dst_rows}
+        dst_rows_modified = []
+        for (stamp, id), src_row in pk_to_src_row.items():
+            dst_row = pk_to_dst_row.get((stamp, id))
+            if dst_row:
+                dst_row.is_active = False
+                dst_row.epoch = prev_epoch + 1
+                dst_rows_modified.append(dst_row)
 
     def _copy_new_rows(self):
-        pass
+        for row in self.sess.query(self.src_table).filter(
+                self.src_table.stamp > self.prev_stamp):
+            self.sess.add(self._dest_table_row_copy(row))
 
     def _copy_all_rows(self):
+        """Copies src into an empty dest table."""
         # self.sess.execute(str(self.dest_table.__table__.delete()))
-        delete(self.dest_table)
+        sql.delete(self.dest_table)
 
         for row in self.sess.query(self.src_table):
             self.sess.add(self._dest_table_row_copy(row))

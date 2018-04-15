@@ -67,14 +67,30 @@ class TableUpdaterTest(unittest.TestCase):
         src_name = EventLog.__tablename__
         self.assertEqual(0, num_rows(self.engine, dest_name))
         self.assertEqual(0, num_rows(self.engine, src_name))
+        upd = TableUpdater(self.engine, EventLog, EventLogCopy)
 
         gen_events(self.engine, 7)
-        self.assertEqual(7, num_rows(self.engine, src_name))
-
-        upd = TableUpdater(self.engine, EventLog, EventLogCopy)
         upd.update()
         self.assertEqual(7, num_rows(self.engine, src_name))
         self.assertEqual(7, num_rows(self.engine, dest_name))
+
+        gen_events(self.engine, 2)
+        upd.update()
+        self.assertEqual(9, num_rows(self.engine, src_name))
+        self.assertEqual(9, num_rows(self.engine, dest_name))
+
+        # Now update a src event log message, and verify it appears in dest.
+        msg = 'six'
+        self.assertEqual(0, len(list(upd.sess.query(EventLog).filter(
+            EventLog.event == 'msg'))))
+
+        six = list(upd.sess.query(EventLog).filter(EventLog.id == 6))[0]
+        six.stamp = dt.datetime.now()
+        six.event = msg
+        upd.sess.commit()
+        upd.update()
+        self.assertEqual(1, len(list(upd.sess.query(EventLog).filter(
+            EventLog.event == 'msg'))))
 
 
 if __name__ == '__main__':
