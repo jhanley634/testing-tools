@@ -18,9 +18,13 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from sqlalchemy.sql.expression import select, insert, delete
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 import sqlalchemy.schema as schema
+
+# from problem.incremental_row_copy.tbl_event_log import EventLog
+from problem.incremental_row_copy.tbl_event_log_copy import EventLogCopy
 
 
 class TableUpdater:
@@ -33,26 +37,41 @@ class TableUpdater:
                  engine: sa.engine.Engine,
                  src_table: schema.Table,
                  dest_table: schema.Table):
-        self.engine = engine
+        self.sess = self._get_session(engine)
         self.src_table = src_table
         self.dest_table = dest_table
+        self.prev_stamp = None  # We know dest rows <= prev_stamp are current.
 
     def update(self):
-        self.copy()
+        self.prev_stamp = list(self.sess.query(
+            sa.func.max(EventLogCopy.stamp)))[0][0]
 
-    def copy(self):
-        sess = self._get_session()
+        if self.prev_stamp is None:  # zero rows
+            return self._copy_all_rows()
+        else:
+            self._update_recently_modified_rows()
+            self._copy_new_rows()
 
-        delete = str(self.dest_table.__table__.delete())
-        sess.execute(delete)
+        self.sess.commit()
 
-        for row in sess.query(self.src_table):
-            sess.add(self._dest_table_row_copy(row))
+    def _update_recently_modified_rows(self):
+        pass
 
-        sess.commit()
+    def _copy_new_rows(self):
+        pass
 
-    def _get_session(self):
-        return orm.sessionmaker(bind=self.engine)()
+    def _copy_all_rows(self):
+        # self.sess.execute(str(self.dest_table.__table__.delete()))
+        delete(self.dest_table)
+
+        for row in self.sess.query(self.src_table):
+            self.sess.add(self._dest_table_row_copy(row))
+
+    def _get_session(self, engine) -> orm.session.Session:
+        """
+        Returns a DB session, with the advantage of explicit type annotation.
+        """
+        return orm.sessionmaker(bind=engine)()
 
     def _dest_table_row_copy(self, row, is_active=True, epoch=1):
         """Adds two columns to a source row: is_active & epoch."""
