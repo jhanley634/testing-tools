@@ -4,6 +4,7 @@ channels:
 - conda-forge
 dependencies:
 - beautifulsoup4
+- click
 - flake8
 - html5lib
 - pandas
