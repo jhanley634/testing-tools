@@ -26,56 +26,49 @@ from bs4 import BeautifulSoup
 import requests
 
 
-class ExternalMergesort:
+def merge_streams(a, b):
     """Given pre-sorted iterables A and B, yields their sorted union.
     """
+    a_item, valid = _get_next(a)
+    if not valid:  # Input A was empty.
+        yield from b
+        return
 
-    def __init__(self):
-        self.sentinel = object()
+    b_item, valid = _get_next(a)
+    if not valid:  # Input B was empty.
+        yield a_item
+        yield from a
+        return
 
-    def merge(self, a, b):
-        """Given pre-sorted iterables A and B, yields their sorted union.
-        """
-        a_item, valid = self._get_next(a)
-        if not valid:  # Input A was empty.
-            yield from b
-            return
+    # Loop invariant:
+    #   We have a & b items we can compare, and
+    #   both streams still potentially have items to consume.
 
-        b_item, valid = self._get_next(a)
-        if not valid:  # Input B was empty.
+    while True:
+
+        if a_item <= b_item:
             yield a_item
-            yield from a
-            return
-
-        # Loop invariant:
-        #   We have a & b items we can compare, and
-        #   both streams still potentially have items to consume.
-
-        while True:
-
-            if a_item <= b_item:
-                yield a_item
-                a_item, valid = self._get_next(a)
-                if not valid:  # We found the end of A.
-                    yield b_item
-                    yield from b
-                    return
-
-            else:
-
+            a_item, valid = _get_next(a)
+            if not valid:  # We found the end of A.
                 yield b_item
-                b_item, valid = self._get_next(b)
-                if not valid:  # We found the end of B.
-                    yield a_item
-                    yield from a
-                    return
+                yield from b
+                return
 
-    @staticmethod
-    def _get_next(it):
-        try:
-            return next(it), True
-        except StopIteration as e:
-            return None, False
+        else:
+
+            yield b_item
+            b_item, valid = _get_next(b)
+            if not valid:  # We found the end of B.
+                yield a_item
+                yield from a
+                return
+
+
+def _get_next(it):
+    try:
+        return next(it), True
+    except StopIteration as e:
+        return None, False
 
 
 # From https://docs.python.org/3/library/itertools.html#itertools-recipes
@@ -130,26 +123,23 @@ class ItemCountGenerator:
 
 class ExternalMergesortTest(unittest.TestCase):
 
-    def setUp(self):
-        self.merger = ExternalMergesort()
-
     def test_one_empty(self):
         a = iter('')
         b = iter('xy')
-        self.assertEqual('xy', ''.join(self.merger.merge(a, b)))
+        self.assertEqual('xy', ''.join(merge_streams(a, b)))
 
         a = iter('xy')
         b = iter('')
-        self.assertEqual('xy', ''.join(self.merger.merge(a, b)))
+        self.assertEqual('xy', ''.join(merge_streams(a, b)))
 
     def test_interleaved(self):
         a = iter('abxyz')
         b = iter('cdef')
-        self.assertEqual('abcdefxyz', ''.join(self.merger.merge(a, b)))
+        self.assertEqual('abcdefxyz', ''.join(merge_streams(a, b)))
 
         a = iter('abddexyz')
         b = iter('ceeff')
-        self.assertEqual('abcddeeeffxyz', ''.join(self.merger.merge(a, b)))
+        self.assertEqual('abcddeeeffxyz', ''.join(merge_streams(a, b)))
 
 
 if __name__ == '__main__':
@@ -158,7 +148,6 @@ if __name__ == '__main__':
     a = iter(take(2 * k, ic_gen.generate()))
     b = iter(take(k, ic_gen.generate()))
 
-    merger = ExternalMergesort()
-    lst = list(merger.merge(a, b))
+    lst = list(merge_streams(a, b))
 
     unittest.main()
