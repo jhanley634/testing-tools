@@ -18,6 +18,7 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import enum
 import itertools
 import random
 import unittest
@@ -26,19 +27,32 @@ from bs4 import BeautifulSoup
 import requests
 
 
+class Stream(enum.IntEnum):
+    """Stream Identifier, used as item[] index."""
+    A = 0
+    B = 1
+
+
 def merge_streams(a, b):
     """Given pre-sorted iterables A and B, yields their sorted union.
     """
-    a_item, valid = _get_next(a)
+    item = [None, None]
+    item[Stream.A], valid = _get_next(a)
     if not valid:  # Input A was empty.
         yield from b
         return
 
-    b_item, valid = _get_next(a)
+    item[Stream.B], valid = _get_next(a)
     if not valid:  # Input B was empty.
-        yield a_item
+        yield item[Stream.A]
         yield from a
         return
+
+    stream = (a, b)
+
+    # Choose the "winning" (or lower valued) stream to consume from.
+    a_item, b_item = item
+    cur_stream = Stream.A if a_item <= b_item else Stream.B
 
     # Loop invariant:
     #   We have a & b items we can compare, and
@@ -46,22 +60,18 @@ def merge_streams(a, b):
 
     while True:
 
-        if a_item <= b_item:
-            yield a_item
-            a_item, valid = _get_next(a)
-            if not valid:  # We found the end of A.
-                yield b_item
-                yield from b
-                return
+        yield item[cur_stream]
+        item[cur_stream], valid = _get_next(stream[cur_stream])
 
-        else:
+        if valid:
+            a_item, b_item = item
+            cur_stream = Stream.A if a_item <= b_item else Stream.B
+        else:  # We found the end of this stream.
+            alt = 1 - cur_stream  # Let's drain the alternate stream.
+            yield item[alt]
+            yield from stream[alt]
+            return
 
-            yield b_item
-            b_item, valid = _get_next(b)
-            if not valid:  # We found the end of B.
-                yield a_item
-                yield from a
-                return
 
 
 def _get_next(it):
