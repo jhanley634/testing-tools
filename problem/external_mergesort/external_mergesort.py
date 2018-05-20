@@ -18,7 +18,6 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import enum
 import itertools
 import random
 import unittest
@@ -27,58 +26,35 @@ from bs4 import BeautifulSoup
 import requests
 
 
-class Stream(enum.IntEnum):
-    """Stream Identifier, used as item[] index."""
-    A = 0
-    B = 1
+_sentinel = object()
 
 
 def merge_streams(a, b):
     """Given pre-sorted iterables A and B, yields their sorted union.
     """
-    item = [None, None]
-    item[Stream.A], valid = _get_next(a)
-    if not valid:  # Input A was empty.
-        yield from b
-        return
-
-    item[Stream.B], valid = _get_next(a)
-    if not valid:  # Input B was empty.
-        yield item[Stream.A]
-        yield from a
-        return
-
     stream = (a, b)
+    item = list(map(_get_next, stream))
+    cur_stream = _get_cur_stream_idx(item)  # Stream we are reading ATM.
 
-    # Choose the "winning" (or lower valued) stream to consume from.
-    a_item, b_item = item
-    cur_stream = Stream.A if a_item <= b_item else Stream.B
-
-    # Loop invariant:
-    #   We have a & b items we can compare, and
-    #   both streams still potentially have items to consume.
-
-    while True:
-
+    while item != [_sentinel, _sentinel]:  # While at least one not at EOF.
         yield item[cur_stream]
-        item[cur_stream], valid = _get_next(stream[cur_stream])
+        item[cur_stream] = _get_next(stream[cur_stream])
+        cur_stream = _get_cur_stream_idx(item)
 
-        if valid:
-            a_item, b_item = item
-            cur_stream = Stream.A if a_item <= b_item else Stream.B
-        else:  # We found the end of this stream.
-            alt = 1 - cur_stream  # Let's drain the alternate stream.
-            yield item[alt]
-            yield from stream[alt]
-            return
 
+def _get_cur_stream_idx(item):
+    for i in range(2):
+        if item[i] == _sentinel:
+            return 1 - i  # The non-sentinel value wins.
+
+    return min(enumerate(item), key=lambda x: x[1])[0]  # argmin
 
 
 def _get_next(it):
     try:
-        return next(it), True
+        return next(it)
     except StopIteration as e:
-        return None, False
+        return _sentinel
 
 
 # From https://docs.python.org/3/library/itertools.html#itertools-recipes
@@ -133,6 +109,11 @@ class ItemCountGenerator:
 
 class ExternalMergesortTest(unittest.TestCase):
 
+    def test_both_empty(self):
+        a = iter('')
+        b = iter('')
+        self.assertEqual('', ''.join(merge_streams(a, b)))
+
     def test_one_empty(self):
         a = iter('')
         b = iter('xy')
@@ -151,13 +132,14 @@ class ExternalMergesortTest(unittest.TestCase):
         b = iter('ceeff')
         self.assertEqual('abcddeeeffxyz', ''.join(merge_streams(a, b)))
 
+    def test_generated_items(self):
+        ic_gen = ItemCountGenerator(seed=42)
+        k = 100
+        a = iter(take(2 * k, ic_gen.generate()))
+        b = iter(take(k, ic_gen.generate()))
+
+        self.assertEqual(3 * k, len(list(merge_streams(a, b))))
+
 
 if __name__ == '__main__':
-    ic_gen = ItemCountGenerator(seed=42)
-    k = 3
-    a = iter(take(2 * k, ic_gen.generate()))
-    b = iter(take(k, ic_gen.generate()))
-
-    lst = list(merge_streams(a, b))
-
     unittest.main()
