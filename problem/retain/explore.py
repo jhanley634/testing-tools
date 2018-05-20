@@ -20,14 +20,13 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
-import sqlalchemy
 import sqlalchemy.ext.declarative
 from sqlalchemy.sql.functions import sum as sum1
 from sqlalchemy import Table
 from sqlalchemy.orm import scoped_session, sessionmaker
 # from sqlalchemy.sql.expression import select, desc
-sys.path.append('.'); import etl
+
+import problem.retain.etl as etl
 
 
 Base = sqlalchemy.ext.declarative.declarative_base()

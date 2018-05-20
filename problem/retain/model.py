@@ -21,12 +21,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn.linear_model
-import sys
-import sqlalchemy
 import sqlalchemy.ext.declarative
 from sqlalchemy import Table
 from sqlalchemy.orm import scoped_session, sessionmaker
-sys.path.append('.'); import etl
+
+import problem.retain.etl as etl
 
 
 Base = sqlalchemy.ext.declarative.declarative_base()

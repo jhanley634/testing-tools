@@ -19,8 +19,8 @@
 # other dealings in the software.
 
 import unittest
-import sys
-sys.path.append('.'); from line_draw import Canvas
+
+from problem.pixel.line_draw import Canvas
 
 
 class FloodFiller:

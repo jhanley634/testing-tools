@@ -35,18 +35,18 @@ def permutations(vals):
                 return k
         return -1
 
-    def largest_l(k, a):
-        for l in range(len(a) - 1, k, -1):
-            if a[k] < a[l]:
-                return l
-        assert None, (k, l, a)  # Can't happen.
+    def largest_m(k, a):
+        for m in range(len(a) - 1, k, -1):
+            if a[k] < a[m]:
+                return m
+        assert None, (k, m, a)  # Can't happen.
 
     if len(vals) > 0:
         yield tuple(vals)
     k = largest_k(vals)
     while k > -1:
-        l = largest_l(k, vals)
-        vals[k], vals[l] = vals[l], vals[k]  # Swap k, l.
+        m = largest_m(k, vals)
+        vals[k], vals[m] = vals[m], vals[k]  # Swap k, l.
         vals = vals[:k + 1] + list(reversed(vals[k + 1:]))
         yield tuple(vals)
         k = largest_k(vals)
@@ -110,7 +110,7 @@ class PowersetTest(GenTest):
         for pset in [powerset, powerset_recursive]:  # 1.15s vs 1.31s
             t0 = time()
             self.assertEqual(4037913, len(pset(n)))
-            self.assertLess(time() - t0, 1.7)
+            self.assertLess(time() - t0, 1.8)
 
 
 if __name__ == '__main__':

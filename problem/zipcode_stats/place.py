@@ -85,13 +85,13 @@ class Places2kMgr:
         base = sqlalchemy.ext.automap.automap_base(metadata=meta)
         base.prepare()
         assert 1 == len(base.metadata.sorted_tables)
-        place = base.metadata.sorted_tables[0]
+        # place = base.metadata.sorted_tables[0]
 
-        sess = sqlalchemy.orm.session.sessionmaker()()
+        # sess = sqlalchemy.orm.session.sessionmaker()()
         # Now populate the table.
         for row in self._get_text_file_fields(fin):
             state, fips, name = row[:3]
-            ins = place.insert()
+            # ins = place.insert()
 
     def _get_text_file_fields(self, fin):
         # Columns 1-2: United States Postal Service State Abbreviation
@@ -110,7 +110,6 @@ class Places2kMgr:
             assert lng < 0 or name.startswith('Attu ')  # western hemisphere
             yield state, fips, name, pop2k, homes2k, lat, lng
 
-
     def _ensure_table_exists(self):
         meta = sqlalchemy.MetaData(bind=self.engine)
         query = 'select *  from place  where 1 > 2'  # Sqlite lacks 'False'.
@@ -120,7 +119,6 @@ class Places2kMgr:
             meta.create_all(tables=[place_table.t_places])
             self.engine.execute(query).fetchall()
         return meta
-
 
     def _download(self, out_file, zip_url='https://www.cs.rutgers.edu/~pxk'
                                           '/rutgers/hw/places.zip'):
@@ -156,6 +154,7 @@ class ZipcodeStatsTest(unittest.TestCase):
 
     def test_places(self):
         pass
+
 
 if __name__ == '__main__':
     unittest.main()
