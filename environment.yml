@@ -11,5 +11,6 @@ dependencies:
 - requests
 - sqlalchemy
 - pip:
+  - distlib
   - sqlacodegen
   - uszipcode

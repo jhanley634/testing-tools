@@ -24,6 +24,7 @@ import re
 import sys
 
 import click
+import distlib.database
 
 
 class DependencyType(enum.IntEnum):
@@ -56,6 +57,12 @@ class EnvironmentYmlParser:
         m = self.name_re.search(line)
         assert m, line
         return m.group(1)
+
+
+class PySourceParser:
+
+    def __init__(self):
+        pass
 
 
 class EnvDeps:
@@ -93,6 +100,12 @@ dependencies:
 @click.command()
 @click.option('--src-dir', default='.')
 def main(src_dir):
+
+    dp = distlib.database.DistributionPath()
+    for dist in dp.get_distributions():
+        print(dist)
+
+    sys.exit(0)
     ss = EnvDeps(src_dir=src_dir)
     ss.write_environment_yml('foo', sys.stdout)
 
