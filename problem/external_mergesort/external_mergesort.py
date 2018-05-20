@@ -26,7 +26,6 @@ from bs4 import BeautifulSoup
 import requests
 
 
-
 class ExternalMergesort:
     """Given pre-sorted iterables A and B, yields their sorted union.
     """
@@ -39,15 +38,13 @@ class ExternalMergesort:
         """
         a_item, valid = self._get_next(a)
         if not valid:  # Input A was empty.
-            for b_item in b:
-                yield b_item
+            yield from b
             return
 
         b_item, valid = self._get_next(a)
         if not valid:  # Input B was empty.
             yield a_item
-            for a_item in a:
-                yield a_item
+            yield from a
             return
 
         # Loop invariant:
@@ -61,8 +58,7 @@ class ExternalMergesort:
                 a_item, valid = self._get_next(a)
                 if not valid:  # We found the end of A.
                     yield b_item
-                    for b_item in b:
-                        yield b_item
+                    yield from b
                     return
 
             else:
@@ -71,8 +67,7 @@ class ExternalMergesort:
                 b_item, valid = self._get_next(b)
                 if not valid:  # We found the end of B.
                     yield a_item
-                    for a_item in a:
-                        yield a_item
+                    yield from a
                     return
 
     @staticmethod
