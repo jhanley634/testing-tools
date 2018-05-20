@@ -18,4 +18,6 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+__all__ = ['get_cem', 'SESSION']
+
 from . get_conn import get_cem, SESSION

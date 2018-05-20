@@ -24,9 +24,8 @@ import pandas
 import pprint
 import sklearn.svm
 import sklearn.cluster
-import sys
 
-sys.path.append('.'); import peninsula
+import problem.breadcrumb.peninsula as peninsula
 
 
 def approx(n, k=400):

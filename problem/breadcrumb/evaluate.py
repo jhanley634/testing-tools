@@ -21,9 +21,8 @@
 import os
 import pandas
 import sklearn.metrics
-import sys
 
-sys.path.append('.'); import cluster
+import problem.breadcrumb.cluster as cluster
 
 
 def summarize_location(loc):

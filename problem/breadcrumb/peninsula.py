@@ -28,7 +28,7 @@ import numpy as np
 import os
 import sys
 
-import dbcred
+import problem.breadcrumb.dbcred as dbcred
 
 
 def cities():

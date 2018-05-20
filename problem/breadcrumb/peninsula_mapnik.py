@@ -19,11 +19,10 @@
 # other dealings in the software.
 
 import os
-import sys
 
 import mapnik
 
-sys.path.append('.'); import world  # for styling
+import problem.breadcrumb.world as world  # for styling
 
 
 def make_sf_bay_area_map(out_file='peninsula.png'):  # quality of map is low

@@ -1,16 +1,18 @@
 name: testing-tools
 channels:
-- defaults
-- conda-forge
+  - defaults
+  - conda-forge
 dependencies:
-- beautifulsoup4
-- click
-- flake8
-- html5lib
-- pandas
-- requests
-- sqlalchemy
-- pip:
-  - distlib
-  - sqlacodegen
-  - uszipcode
+  - beautifulsoup4
+  - click
+  - flake8
+  - html5lib
+  - matplotlib
+  - pandas
+  - requests
+  - scikit-learn
+  - sqlalchemy
+  - pip:
+    - distlib
+    - sqlacodegen
+    - uszipcode
