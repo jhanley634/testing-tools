@@ -14,5 +14,6 @@ dependencies:
   - sqlalchemy
   - pip:
     - distlib
+    - imgkit
     - sqlacodegen
     - uszipcode
