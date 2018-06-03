@@ -28,20 +28,48 @@ import imgkit
 
 
 def _get_html(text):
-    return f"""<!DOCTYPE html>
+    ttf = _get_static() / 'tangerine.ttf'
+    font_src = f"src: url('{ttf}');"
+    return ("""<!DOCTYPE html>
 <html>
+<head>
+  <style type="text/css">
+  @font-face {
+    font-family: 'Tangerine';
+    """ + font_src + """
+    font-weight: normal;
+    font-style: normal;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    font-size: 24px;
+    font-family: 'sans serif';
+  }
+  p {
+    font-family: 'Tangerine';
+    margin: 0;
+    padding: 0;
+  }
+  </style>
+</head>
 
 <body>
-  <div>
-    {text}
-  </div>
+  <p>
+    """ + text + """
+  </p>
 </body>
 </html>
-"""
+""")
+
+
+def _get_static():
+    d = Path(os.path.dirname(os.path.abspath(__file__)))
+    return d / 'static'
 
 
 @click.command()
-@click.argument('message_text', default='Hello world!')
+@click.argument('message_text', default="How vexingly quick daft zebras jump!")
 @click.option('--directory', default=os.path.expanduser('~/Desktop'))
 @click.option('--file', default='text.png')
 @click.option('--width', default=400)  # imgkit would default to 1024
