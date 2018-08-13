@@ -7,7 +7,6 @@ import uszipcode
 
 def pop_map(zipcode='94025'):
     search = uszipcode.ZipcodeSearchEngine()
-    print(search.all_state_short)
     print(search.by_zipcode('94025'))
 
 
