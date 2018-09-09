@@ -9,6 +9,7 @@ dependencies:
   - html5lib
   - matplotlib
   - pandas
+  - quantities
   - requests
   - scikit-learn
   - sqlalchemy
