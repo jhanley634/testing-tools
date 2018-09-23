@@ -12,6 +12,7 @@ dependencies:
   - quantities
   - requests
   - scikit-learn
+  - seaborn
   - sqlalchemy
   - pip:
     - distlib
