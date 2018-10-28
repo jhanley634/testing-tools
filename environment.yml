@@ -6,6 +6,7 @@ dependencies:
   - beautifulsoup4
   - click
   - flake8
+  - folium
   - html5lib
   - matplotlib
   - pandas
@@ -18,4 +19,4 @@ dependencies:
     - distlib
     - imgkit
     - sqlacodegen
-    - uszipcode
+    - uszipcode >= 0.2.0
