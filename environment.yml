@@ -10,6 +10,7 @@ dependencies:
   - html5lib
   - matplotlib
   - pandas
+  - pillow
   - quantities
   - requests
   - scikit-learn
