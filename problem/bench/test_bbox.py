@@ -43,7 +43,7 @@ def get_marked_image(mark_coord=None, radius=20, im_size=(200, 100)):
     return im
 
 
-class BboxFinder:
+class BboxFinder1:
 
     @staticmethod
     def _find_first_positive(vals, reverse=False):
@@ -58,6 +58,25 @@ class BboxFinder:
             if val > 0:
                 return start + sgn * i
         return start + sgn * i
+
+
+class BboxFinder2:
+
+    @staticmethod
+    def _find_first_positive(vals, reverse=False):
+        nz = np.nonzero(vals)[0]
+        if len(nz) == 0:
+            if reverse:
+                return len(vals)
+            else:
+                return 0
+        if reverse:
+            return nz[-1]
+        else:
+            return nz[0]
+
+
+class BboxFinder(BboxFinder2):
 
     @classmethod
     def find_bbox(cls, im):
@@ -83,8 +102,11 @@ class BboxFinderTest(unittest.TestCase):
     def test_bbox_finder(self):
         im = get_marked_image()
         im.save(os.path.expanduser('~/Desktop/t.png'))
-        # bbox = BboxFinder.find_bbox(im)
+        bbox = BboxFinder.find_bbox(im)
+        self.assertEqual((20, 10, 40, 30), bbox)
+
         # t = timeit.Timer(self._find1).autorange()
         elapsed = timeit.timeit(self._find1, number=1000)
-        self.assertLess(.80, elapsed)
+        print(f'{elapsed:.3f}')
+        self.assertLess(.15, elapsed)
         self.assertLess(elapsed, .99)
