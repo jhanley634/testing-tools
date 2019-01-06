@@ -4,9 +4,12 @@ channels:
   - conda-forge
 dependencies:
   - beautifulsoup4
+  - boltons
   - click
   - flake8
   - folium
+  - geopy
+  - isort
   - html5lib
   - matplotlib
   - pandas

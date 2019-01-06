@@ -53,7 +53,7 @@ def _get_cur_stream_idx(item):
 def _get_next(it):
     try:
         return next(it)
-    except StopIteration as e:
+    except StopIteration:
         return _sentinel
 
 
