@@ -5,9 +5,15 @@ channels:
   - conda-forge
 
 dependencies:
+  - cartopy >= 0.17.0
   - flake8 >= 3.6.0
   - geopy >= 1.18.1
+  - isort >= 4.3.4
+  - numpy >= 1.15.4
+  - pandas >= 0.24.0
+  - pillow >= 5.4.1
   - python >= 3.7
+  - pyproj >= 1.9.6
   - requests >= 2.21.0
   - sqlalchemy >= 1.2.16
   - sqlite >= 3.26.0
