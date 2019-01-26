@@ -1,0 +1,10 @@
+name: stores
+
+channels:
+  - default
+  - conda-forge
+
+dependencies:
+  - flake8 >= 3.6.0
+  - geopy >= 1.18.1
+  - python >= 3.7
