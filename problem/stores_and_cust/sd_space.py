@@ -7,6 +7,8 @@ class SdSpace:
     the continental 48, originally located in quadrant II, to
     a portion of quadrant I, with San Diego somewhat near the origin."""
 
+    X_SCALE = 4_149_754 / 44.791  # meters per degree of longitude (SD->Miami)
+
     ORIGIN_LAT = 24
     """24 degrees N latitude,
     which accommodates the Florida Keys.
@@ -29,17 +31,17 @@ class SdSpace:
                 or lng < self.ORIGIN_LNG
                 or lng > self.MAINE):
             raise ValueError(f'coord ({lat}, {lng}) out of bounds')
-        self.x = lng - self.ORIGIN_LNG
+        self.x = int((lng - self.ORIGIN_LNG) * self.X_SCALE)
         self.y = lat - self.ORIGIN_LAT
 
     def lng(self):
-        return self.x + self.ORIGIN_LNG
+        return self.x / self.X_SCALE + self.ORIGIN_LNG
 
     def lat(self):
         return self.y + self.ORIGIN_LAT
 
     def distance(self, other):
         """Great circle distance in meters between two geographic points."""
-        p1 = (self.y, self.x)
-        p2 = (other.y, other.x)
+        p1 = (self.lat(), self.lng())
+        p2 = (other.lat(), other.lng())
         return geopy.distance.distance(p1, p2).meters
