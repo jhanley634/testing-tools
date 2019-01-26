@@ -41,17 +41,17 @@ class SdSpace:
     which accommodates Ozette Island in Washington state.
     We choose to ignore Juneau and other points to the west."""
 
-    CANADIAN_BORDER = 49
-    """49th parallel, which accommodates nearly all of Minnesota."""
+    CANADIAN_BORDER = 49.4
+    """49th parallel, plus the Northwest Angle of Minnesota."""  # pop. 119
 
-    MAINE = -65
-    """65 degrees W longitude, which accomodates all of Maine."""
+    EASTPORT_MAINE = -67
+    """67 degrees W longitude, which accomodates all of Maine."""
 
     def __init__(self, lat, lng):
         if (lat < self.ORIGIN_LAT
                 or lat > self.CANADIAN_BORDER
                 or lng < self.ORIGIN_LNG
-                or lng > self.MAINE):
+                or lng > self.EASTPORT_MAINE):
             raise ValueError(f'coord ({lat}, {lng}) out of bounds')
         self.x = int((lng - self.ORIGIN_LNG) * self.X_SCALE)
         self.y = int((lat - self.ORIGIN_LAT) * self.Y_SCALE)
