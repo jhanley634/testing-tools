@@ -1,2 +1,6 @@
 .gradle/
 build/
+
+restful_spring.iml
+restful_spring.ipr
+restful_spring.iws
