@@ -19,16 +19,31 @@
 # other dealings in the software.
 
 import cartopy.crs as ccrs
+import cartopy.io.shapereader as shpreader
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # noqa E402
 import matplotlib.pyplot as plt
 
 
 def draw_map():
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.coastlines()
 
-    plt.savefig('/tmp/coastlines.png')
+    def colorize_state(geometry):
+        return {'facecolor': (.94, .94, .86),
+                'edgecolor': (.55, .55, .55)}
+
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal())
+    ax.set_extent([-125, -66.5, 20, 50], ccrs.Geodetic())
+
+    shapename = 'admin_1_states_provinces_lakes_shp'
+    states_shp = shpreader.natural_earth(resolution='110m',
+                                         category='cultural', name=shapename)
+    ax.add_geometries(
+        shpreader.Reader(states_shp).geometries(),
+        ccrs.PlateCarree(),
+        styler=colorize_state)
+    ax.stock_img()
+    plt.savefig('/tmp/states.png')
 
 
 if __name__ == '__main__':
