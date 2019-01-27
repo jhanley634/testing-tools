@@ -18,6 +18,8 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import sys
+
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
 import matplotlib
@@ -63,5 +65,18 @@ def draw_map():
     plt.savefig('/tmp/states.png')
 
 
+# from https://stackoverflow.com/questions/8315389/print-fns-as-theyre-called
+def tracefunc(frame, event, _, indent=[0]):
+    if event == "call":
+        indent[0] += 2
+        file = frame.f_code.co_filename.split('/')[-1]
+        print("-" * indent[0] + "> call function", frame.f_code.co_name, file)
+    elif event == "return":
+        print("<" + "-" * indent[0], "exit function", frame.f_code.co_name)
+        indent[0] -= 2
+    return tracefunc
+
+
 if __name__ == '__main__':
+    sys.setprofile(None)  # (tracefunc)
     draw_map()
