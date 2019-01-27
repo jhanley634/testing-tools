@@ -23,6 +23,15 @@ import cartopy.io.shapereader as shpreader
 import matplotlib
 matplotlib.use('Agg')  # noqa E402
 import matplotlib.pyplot as plt
+import uszipcode
+
+
+def get_populous_cities():
+    search = uszipcode.SearchEngine()
+    for r in search.by_population(1e5):
+        print(r.population,
+              r.post_office_city)
+        yield r.lat, r.lng
 
 
 def draw_map():
@@ -32,7 +41,7 @@ def draw_map():
                 'edgecolor': (.55, .55, .55)}
 
     fig = plt.figure()
-    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal())
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.PlateCarree())
     ax.set_extent([-125, -66.5, 20, 50], ccrs.Geodetic())
 
     shapename = 'admin_1_states_provinces_lakes_shp'
@@ -43,6 +52,14 @@ def draw_map():
         ccrs.PlateCarree(),
         styler=colorize_state)
     ax.stock_img()
+
+    xs = []
+    ys = []
+    for lat, lng in get_populous_cities():
+        xs.append(lng)
+        ys.append(lat)
+    ax.plot(xs, ys, 'ok', transform=ccrs.PlateCarree(), markersize=8)
+
     plt.savefig('/tmp/states.png')
 
 
