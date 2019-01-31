@@ -28,12 +28,10 @@ def constant_columns(df):
     first = df.iloc[0]
     cols = set(df.columns)  # potentially boring columns
     for i, row in df.iterrows():
-        removes = set()
-        for col in cols:
-            if row[col] != first[col]:
-                removes.add(col)  # Hmmm, turns out it is informative.
-        for remove in removes:
-            cols.remove(remove)
+        for informative_col in {col
+                                for col in cols
+                                if row[col] != first[col]}:
+            cols.remove(informative_col)
 
     return sorted(cols)
 
