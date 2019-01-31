@@ -1,5 +1,23 @@
 #! /usr/bin/env python
 
+# Copyright 2019 John Hanley.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# The software is provided "AS IS", without warranty of any kind, express or
+# implied, including but not limited to the warranties of merchantability,
+# fitness for a particular purpose and noninfringement. In no event shall
+# the authors or copyright holders be liable for any claim, damages or
+# other liability, whether in an action of contract, tort or otherwise,
+# arising from, out of or in connection with the software or the use or
+# other dealings in the software.
+
 import unittest
 
 import pandas as pd
@@ -7,20 +25,28 @@ import pandas as pd
 
 def constant_columns(df):
     """Returns uninformative boring column names of a dataframe."""
-    first = df.iloc[1]
-    cols = set(df.columns)
-    for i, row in df.iteritems():
-        print(row)
+    first = df.iloc[0]
+    cols = set(df.columns)  # potentially boring columns
+    for i, row in df.iterrows():
+        removes = set()
         for col in cols:
-            print(col)
+            if row[col] != first[col]:
+                removes.add(col)  # Hmmm, turns out it is informative.
+        for remove in removes:
+            cols.remove(remove)
 
-    return ''
+    return sorted(cols)
+
+
+def interesting_columns(df):
+    """Returns non-constant column names of a dataframe."""
+    return sorted(set(df.columns) - set(constant_columns(df)))
 
 
 class ConstantColumnsTest(unittest.TestCase):
 
     @staticmethod
-    def get_example_df(num_boring_cols=2, num_rows=12):
+    def get_example_df(num_boring_cols=4, num_rows=1000):
         """Produces three 'informative' columns, plus some boring ones."""
         boring_vals = {chr(ord('c') + i): 0
                        for i in range(num_boring_cols)}
@@ -34,7 +60,8 @@ class ConstantColumnsTest(unittest.TestCase):
 
     def test_constant_columns(self):
         df = self.get_example_df()
-        self.assertEqual('', constant_columns(df))
+        self.assertEqual('c d e f'.split(), constant_columns(df))
+        self.assertEqual('a b z'.split(), interesting_columns(df))
 
 
 if __name__ == '__main__':
