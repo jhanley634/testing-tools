@@ -8,10 +8,11 @@ dependencies:
   - cartopy
   - click
   - flake8
+  - flask
   - folium
   - geopy
-  - isort
   - html5lib
+  - isort
   - matplotlib
   - pandas
   - pillow
