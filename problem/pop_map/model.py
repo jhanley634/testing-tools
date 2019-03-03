@@ -19,14 +19,13 @@
 # other dealings in the software.
 
 from pathlib import Path
+import pprint
 
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # noqa E402
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 import sklearn.linear_model
-import sqlalchemy as sa
 import sqlalchemy.orm as orm
 import uszipcode
 import uszipcode.db
@@ -37,11 +36,12 @@ def _query_by_zip(zipcode=94025):
     zse = uszipcode.SearchEngine()
     r = zse.by_zipcode(zipcode)
     # print('\n'.join(dir(r)))
+    pprint.pprint(dict(r.to_OrderedDict()))
     density, income = (
         r.population_density,      # people / sq. mi.
         r.median_household_income  # USD
     )
-    # print(r.to_json())
+    return density, income
 
 
 def query_by_state(state='CA'):
@@ -65,8 +65,6 @@ def main():
 
     tbl = uszipcode.model.SimpleZipcode
     q = query_by_state('CA').filter(tbl.zipcode >= 95100)
-    # for i, row in enumerate(q):
-    #     print(i, row)
     df = pd.DataFrame(list(q)).set_index('zipcode')
 
     # sns.pairplot(df)

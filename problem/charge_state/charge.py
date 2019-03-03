@@ -22,10 +22,32 @@ from pathlib import Path
 import datetime as dt
 import re
 
+from pandas.plotting import register_matplotlib_converters
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # noqa E402
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
-def convert_to_csv():
+def plot(df):
+    register_matplotlib_converters()
+    sns.set()
+
+    fig, (ax1, ax2) = plt.subplots(2)
+    ax1.scatter(df.stamp, df.range)
+    ax2.scatter(df.stamp, df.odometer)
+    fig.autofmt_xdate()
+
+    # g = sns.relplot(x='stamp', y='range', kind='line', data=df)
+    # g = sns.relplot(x='odometer', y='range', kind='line', data=df)
+    # g.fig.autofmt_xdate()
+
+    folder = Path('~/Desktop').expanduser()
+    plt.savefig(folder / 'charge.png')
+
+
+def read_csv():
     stamp_miles_re = re.compile(
         r'^<(\d{4}-\d+-\d+ \w{3} \d+:\d+)>\s*(\d+)\s+(\d+)')
     fspec = (Path(__file__) / '../charge.txt').resolve()
@@ -37,15 +59,15 @@ def convert_to_csv():
                 stamp, odometer, range = m.groups()
                 stamp = dt.datetime.strptime(stamp, '%Y-%m-%d %a %H:%M')
                 rows.append(dict(stamp=stamp,
-                                 odometer=odometer,
-                                 range=range))
-    columns = list(rows[0].keys())
+                                 odometer=int(odometer),
+                                 range=int(range)))
     folder = Path('~/Desktop').expanduser()
     out_file = str(folder / 'charge.csv')
-    df = pd.DataFrame(rows)
+    columns = list(rows[0].keys())
+    df = pd.DataFrame(rows, columns=columns)
     df.to_csv(out_file, columns=columns, index=False)
     return df
 
 
 if __name__ == '__main__':
-    convert_to_csv()
+    plot(read_csv())
