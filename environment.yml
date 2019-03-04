@@ -23,6 +23,7 @@ dependencies:
   - sqlalchemy
   - pip:
     - distlib
+    - flask-api
     - imgkit
     - sqlacodegen
     - uszipcode >= 0.2.0
