@@ -26,8 +26,20 @@ def as_dict(row):
 
 @app.route('/president/<int:id>')
 def president(id):
+    """Returns the record for a single person."""
     row = df.iloc[id - 1]
     return {'result': as_dict(row)}
+
+
+# e.g. http://localhost:5000/time/2007
+
+@app.route('/time/<int:year>')
+def time(year):
+    """Returns list of presidents alive in a given year."""
+    rows = [as_dict(row)
+            for _, row in df.iterrows()
+            if row.born <= year <= row.died]
+    return {'result': rows}
 
 
 if __name__ == '__main__':
