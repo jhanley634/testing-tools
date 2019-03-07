@@ -23,6 +23,8 @@ def get_us_presidents(
         tds = row.find_all('td')
         if len(tds) < 8:
             continue
+        id = int(tds[0].text)
+        assert 1 <= id <= 45, id
         term = tds[1].text.replace('Incumbent', f'January 20, {current_year}')
         # date_spans = term.find_all('span', class_='date')
         # for span in date_spans:
@@ -37,7 +39,8 @@ def get_us_presidents(
         born, died = born_died_re.search(life.text).groups()
         died = died or current_year
         born, died = map(int, (born, died))
-        rows.append(dict(born=born,
+        rows.append(dict(id=id,
+                         born=born,
                          died=died,
                          start=years[0],
                          end=years[1],
