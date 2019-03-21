@@ -18,24 +18,22 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-"""Repeatedly invokes memory hog to measure usage."""
+"""Consumes lots of memory, then deallocates it."""
 
-import os
-import subprocess
+import sys
 
+import click
 
-def find_acceptable_memory_size(type_):
-    size = 1e6  # target allocation of one megabyte
-    cmd = './mem_hog.py --target={}'.format(size)
-    subprocess.run(cmd, shell=True, check=True)
-    return size
+from memory_use.allocator import Allocator
 
 
-def main(type_='list', margin=.10):
-    size = (1 - margin) * find_acceptable_memory_size(type_)  # 90% of max mem size
-    print(size)
+@click.command()
+@click.option('--bytes', type=int)
+def hog(bytes):
+    a = Allocator()
+    print(len(a.BIG), sys.getsizeof(a.BIG))
+    print(bytes)
 
 
 if __name__ == '__main__':
-    os.chdir('../del')
-    main()
+    hog()

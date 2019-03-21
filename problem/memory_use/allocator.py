@@ -18,12 +18,7 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-"""Consumes lots of memory, then deallocates it."""
 
+class Allocator:
 
-def main():
-    ''
-
-
-if __name__ == '__main__':
-    main()
+    BIG = 'x' * int(1e5)
