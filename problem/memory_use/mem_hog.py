@@ -22,13 +22,15 @@
 
 import click
 
-from memory_use.allocator import ListAllocator
+from memory_use.allocator import ListAllocator, DictAllocator, DfAllocator
 
 
 @click.command()
 @click.option('--bytes', type=int)
-def hog(bytes):
-    a = ListAllocator()
+@click.option('--kind', default='df')
+def hog(bytes, kind):
+    m = dict(zip('list dict df'.split(), [ListAllocator, DictAllocator, DfAllocator]))
+    a = m[kind]()
     a.allocate(bytes)
 
 

@@ -21,6 +21,8 @@
 import sys
 import uuid
 
+import pandas as pd
+
 
 class ListAllocator:
 
@@ -29,7 +31,14 @@ class ListAllocator:
 
     _UUID_LEN = 36
 
-    BIG = 'x' * int(1e5 - _OVERHEAD - _UUID_LEN)
+    N = int(1e5)
+
+    BIG = 'x' * (N - _OVERHEAD - _UUID_LEN)
+
+    @classmethod
+    def get_big_string(cls):
+        # We intern a different str object on each iteration.
+        return str(uuid.uuid4()) + cls.BIG
 
     def __init__(self):
         self.big_list = []
@@ -38,9 +47,38 @@ class ListAllocator:
         n = 0
         lst = []
         while n < bytes:
-            # Intern a different str object on each iteration.
-            big = str(uuid.uuid4()) + self.BIG
+            big = self.get_big_string()
             lst.append(big)
+            n += sys.getsizeof(big)
+        self.big_list = lst
+        return n
+
+
+class DictAllocator(ListAllocator):
+
+    def __init__(self):
+        self.big_dict = {}
+
+    def allocate(self, bytes):
+        n = 0
+        d = {}
+        while n < bytes:
+            big = self.get_big_string()
+            d[len(d)] = big
+            n += sys.getsizeof(big)
+        self.big_dict = d
+        return n
+
+
+class DfAllocator(ListAllocator):
+
+    def allocate(self, bytes):
+        n = 0
+        lst = []
+        while n < bytes:
+            big = self.get_big_string()
+            df = pd.DataFrame([dict(id=1, val=big)])
+            lst.append(df)
             n += sys.getsizeof(big)
         self.big_list = lst
         return n

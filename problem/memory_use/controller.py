@@ -20,8 +20,10 @@
 
 """Repeatedly invokes memory hog to measure usage."""
 
+import gc
 import math
 import os
+import pprint
 import subprocess
 
 from memory_use.allocator import ListAllocator
@@ -42,7 +44,7 @@ def find_acceptable_memory_size(type_):
             bottom = successful_size = size  # Yay! We survived.
 
         if top == math.inf:
-            size *= 2
+            size *= 2  # The sky's the limit! (so far)
         else:
             size = (top - bottom) // 2 + bottom  # binary search
 
@@ -68,11 +70,21 @@ def allocate_then_del(size, k=12):
         del a.big_list
 
 
+def show():
+    """Shows GC stats, to help identify when garbage collection was invoked."""
+    print('GC counts:', gc.get_count())
+    pprint.pprint(gc.get_stats())
+
+
 def main(type_='list', margin=.10):
+    show()
     size = int((1 - margin) * find_acceptable_memory_size(type_))  # 90% of max mem size
+    show()
     allocate_then_out_of_scope(size)
+    show()
     allocate_then_del(size)
-    # allocate_then_del(1.2 * size)  # This, predictably, will fail.
+    show()
+    # allocate_then_del(int(1.4 * size))  # This, predictably, will fail.
 
 
 if __name__ == '__main__':
