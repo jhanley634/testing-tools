@@ -20,21 +20,59 @@
 
 """Repeatedly invokes memory hog to measure usage."""
 
+import math
 import os
 import subprocess
 
+from memory_use.allocator import ListAllocator
+
 
 def find_acceptable_memory_size(type_):
-    size = int(1e6)  # target allocation of one megabyte
-    cmd = 'memory_use/mem_hog.py --bytes={}'.format(size)
-    p = subprocess.run(cmd, shell=True, check=True)
-    print(p.returncode)
-    return size
+    meg = 2 ** 20
+    successful_size = size = bottom = meg  # initial target allocation is one megabyte
+    top = math.inf  # top is always greater than acceptable size, will cause failure
+    accuracy_threshold = 10 * meg
+    while top - bottom > accuracy_threshold:
+        cmd = 'memory_use/mem_hog.py --bytes={}'.format(size)
+        p = subprocess.run(cmd, shell=True)
+        if p.returncode:
+            assert 137 == p.returncode, p.returncode  # malloc fail
+            top = size
+        else:
+            bottom = successful_size = size  # Yay! We survived.
+
+        if top == math.inf:
+            size *= 2
+        else:
+            size = (top - bottom) // 2 + bottom  # binary search
+
+    return successful_size
+
+
+def _helper(size):
+    a = ListAllocator()
+    return a.allocate(size)
+
+
+def allocate_then_out_of_scope(size, k=12):
+    for _ in range(k):
+        print(size, _)
+        assert _helper(size) >= size
+
+
+def allocate_then_del(size, k=12):
+    a = ListAllocator()
+    for _ in range(k):
+        print(size, _)
+        assert a.allocate(size) >= size
+        del a.big_list
 
 
 def main(type_='list', margin=.10):
     size = int((1 - margin) * find_acceptable_memory_size(type_))  # 90% of max mem size
-    print(size)
+    allocate_then_out_of_scope(size)
+    allocate_then_del(size)
+    # allocate_then_del(1.2 * size)  # This, predictably, will fail.
 
 
 if __name__ == '__main__':

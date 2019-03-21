@@ -19,6 +19,7 @@
 # other dealings in the software.
 
 import sys
+import uuid
 
 
 class ListAllocator:
@@ -26,13 +27,20 @@ class ListAllocator:
     # 25 bytes for things like length, according to sys.getsizeof()
     _OVERHEAD = 25
 
-    BIG = 'x' * int(1e5 - _OVERHEAD)
+    _UUID_LEN = 36
 
-    @classmethod
-    def allocate(cls, bytes):
+    BIG = 'x' * int(1e5 - _OVERHEAD - _UUID_LEN)
+
+    def __init__(self):
+        self.big_list = []
+
+    def allocate(self, bytes):
         n = 0
         lst = []
         while n < bytes:
-            lst.append(cls.BIG)
-            n += sys.getsizeof(cls.BIG)
+            # Intern a different str object on each iteration.
+            big = str(uuid.uuid4()) + self.BIG
+            lst.append(big)
+            n += sys.getsizeof(big)
+        self.big_list = lst
         return n
