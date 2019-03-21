@@ -27,7 +27,8 @@ import subprocess
 def find_acceptable_memory_size(type_):
     size = int(1e6)  # target allocation of one megabyte
     cmd = 'memory_use/mem_hog.py --bytes={}'.format(size)
-    subprocess.run(cmd, shell=True, check=True)
+    p = subprocess.run(cmd, shell=True, check=True)
+    print(p.returncode)
     return size
 
 

@@ -18,7 +18,21 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import sys
 
-class Allocator:
 
-    BIG = 'x' * int(1e5)
+class ListAllocator:
+
+    # 25 bytes for things like length, according to sys.getsizeof()
+    _OVERHEAD = 25
+
+    BIG = 'x' * int(1e5 - _OVERHEAD)
+
+    @classmethod
+    def allocate(cls, bytes):
+        n = 0
+        lst = []
+        while n < bytes:
+            lst.append(cls.BIG)
+            n += sys.getsizeof(cls.BIG)
+        return n

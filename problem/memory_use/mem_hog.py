@@ -20,19 +20,16 @@
 
 """Consumes lots of memory, then deallocates it."""
 
-import sys
-
 import click
 
-from memory_use.allocator import Allocator
+from memory_use.allocator import ListAllocator
 
 
 @click.command()
 @click.option('--bytes', type=int)
 def hog(bytes):
-    a = Allocator()
-    print(len(a.BIG), sys.getsizeof(a.BIG))
-    print(bytes)
+    a = ListAllocator()
+    a.allocate(bytes)
 
 
 if __name__ == '__main__':
