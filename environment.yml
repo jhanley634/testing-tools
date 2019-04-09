@@ -16,6 +16,7 @@ dependencies:
   - matplotlib
   - pandas
   - pillow
+  - pip
   - pyarrow >= 0.12.1
   - quantities
   - requests
