@@ -110,6 +110,108 @@ It matters more when designing the public API.
 
 Should I muddle on? Return `None`? Raise an error?
 
+#comments
+Comments are Good. But...
+\blank
+
+Comments lie.
+\blank
+
+**Details** go in the code,
+
+**generalities** go in the comments.
+
+Better to write a vague comment which does not lie,
+
+than to write something specific which isn't true.
+\blank
+
+Bit rot happens.
+
+Comments are likely to rot, over time.
+
+#docstring
+A special kind of comment is a python *docstring*.
+
+The audience is: engineers wanting to call your code.
+
+Use `#` comments instead when you're writing *code* explanations,
+rather than API *calling* explanations.
+\blank
+
+Each docstring should start with an English sentence.
+
+A sentence begins with a Capital,
+has a noun and a verb,
+and ends with a `.` period.
+\blank
+
+Between the signature and the docstring,
+an engineer should have a pretty good idea of how to
+(correctly) use your public API.
+
+Feel free to assume the engineer will *also* view your source code.
+You don't have to answer every single question that might arise;
+this isn't Sun's javadocs.
+If you choose to wax poetic,
+typically you should leave a blank line after the initial summary sentence
+before beginning paragraph(s) describing your method.
+
+#docstring --- numpydoc
+You do *not* have to exhaustively detail every parameter of your method in a docstring.
+A single sentence often will sufice.
+
+However, if you feel details would be helpful,
+please use numpydoc format. (https://numpydoc.readthedocs.io/en/latest/)
+
+#docstring --- numpydoc
+Here is a numpydoc example:
+
+    def draw_random_sample(mu, sigma):
+        """Draws random sample from a normal random variable.
+        
+        Parameters
+        ----------
+        mu : float
+            Mean of the distribution.
+        sigma : float
+            Standard deviation of the distribution
+
+        Returns
+        -------
+        float
+            A normally distributed value from N(mu, sigma).
+        """
+
+#docstring --- numpydoc
+If you *do* choose to go with a detailed Parameters section,
+it is probably best to obey DRY (Don't Repeat Yourself),
+and omit annotations from the signature.
+After renames and whatnot,
+we wouldn't want to see documentation out of sync.
+
+#docstring --- doctest
+The `doctest` module lets you execute specially formatted documentation.
+
+It is related to the `unittest` module.
+\blank
+
+Here is an example:
+
+    def sqrt(n):
+        """Returns square root of a non-negative number.
+        
+        >>> sqrt(9)
+        3.0
+        """
+               
+If you use this format,
+you *should* regularly execute such tests,
+perhaps through a `Makefile` target.
+
+For example: `$ python -m doctest *.py`
+
+
 <!---
 Copyright 2019 John Hanley.
 
