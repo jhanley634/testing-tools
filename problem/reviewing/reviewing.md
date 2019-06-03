@@ -31,7 +31,7 @@ My goal is to let the author see the code from
 a new perspective, from my perspective.
 \blank
 
-If, having considered that, the author chooses to
+Having considered that, if the author chooses to
 reject a proposed change, that is *just fine!*
 
 #ground rules
@@ -51,7 +51,7 @@ OTOH, if I remark that I find code or docs
 - obscure
 - misleading
 
-then you have at *least one* data point
+then you have *at least one* data point
 that you *might* want to clarify what you wrote.
 
 It could be the case that a quick casual reading
@@ -96,7 +96,7 @@ Consider using `assert`, `verify()`, or conditional `raise`
 to signal that input args were incorrect.
 
 Simply assuming things about inputs is fine, also,
-e.g. going ahead and de-referencing `x[y]`.
+e.g. going ahead and de-reference `x[y]`.
 *Do* think about whether a failed operation
 will produce a *diagnostic* error or an opaque one.
 Consider adding checks you feel may help future debugging.
@@ -155,7 +155,7 @@ You don't have to answer every single question that might arise;
 this isn't Sun's javadocs.
 If you choose to wax poetic,
 typically you should leave a blank line after the initial summary sentence
-before beginning paragraph(s) describing your method.
+before you launch into paragraph(s) that describe your method.
 
 #docstring --- numpydoc
 You do *not* have to exhaustively detail every parameter of your method in a docstring.
@@ -169,7 +169,7 @@ Here is a numpydoc example:
 
     def draw_random_sample(mu, sigma):
         """Draws random sample from a normal random variable.
-        
+
         Parameters
         ----------
         mu : float
@@ -200,16 +200,70 @@ Here is an example:
 
     def sqrt(n):
         """Returns square root of a non-negative number.
-        
+
         >>> sqrt(9)
         3.0
         """
-               
+
 If you use this format,
 you *should* regularly execute such tests,
 perhaps through a `Makefile` target.
 
 For example: `$ python -m doctest *.py`
+
+#comments -- extract helper
+Comments are good.
+
+Sometimes the *need* for a comment helps illuminate what is unclear.
+\blank
+
+Here is a fairly common pattern:
+
+    def foo():
+         # Do step 1.
+         bar()
+         baz()
+
+         # Do step 2.
+         qux()
+
+         # Do step 3.
+         ...
+
+#comments -- extract helper
+Feeling a need to call out each step, in a comment,
+suggests that perhaps an **identifier** should be used,
+rather than a comment.
+
+    def foo():
+        step1()
+        step2()
+        step3()
+
+    def step1():
+        bar()
+        baz()
+
+#extract helper
+In general, defining a **helper** function is a good idea;
+do it often.
+\blank
+
+In the real world, one often encounters copy-n-pasted code.
+
+When you see the 2nd occurence of code, think "extract helper?"
+
+When you see the 3rd occurence, **definitely** extract it into a helper.
+\blank
+
+You may need to parameterize.
+
+Don't be afraid, this is a good thing.
+It shows that a pattern is valuable,
+so valuable it is used multiple times,
+so it is worth devoting a bit of effort
+to tease out "What's really happening here?
+What are the parameters that matter?"
 
 
 <!---
