@@ -265,6 +265,36 @@ so it is worth devoting a bit of effort
 to tease out "What's really happening here?
 What are the parameters that matter?"
 
+#quotes
+Debugging is twice as hard as writing the code in the first place.
+Therefore if you write the code as cleverly as possible,
+you are, by definition, not smart enough to debug it.
+
+\hfill ---Brian Kernighan
+
+#interlude
+Write **short** functions!
+
+#quotes
+Caveat lector:
+\blank
+
+Beware of bugs in the above code; I have only proved it correct,
+
+not tried it.
+
+\hfill ---Donald Knuth
+\blank
+
+#responsibility
+In an essay,
+or poem,
+or theorem proof,
+it is the author's responsibility to **convince** the Gentle Reader
+of the correctness of his position.
+\blank
+
+So, too, with code.
 
 <!---
 Copyright 2019 John Hanley.
