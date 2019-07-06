@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 
 # Copyright 2019 John Hanley.
 #
@@ -18,18 +17,40 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from math import exp, log
+
 
 def _relative_error(a, b):
     return (a - b) / b
 
 
+def sqrt_logarithm(n):
+    return exp(log(n) / 2)
+
+
 def sqrt_newton_raphson(n, rel_error=1e-6):
     n = n or rel_error
     assert n > 0
-    # return math.exp(math.log(n) / 2)
 
-    root = n
+    root = 1
     while abs(_relative_error(root * root, n)) > rel_error:
-        # print(f'{root:.6f}  {_relative_error(root * root, n):.6f}')
         root = (root + n / root) / 2
+    return root
+
+
+def sqrt_binary_search(n, rel_error=1e-6):
+    n = n or rel_error
+    assert n > 0
+
+    lower, upper = 1, n
+    if n < 1:
+        lower, upper = n, 1  # answer shall be larger than N in this case
+
+    root = 1
+    while abs(_relative_error(root * root, n)) > rel_error:
+        root = (lower + upper) / 2
+        if root * root < n:
+            lower = root
+        else:
+            upper = root
     return root

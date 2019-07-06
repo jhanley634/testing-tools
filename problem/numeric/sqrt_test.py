@@ -20,7 +20,8 @@
 
 import unittest
 
-from numeric.sqrt import sqrt_newton_raphson as sqrt
+from problem.numeric.sqrt import sqrt_binary_search as sqrt
+# from problem.numeric.sqrt import sqrt_newton_raphson as sqrt
 
 
 class SqrtTest(unittest.TestCase):
@@ -35,7 +36,7 @@ class SqrtTest(unittest.TestCase):
         self.assertAlmostEqual(.001, sqrt(0), 4)
 
     def test_not_i(self):
-        with self.assertRaises(AssertionError) as _:
+        with self.assertRaises(AssertionError):
             sqrt(-1)
 
 
