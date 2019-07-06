@@ -18,18 +18,26 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import unittest
 
-def _relative_error(a, b):
-    return (a - b) / b
+from numeric.sqrt import sqrt_newton_raphson as sqrt
 
 
-def sqrt_newton_raphson(n, rel_error=1e-6):
-    n = n or rel_error
-    assert n > 0
-    # return math.exp(math.log(n) / 2)
+class SqrtTest(unittest.TestCase):
 
-    root = n
-    while abs(_relative_error(root * root, n)) > rel_error:
-        # print(f'{root:.6f}  {_relative_error(root * root, n):.6f}')
-        root = (root + n / root) / 2
-    return root
+    def test_big_sqrt(self):
+        self.assertAlmostEqual(3, sqrt(9), 4)
+        self.assertAlmostEqual(3.1464, sqrt(9.9), 4)
+
+    def test_small_sqrt(self):
+        self.assertAlmostEqual(.5, sqrt(.25), 4)
+        self.assertAlmostEqual(.7071, sqrt(.5), 4)
+        self.assertAlmostEqual(.001, sqrt(0), 4)
+
+    def test_not_i(self):
+        with self.assertRaises(AssertionError) as _:
+            sqrt(-1)
+
+
+if __name__ == '__main__':
+    unittest.main()
