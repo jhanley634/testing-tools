@@ -3,26 +3,26 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - beautifulsoup4
-  - boltons
-  - cartopy
-  - click
-  - flake8
-  - flask
-  - folium
-  - geopy
-  - html5lib
-  - isort
-  - matplotlib
-  - pandas
-  - pillow
-  - pip
-  - pyarrow >= 0.12.1
-  - quantities
-  - requests
-  - scikit-learn
-  - seaborn
-  - sqlalchemy
+  - beautifulsoup4 >= 4.7.1
+  - boltons >= 19.1.0
+  - cartopy >= 0.17.0
+  - click >= 7.0
+  - flake8 >= 3.7.7
+  - flask >= 1.0.3
+  - folium >= 0.9.1
+  - geopy >= 1.20.0
+  - html5lib >= 1.0.1
+  - isort >= 4.3.21
+  - matplotlib >= 3.1.0
+  - pandas >= 0.24.2
+  - pillow >= 5.4.1
+  - pip >= 19.1.1
+  - pyarrow >= 0.14.0
+  - quantities >= 0.12.3
+  - requests >= 2.21.0
+  - scikit-learn >= 0.21.2
+  - seaborn >= 0.9.0
+  - sqlalchemy >= 1.3.5
   - pip:
     - distlib
     - flask-api
