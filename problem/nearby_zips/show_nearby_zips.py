@@ -18,8 +18,11 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import os
 import pprint
 
+from unyt import m, mile
+import folium
 import uszipcode
 
 
@@ -28,11 +31,39 @@ class NearbyZips:
     def __init__(self):
         self.search = uszipcode.SearchEngine()
 
-    def plot_zip(self, zipcode):
+    def plot_zip(self, zipcode, fspec='~/Desktop/map.html'):
         r = self.search.by_zipcode(zipcode)
-        # r.lng, r.lat, r.radius_in_miles
-        nw = r.bounds_west, r.bounds_north
-        se = r.bounds_east, r.bounds_south
+        radius = r.radius_in_miles * mile
+        nw = r.bounds_north, r.bounds_west
+        se = r.bounds_south, r.bounds_east
+        sp = '&nbsp;'
+
+        map_ = folium.Map(
+            location=(r.lat, r.lng),
+            tiles='Stamen Terrain',
+        )
+        msg = f'{zipcode}, radius{sp}={sp}{radius}'
+        folium.Circle(
+            location=[r.lat, r.lng],
+            radius=radius.to_value('m'),
+            tooltip=msg,
+            color='purple',
+        ).add_to(map_)
+        folium.CircleMarker(
+            location=[r.lat, r.lng],
+            radius=6,  # px
+            popup=msg,
+            color='purple',
+            fill=True,
+            fill_opacity=.8,
+        ).add_to(map_)
+        folium.Rectangle(
+            bounds=(nw, se),
+            tooltip=msg,
+            color='DarkBlue',
+        ).add_to(map_)
+
+        map_.save(os.path.expanduser(fspec))
 
 
 if __name__ == '__main__':
