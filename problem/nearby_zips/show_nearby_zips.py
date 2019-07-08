@@ -19,10 +19,10 @@
 # other dealings in the software.
 
 import os
-import pprint
 
-from unyt import m, mile
 import folium
+import sqlalchemy as sa
+import unyt
 import uszipcode
 
 
@@ -31,40 +31,70 @@ class NearbyZips:
     def __init__(self):
         self.search = uszipcode.SearchEngine()
 
-    def plot_zip(self, zipcode, fspec='~/Desktop/map.html'):
-        r = self.search.by_zipcode(zipcode)
-        radius = r.radius_in_miles * mile
-        nw = r.bounds_north, r.bounds_west
-        se = r.bounds_south, r.bounds_east
-        sp = '&nbsp;'
+    def _get_zipcode_table(self):
+        con = self.search.ses.connection()
+        meta = sa.MetaData(bind=con)
+        return sa.Table('simple_zipcode', meta, autoload=True)
 
+    def zips_near(self, zipcode):
+        zipcode = f'{int(zipcode):05d}'
+        r = self.search.by_zipcode(zipcode)
+        lng_bounds = r.bounds_west, r.bounds_east
+        lat_bounds = r.bounds_south, r.bounds_north
+        zips = self._get_zipcode_table()
+        q = (self.search.ses
+             .query(zips.c.zipcode)
+             .filter(zips.c.zipcode_type == 'Standard')
+             # NW, NE, SE, SW
+             .filter((zips.c.bounds_north.between(*lat_bounds)
+                      & zips.c.bounds_west.between(*lng_bounds))
+                     | (zips.c.bounds_north.between(*lat_bounds)
+                        & zips.c.bounds_east.between(*lng_bounds))
+                     | (zips.c.bounds_south.between(*lat_bounds)
+                        & zips.c.bounds_east.between(*lng_bounds))
+                     | (zips.c.bounds_south.between(*lat_bounds)
+                        & zips.c.bounds_west.between(*lng_bounds)))
+             .order_by(zips.c.zipcode)
+        )
+        return list(set(zipcode  for zipcode, in q))
+
+    def plot_zips(self, zipcodes, fspec='~/Desktop/map.html'):
+        r = self.search.by_zipcode(zipcodes[0])
         map_ = folium.Map(
             location=(r.lat, r.lng),
             tiles='Stamen Terrain',
         )
-        msg = f'{zipcode}, radius{sp}={sp}{radius}'
-        folium.Circle(
-            location=[r.lat, r.lng],
-            radius=radius.to_value('m'),
-            tooltip=msg,
-            color='purple',
-        ).add_to(map_)
-        folium.CircleMarker(
-            location=[r.lat, r.lng],
-            radius=6,  # px
-            popup=msg,
-            color='purple',
-            fill=True,
-            fill_opacity=.8,
-        ).add_to(map_)
-        folium.Rectangle(
-            bounds=(nw, se),
-            tooltip=msg,
-            color='DarkBlue',
-        ).add_to(map_)
+        for zipcode in zipcodes:
+            r = self.search.by_zipcode(zipcode)
+            radius = r.radius_in_miles * unyt.mile
+            nw = r.bounds_north, r.bounds_west
+            se = r.bounds_south, r.bounds_east
+            sp = '&nbsp;'
+
+            msg = f'{zipcode}, radius{sp}={sp}{radius}'
+            folium.Circle(
+                location=[r.lat, r.lng],
+                radius=radius.to_value('m'),
+                tooltip=msg,
+                color='purple',
+            ).add_to(map_)
+            folium.CircleMarker(
+                location=[r.lat, r.lng],
+                radius=6,  # px
+                popup=msg,
+                color='purple',
+                fill=True,
+                fill_opacity=.7,
+            ).add_to(map_)
+            folium.Rectangle(
+                bounds=(nw, se),
+                tooltip=msg,
+                color='DarkBlue',
+            ).add_to(map_)
 
         map_.save(os.path.expanduser(fspec))
 
 
 if __name__ == '__main__':
-    NearbyZips().plot_zip(90210)
+    nz = NearbyZips()
+    nz.plot_zips(nz.zips_near(90210))
