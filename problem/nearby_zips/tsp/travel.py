@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
+import os
 import re
 
+import folium
 import geocoder
 
 
@@ -24,15 +26,32 @@ def parse_addresses(fin):
                 lat, lng = 36.9647, -122.0238
             else:
                 lat, lng = get_lat_lng(addr)
-            yield lat, lng, addr, f'{price}  {listnum}  {url}'
+            yield (lat, lng), addr, f'{price}  {listnum}  {url}'
         elif addr_price_listnum_re.search(line):
             addr, price, listnum = addr_price_listnum_re.search(line).groups()
 
 
-def show_addresses(infile='/tmp/addrs.txt'):
+def show_addresses(infile='/tmp/addrs.txt', outfile='~/Desktop/map.html'):
     with open(infile) as fin:
-        for lat, lng, addr, details in parse_addresses(fin):
-            print(lat, lng)
+        locs = [(loc, addr) for loc, addr, details in parse_addresses(fin)]
+        map_ = folium.Map(location=locs[0][0], tiles='Stamen Terrain')
+        for loc, addr in locs:
+            addr = shorten(addr)
+            folium.CircleMarker(
+                location=loc,
+                radius=6,  # px
+                tooltip=addr,
+                color='purple',
+                fill=True,
+                fill_opacity=.7,
+            ).add_to(map_)
+
+        map_.save(os.path.expanduser(outfile))
+
+
+def shorten(addr):
+    addr = re.sub(r' santa cruz ca \d+', '', addr)
+    return addr.title().replace('Nd ', 'nd ')
 
 
 if __name__ == '__main__':
