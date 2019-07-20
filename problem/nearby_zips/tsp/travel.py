@@ -34,23 +34,31 @@ def parse_addresses(fin):
 def show_addresses(infile='/tmp/addrs.txt', outfile='~/Desktop/map.html'):
     with open(infile) as fin:
         locs = [(loc, addr) for loc, addr, details in parse_addresses(fin)]
-        map_ = folium.Map(location=locs[0][0], tiles='Stamen Terrain')
+        map_ = folium.Map(location=locs[0][0], tiles='Stamen Terrain', zoom_start=14)
         for loc, addr in locs:
             addr = shorten(addr)
             folium.CircleMarker(
                 location=loc,
                 radius=6,  # px
-                tooltip=addr,
                 color='purple',
                 fill=True,
                 fill_opacity=.7,
+            ).add_to(map_)
+            style = 'font-size: 20pt; color: #00008b;'
+            folium.map.Marker(
+                location=loc,
+                icon=folium.DivIcon(
+                    icon_size=(100, 200),
+                    icon_anchor=(0, 0),
+                    html=f'<div style="{style}">{addr}</div>',
+                )
             ).add_to(map_)
 
         map_.save(os.path.expanduser(outfile))
 
 
 def shorten(addr):
-    addr = re.sub(r' santa cruz ca \d+', '', addr)
+    addr = re.sub(r' \w+ \w+ ca \d+', '', addr)
     return addr.title().replace('Nd ', 'nd ')
 
 
