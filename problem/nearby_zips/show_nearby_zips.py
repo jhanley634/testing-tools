@@ -55,8 +55,8 @@ class NearbyZips:
                      | (zips.c.bounds_south.between(*lat_bounds)
                         & zips.c.bounds_west.between(*lng_bounds)))
              .order_by(zips.c.zipcode)
-        )
-        return list(set(zipcode  for zipcode, in q))
+             )
+        return list(set(zipcode for zipcode, in q))
 
     def plot_zips(self, zipcodes, fspec='~/Desktop/map.html'):
         r = self.search.by_zipcode(zipcodes[0])
