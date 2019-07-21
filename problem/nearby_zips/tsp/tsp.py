@@ -25,11 +25,11 @@ import os
 from geopy.distance import distance
 from tspy import TSP
 from tspy.solvers import TwoOpt_solver
-import tspy.lower_bounds.lp as lp
-# import tspy.lower_bounds.held_karp as hk
+import folium
 import numpy as np
+import tspy.lower_bounds.lp as lp
 
-from problem.nearby_zips.tsp.travel_map import parse_addresses
+from problem.nearby_zips.tsp.travel_map import parse_addresses, shorten
 
 
 def _dist(loc1, loc2):
@@ -45,6 +45,7 @@ class PlaceGroup:
         bb_s, bb_w = self._find_origin(locs)
         self.locs = [(_dist((lat, lng), (bb_s, lng)), _dist((lat, lng), (lat, bb_w)))
                      for lat, lng in locs]
+        self.origin = bb_s, bb_w
 
     def _get_places(self, infile='/tmp/addrs.txt'):
         if not os.path.exists(self._json_filename(infile)):
@@ -66,12 +67,26 @@ class PlaceGroup:
         return bb_s, bb_w
 
 
+def plot(tour, pg, outfile='~/Desktop/map.html'):
+    map_ = folium.Map(location=pg.origin, tiles='Stamen Terrain', zoom_start=14)
+    prev = None
+    for idx in tour:
+        loc, desc = pg.places_with_description[idx]
+        print(idx, ' ', shorten(desc))
+        if prev:
+            folium.PolyLine([prev, loc], color='purple').add_to(map_)
+        prev = loc
+
+    map_.save(os.path.expanduser(outfile))
+
+
 def traveling_salesman():
     pg = PlaceGroup()
     tsp = TSP()
     tsp.read_data(np.array(pg.locs))
     two_opt = TwoOpt_solver(initial_tour='NN')
     tour = two_opt.solve(tsp)
+    plot(tour, pg)
     assert len(pg.locs) + 1 == len(tour)
     tsp.get_approx_solution(two_opt)
 

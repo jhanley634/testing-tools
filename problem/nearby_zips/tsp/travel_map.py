@@ -76,7 +76,7 @@ def show_addresses(infile='/tmp/addrs.txt', outfile='~/Desktop/map.html'):
 
 
 def shorten(addr):
-    addr = re.sub(r' \w+ \w+ ca \d+', '', addr)
+    addr = re.sub(r' \w+ \w+ \w{2} \d+', '', addr)
     return addr.title().replace('Nd ', 'nd ')
 
 
