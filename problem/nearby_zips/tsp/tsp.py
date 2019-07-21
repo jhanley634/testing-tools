@@ -34,7 +34,10 @@ class PlaceGroup:
 
     def __init__(self):
         self.places_with_description = self._get_places()
-        self.locs = [loc for loc, _ in self.places_with_description]
+        locs = [loc for loc, _ in self.places_with_description]
+        bb_s, bb_w = self._find_origin(locs)
+        self.locs = [(lat - bb_s, lng - bb_w)
+                     for lat, lng in locs]
 
     def _get_places(self, infile='/tmp/addrs.txt'):
         if not os.path.exists(self._json_filename(infile)):
@@ -49,9 +52,10 @@ class PlaceGroup:
     def _json_filename(txt_filename):
         return txt_filename.replace('.txt', '.json')
 
-    def find_origin(self):
-        bb_s = min(map(itemgetter(0), self.locs))  # lat
-        bb_w = min(map(itemgetter(1), self.locs))  # lng
+    @staticmethod
+    def _find_origin(locs):
+        bb_s = min(map(itemgetter(0), locs))  # lat
+        bb_w = min(map(itemgetter(1), locs))  # lng
         return bb_s, bb_w
 
 

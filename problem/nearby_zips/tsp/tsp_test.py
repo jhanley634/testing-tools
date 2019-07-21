@@ -32,4 +32,6 @@ class TspTest(unittest.TestCase):
         self.assertEqual(48610, int(distance(sfo, sjc).m))
 
     def test_find_origin(self):
-        self.assertEqual((37, -122), tuple(map(round, PlaceGroup().find_origin())))
+        pg = PlaceGroup()
+        locs = [loc for loc, _ in pg.places_with_description]
+        self.assertEqual((37, -122), tuple(map(round, pg._find_origin(locs))))
