@@ -29,7 +29,7 @@ class TspTest(unittest.TestCase):
     def test_distance(self):
         sfo = 37.619, -122.375
         sjc = 37.363, -121.929
-        self.assertAlmostEqual(48610, int(distance(sfo, sjc).m))
+        self.assertEqual(48610, int(distance(sfo, sjc).m))
 
     def test_find_origin(self):
         self.assertEqual((37, -122), tuple(map(round, PlaceGroup().find_origin())))

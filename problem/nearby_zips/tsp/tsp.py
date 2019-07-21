@@ -19,6 +19,8 @@
 # other dealings in the software.
 
 from operator import itemgetter
+import json
+import os
 
 from problem.nearby_zips.tsp.travel_map import parse_addresses
 
@@ -33,11 +35,19 @@ class PlaceGroup:
     def __init__(self):
         self.places_with_description = self._get_places()
         self.locs = [loc for loc, _ in self.places_with_description]
-        print(self.locs)
 
     def _get_places(self, infile='/tmp/addrs.txt'):
-        with open(infile) as fin:
-            return [(loc, addr) for loc, addr, details in parse_addresses(fin)]
+        if not os.path.exists(self._json_filename(infile)):
+            with open(infile) as fin:
+                places = [(loc, addr) for loc, addr, details in parse_addresses(fin)]
+                with open(self._json_filename(infile), 'w') as fout:
+                    json.dump(places, fout, indent=2)
+        with open(self._json_filename(infile)) as fin:
+            return json.load(fin)
+
+    @staticmethod
+    def _json_filename(txt_filename):
+        return txt_filename.replace('.txt', '.json')
 
     def find_origin(self):
         bb_s = min(map(itemgetter(0), self.locs))  # lat
