@@ -26,16 +26,23 @@ from problem.nearby_zips.tsp.travel_map import parse_addresses
 def tsp():
     ''
 
-def get_places(infile='/tmp/addrs.txt'):
-    with open(infile) as fin:
-        return [(loc, addr) for loc, addr, details in parse_addresses(fin)]
 
+class PlaceGroup:
+    """Models a collection of places (or, in TSP parlance, cities)."""
 
-def find_origin():
-    locs = [loc for loc, _ in get_places()]
-    bb_s = min(map(itemgetter(0), locs))  # lat
-    bb_w = min(map(itemgetter(1), locs))  # lng
-    return bb_s, bb_w
+    def __init__(self):
+        self.places_with_description = self._get_places()
+        self.locs = [loc for loc, _ in self.places_with_description]
+        print(self.locs)
+
+    def _get_places(self, infile='/tmp/addrs.txt'):
+        with open(infile) as fin:
+            return [(loc, addr) for loc, addr, details in parse_addresses(fin)]
+
+    def find_origin(self):
+        bb_s = min(map(itemgetter(0), self.locs))  # lat
+        bb_w = min(map(itemgetter(1), self.locs))  # lng
+        return bb_s, bb_w
 
 
 if __name__ == '__main__':

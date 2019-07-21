@@ -21,7 +21,7 @@ import unittest
 
 from geopy.distance import distance
 
-from problem.nearby_zips.tsp.tsp import find_origin
+from problem.nearby_zips.tsp.tsp import PlaceGroup
 
 
 class TspTest(unittest.TestCase):
@@ -32,4 +32,4 @@ class TspTest(unittest.TestCase):
         self.assertAlmostEqual(48610, int(distance(sfo, sjc).m))
 
     def test_find_origin(self):
-        self.assertEqual((37, -122), tuple(map(round, find_origin())))
+        self.assertEqual((37, -122), tuple(map(round, PlaceGroup().find_origin())))
