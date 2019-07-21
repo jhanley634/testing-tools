@@ -24,6 +24,9 @@ import os
 
 from geopy.distance import distance
 from tspy import TSP
+from tspy.solvers import TwoOpt_solver
+import tspy.lower_bounds.lp as lp
+# import tspy.lower_bounds.held_karp as hk
 import numpy as np
 
 from problem.nearby_zips.tsp.travel_map import parse_addresses
@@ -67,6 +70,19 @@ def traveling_salesman():
     pg = PlaceGroup()
     tsp = TSP()
     tsp.read_data(np.array(pg.locs))
+    two_opt = TwoOpt_solver(initial_tour='NN')
+    tour = two_opt.solve(tsp)
+    assert len(pg.locs) + 1 == len(tour)
+    tsp.get_approx_solution(two_opt)
+
+    for BoundTechnique in [
+        lp.Simple_LP_bound,
+        lp.Connected_LP_bound,
+        lp.MinCut_LP_bound,
+        # hk.Held_Karp,
+    ]:
+        print(f'\n{BoundTechnique.__name__}')
+        tsp.get_lower_bound(BoundTechnique())
 
 
 if __name__ == '__main__':
