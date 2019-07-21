@@ -31,4 +31,5 @@ dependencies:
     - flask-api
     - imgkit
     - sqlacodegen
+    - tspy >= 0.1.1.1
     - uszipcode >= 0.2.0

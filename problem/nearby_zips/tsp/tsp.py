@@ -22,11 +22,15 @@ from operator import itemgetter
 import json
 import os
 
+from geopy.distance import distance
+from tspy import TSP
+import numpy as np
+
 from problem.nearby_zips.tsp.travel_map import parse_addresses
 
 
-def tsp():
-    ''
+def _dist(loc1, loc2):
+    return round(distance(loc1, loc2).meters, 2)  # cm resolution
 
 
 class PlaceGroup:
@@ -36,7 +40,7 @@ class PlaceGroup:
         self.places_with_description = self._get_places()
         locs = [loc for loc, _ in self.places_with_description]
         bb_s, bb_w = self._find_origin(locs)
-        self.locs = [(lat - bb_s, lng - bb_w)
+        self.locs = [(_dist((lat, lng), (bb_s, lng)), _dist((lat, lng), (lat, bb_w)))
                      for lat, lng in locs]
 
     def _get_places(self, infile='/tmp/addrs.txt'):
@@ -59,5 +63,11 @@ class PlaceGroup:
         return bb_s, bb_w
 
 
+def traveling_salesman():
+    pg = PlaceGroup()
+    tsp = TSP()
+    tsp.read_data(np.array(pg.locs))
+
+
 if __name__ == '__main__':
-    tsp()
+    traveling_salesman()
