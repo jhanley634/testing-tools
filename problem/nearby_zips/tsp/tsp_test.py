@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 
 # Copyright 2018 John Hanley.
 #
@@ -18,25 +17,19 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-from operator import itemgetter
+import unittest
 
-from problem.nearby_zips.tsp.travel_map import parse_addresses
+from geopy.distance import distance
 
-
-def tsp():
-    ''
-
-def get_places(infile='/tmp/addrs.txt'):
-    with open(infile) as fin:
-        return [(loc, addr) for loc, addr, details in parse_addresses(fin)]
+from problem.nearby_zips.tsp.tsp import find_origin
 
 
-def find_origin():
-    locs = [loc for loc, _ in get_places()]
-    bb_s = min(map(itemgetter(0), locs))  # lat
-    bb_w = min(map(itemgetter(1), locs))  # lng
-    return bb_s, bb_w
+class TspTest(unittest.TestCase):
 
+    def test_distance(self):
+        sfo = 37.619, -122.375
+        sjc = 37.363, -121.929
+        self.assertAlmostEqual(48610, int(distance(sfo, sjc).m))
 
-if __name__ == '__main__':
-    tsp()
+    def test_find_origin(self):
+        self.assertEqual((37, -122), tuple(map(round, find_origin())))
