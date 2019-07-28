@@ -295,6 +295,14 @@ of the correctness of his position.
 \blank
 
 So, too, with code.
+\blank
+
+"We take the position that it is not only the programmer's
+responsibility to produce a correct program but also to demonstrate
+its correctness in a convincing manner." --Edsger Dijkstra
+
+"Program testing can be used to show the presence of bugs,
+but never to show their absence!" --Dijkstra
 
 <!---
 Copyright 2019 John Hanley.
