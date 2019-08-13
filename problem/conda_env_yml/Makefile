@@ -25,6 +25,9 @@ CUR_LIST := $(CUR).txt
 
 all: diffs
 
+check:
+	cd ../.. && problem/conda_env_yml/env_report.py
+
 $(CUR): $(ENV)
 	sed -e '/^name:/s/$$/-current/' -e 's/ *[<>=].*//'  < $? > $@
 	diff -wu $? $@ || true
