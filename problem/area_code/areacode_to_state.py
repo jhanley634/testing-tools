@@ -94,6 +94,14 @@ def get_areacode_to_state():
                 assert 3 == len(a.text), a
                 assert a.text.isdigit(), a
                 yield int(a.text), state
+    yield 240, 'md'  # greater Wash. D.C.
+    yield 267, 'pa'  # Philadelpha
+    yield 347, 'ny'  # outer boroughs
+    yield 424, 'ca'  # L.A.
+    yield 646, 'ny'  # Manhattan
+    yield 720, 'co'  # Denver
+    yield 832, 'tx'  # Houston
+    yield 917, 'ny'  # NYC
 
 
 if __name__ == '__main__':
