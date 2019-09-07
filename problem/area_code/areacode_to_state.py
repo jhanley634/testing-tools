@@ -79,7 +79,7 @@ def get_cached_web_page(url, cache_dir='/tmp'):
 def get_areacode_to_state():
     """Returns a NANPA telephone area code to state mapping."""
     url = 'https://www.worldatlas.com/na/us/area-codes.html'
-    state_link_re = re.compile(r'/namerica/usstates/(\w{2}).htm$')
+    state_link_re = re.compile(r'/namerica/usstates/(\w{2}|washdc).htm$')
     areacode_link_re = re.compile(r'/na/us/\w{2}/area-code-\d{3}.html$')
     state = 'XX'
     soup = bs4.BeautifulSoup(get_cached_web_page(url), 'html5lib')
@@ -89,7 +89,7 @@ def get_areacode_to_state():
             href = a.get('href')
             m = state_link_re.search(href)
             if m:
-                state = m.group(1)
+                state = m.group(1)[-2:]
             if areacode_link_re.search(href):
                 assert 3 == len(a.text), a
                 assert a.text.isdigit(), a
@@ -99,4 +99,6 @@ def get_areacode_to_state():
 if __name__ == '__main__':
     ac_to_state = dict(get_areacode_to_state())
     assert 241 == len(ac_to_state)
-    assert 50 == len(set(ac_to_state.values()))  # No District of Columbia
+    assert 51 == len(set(ac_to_state.values()))
+    assert 'dc' == ac_to_state[202]
+    assert 'nj' == ac_to_state[201]
