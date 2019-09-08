@@ -76,9 +76,9 @@ def get_cached_web_page(url, cache_dir='/tmp'):
         return fin.read()
 
 
-def get_areacode_to_state():
+def get_atlas_areacode_to_state():
     """Returns a NANPA telephone area code to state mapping."""
-    url = 'https://www.worldatlas.com/na/us/area-codes.html'
+    url = 'https://www.worldatlas.com/na/us/area-codes.html'  # Sigh! A bit old.
     state_link_re = re.compile(r'/namerica/usstates/(\w{2}|washdc).htm$')
     areacode_link_re = re.compile(r'/na/us/\w{2}/area-code-\d{3}.html$')
     state = 'XX'
@@ -94,18 +94,48 @@ def get_areacode_to_state():
                 assert 3 == len(a.text), a
                 assert a.text.isdigit(), a
                 yield int(a.text), state
-    yield 240, 'md'  # greater Wash. D.C.
-    yield 267, 'pa'  # Philadelpha
-    yield 347, 'ny'  # outer boroughs
-    yield 424, 'ca'  # L.A.
-    yield 646, 'ny'  # Manhattan
-    yield 720, 'co'  # Denver
-    yield 832, 'tx'  # Houston
-    yield 917, 'ny'  # NYC
+    yield from _get_recent_areacodes()
+
+
+def _get_recent_areacodes():
+    """This method knows about recently added U.S. area codes."""
+    yield 224, 'il'
+    yield 240, 'md'
+    yield 267, 'pa'
+    yield 346, 'tx'
+    yield 347, 'ny'
+    yield 385, 'ut'
+    yield 424, 'ca'
+    yield 442, 'ca'
+    yield 443, 'md'
+    yield 469, 'tx'
+    yield 470, 'ga'
+    yield 484, 'pa'
+    yield 551, 'nj'
+    yield 571, 'va'
+    yield 628, 'ca'
+    yield 646, 'ny'
+    yield 657, 'ca'
+    yield 669, 'ca'
+    yield 678, 'ga'
+    yield 682, 'tx'
+    yield 720, 'co'
+    yield 737, 'tx'
+    yield 747, 'ca'
+    yield 774, 'ma'
+    yield 786, 'fl'
+    yield 832, 'tx'
+    yield 848, 'nj'
+    yield 857, 'ma'
+    yield 862, 'nj'
+    yield 917, 'ny'
+    yield 929, 'ny'
+    yield 971, 'or'
+    yield 984, 'nc'
 
 
 if __name__ == '__main__':
-    ac_to_state = dict(get_areacode_to_state())
+    ac_to_state = dict(get_atlas_areacode_to_state())
     assert 241 == len(ac_to_state)
     assert 51 == len(set(ac_to_state.values()))
     assert 'dc' == ac_to_state[202]
