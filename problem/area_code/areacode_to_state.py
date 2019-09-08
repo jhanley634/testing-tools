@@ -76,6 +76,44 @@ def get_cached_web_page(url, cache_dir='/tmp'):
         return fin.read()
 
 
+def get_areacode_to_state():
+    """Returns a NANPA telephone area code to state/province/territory mapping."""
+    url = 'https://www.bennetyee.org/ucsd-pages/area.state.html'
+    soup = bs4.BeautifulSoup(get_cached_web_page(url), 'html5lib')
+    tbl = soup.find_all('table')[0]
+    for tr in tbl.find_all('tr'):
+        tds = tuple(_strip_after_punct(td.text)
+                    for td in tr.find_all('td'))
+        if tds and tds[0] != '52 55':
+            areacode, state = tds[:2]
+            yield int(areacode), state.lower()
+
+
+def _int_tz(offset: str):
+    """Returns UTC offset in hours, when Daylight Saving is not in effect.
+
+    >>> _int_tz('-6/-7*')
+    -6
+    """
+    tz_re = re.compile(r'^-?\d+')
+    m = tz_re.search(offset.replace('+', ''))
+    if m:
+        return int(m.group(0))
+    return 0  # Input may have been e.g. '--'.
+
+
+def _strip_after_punct(s):
+    """Abbreviates descriptions.
+    >>> _strip_after_punct('Utah: SLC metro')
+    'Utah'
+    """
+    s = (s
+         .replace(',', ':')
+         .replace('(', ':')
+         .replace('[', ':'))
+    return s.split(':')[0].strip()
+
+
 def get_atlas_areacode_to_state():
     """Returns a NANPA telephone area code to state mapping."""
     url = 'https://www.worldatlas.com/na/us/area-codes.html'  # Sigh! A bit old.
@@ -135,8 +173,18 @@ def _get_recent_areacodes():
 
 
 if __name__ == '__main__':
-    ac_to_state = dict(get_atlas_areacode_to_state())
-    assert 241 == len(ac_to_state)
-    assert 51 == len(set(ac_to_state.values()))
+    ac_to_state1 = dict(get_atlas_areacode_to_state())
+    assert 274 == len(ac_to_state1)
+    assert 51 == len(set(ac_to_state1.values()))
+    assert 'dc' == ac_to_state1[202]
+    assert 'nj' == ac_to_state1[201]
+
+    ac_to_state = dict(get_areacode_to_state())
+    assert 412 == len(ac_to_state)
+    assert 66 == len(set(ac_to_state.values()))
     assert 'dc' == ac_to_state[202]
     assert 'nj' == ac_to_state[201]
+
+    # Verify the atlas data is a proper subset.
+    for num, state in ac_to_state1.items():
+        assert ac_to_state[num] == state
