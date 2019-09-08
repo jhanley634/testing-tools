@@ -20,6 +20,7 @@
 
 """Supplies an area code to state mapping."""
 
+from collections import namedtuple
 from pathlib import Path
 from urllib.parse import urlparse
 import hashlib
@@ -28,6 +29,9 @@ import re
 
 import bs4
 import requests
+
+
+AreacodeRecord = namedtuple('AreacodeRecord', 'state offset')  # TZ, hours from UTC
 
 
 def _hash(s: str, k=6):
@@ -76,7 +80,7 @@ def get_cached_web_page(url, cache_dir='/tmp'):
         return fin.read()
 
 
-def get_areacode_to_state():
+def get_areacode_to_state_tz():
     """Returns a NANPA telephone area code to state/province/territory mapping."""
     url = 'https://www.bennetyee.org/ucsd-pages/area.state.html'
     soup = bs4.BeautifulSoup(get_cached_web_page(url), 'html5lib')
@@ -85,8 +89,8 @@ def get_areacode_to_state():
         tds = tuple(_strip_after_punct(td.text)
                     for td in tr.find_all('td'))
         if tds and tds[0] != '52 55':
-            areacode, state = tds[:2]
-            yield int(areacode), state.lower()
+            areacode, state, offset = tds[:3]
+            yield int(areacode), AreacodeRecord(state.lower(), _int_tz(offset))
 
 
 def _int_tz(offset: str):
@@ -179,12 +183,13 @@ if __name__ == '__main__':
     assert 'dc' == ac_to_state1[202]
     assert 'nj' == ac_to_state1[201]
 
-    ac_to_state = dict(get_areacode_to_state())
+    ac_to_state = dict(get_areacode_to_state_tz())
     assert 412 == len(ac_to_state)
-    assert 66 == len(set(ac_to_state.values()))
-    assert 'dc' == ac_to_state[202]
-    assert 'nj' == ac_to_state[201]
+    # FL, IN, KY & MI have -6 and -5 entries, for example. Also '--' has four offsets.
+    assert 75 == len(set(ac_to_state.values()))
+    assert 'dc' == ac_to_state[202].state
+    assert 'nj' == ac_to_state[201].state
 
     # Verify the atlas data is a proper subset.
     for num, state in ac_to_state1.items():
-        assert ac_to_state[num] == state
+        assert ac_to_state[num].state == state
