@@ -57,7 +57,7 @@ that you *might* want to clarify what you wrote.
 It could be the case that a quick casual reading
 leaves one confused,
 and some tricky concept requires more careful reading.
-But maybe adding a sentence about that tricky aspect
+Maybe adding a sentence about that tricky aspect
 is warranted.
 \blank
 
@@ -96,7 +96,7 @@ Consider using `assert`, `verify()`, or conditional `raise`
 to signal that input args were incorrect.
 
 Simply assuming things about inputs is fine, also,
-e.g. going ahead and de-reference `x[y]`.
+e.g. go ahead and de-reference `x[y]`.
 *Do* think about whether a failed operation
 will produce a *diagnostic* error or an opaque one.
 Consider adding checks you feel may help future debugging.
@@ -155,7 +155,7 @@ You don't have to answer every single question that might arise;
 this isn't Sun's javadocs.
 If you choose to wax poetic,
 typically you should leave a blank line after the initial summary sentence
-before you launch into paragraph(s) that describe your method.
+before you launch into paragraph(s) describing your method.
 
 #docstring --- numpydoc
 You do *not* have to exhaustively detail every parameter of your method in a docstring.
