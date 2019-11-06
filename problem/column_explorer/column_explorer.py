@@ -39,23 +39,37 @@ class ColumnExplorer:
     def __init__(self, cs_or_engine):
         self.engine = sa.create_engine(cs_or_engine)
 
-    def report(self, table_name):
-        for column in self._get_col_names(table_name):
+    def report(self, table_name, round_digits=3):
+
+        meta = sa.MetaData(bind=self.engine)
+        tbl = sa.Table(table_name, meta, autoload=True)
+
+        cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
+        print(f'# {table_name}\n{cnt} rows, {len(tbl.c)} columns\n')
+
+        for column in self._get_col_names(tbl):
             print('\n## ' + column)
-            for agg in ['min', 'avg', 'max', 'count(distinct ']:
+            for agg in ['min', 'avg', 'max', 'count(distinct ', 'nulls']:
                 if '(' not in agg:
                     agg += '('
                 select = f'select {agg}{column}) from {table_name}'
+                if agg.startswith('nulls'):
+                    select = f'select count(*) from {table_name} where {column} is null'
+
                 stat, = self.engine.execute(select).fetchone()
+
+                if agg.startswith('avg'):
+                    stat = round(stat, round_digits)
+                if agg.startswith('nulls'):
+                    pct = round(100 * stat / cnt, round_digits)
+                    stat = f'{stat} ({pct} %)'
                 print('-', agg.replace('(', ' '), stat)
 
-        cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
         print(f'\n{cnt} rows in {table_name}')
 
-    def _get_col_names(self, table_name):
-        meta = sa.MetaData(bind=self.engine)
-        tbl = sa.Table(table_name, meta, autoload=True)
-        return map(str, tbl.columns)
+    def _get_col_names(self, table):
+        for col in table.columns:
+            yield str(col).split('.')[1]
 
 
 if __name__ == '__main__':
