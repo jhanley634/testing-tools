@@ -21,6 +21,17 @@
 """Systematically finds aggregate stats for a table's columns."""
 
 import sqlalchemy as sa
+import uszipcode
+
+
+def get_zipcode_session():
+    return uszipcode.SearchEngine().ses
+
+
+def get_zipcode_cs():
+    """Returns a JDBC connect string for the zipcode database."""
+    # typical value: sqlite:////Users/foo/.uszipcode/simple_db.sqlite
+    return get_zipcode_session().connection().engine.url
 
 
 class ColumnExplorer:
@@ -29,13 +40,22 @@ class ColumnExplorer:
         self.engine = sa.create_engine(cs_or_engine)
 
     def report(self, table_name):
-        for column in self._get_col_names(table):
-            print('\n' + column)
+        for column in self._get_col_names(table_name):
+            print('\n## ' + column)
             for agg in ['min', 'avg', 'max']:
-                for row in self.engine.execute(
-                        f'select {agg}({column}) from {table_name}'):
-                    print(row[0])
+                select = f'select {agg}({column}) from {table_name}'
+                stat, = self.engine.execute(select).fetchone()
+                print('-', agg, stat)
+
+        cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
+        print(f'\n{cnt} rows in {table_name}')
+
+    def _get_col_names(self, table_name):
+        meta = sa.MetaData(bind=self.engine)
+        tbl = sa.Table(table_name, meta, autoload=True)
+        return map(str, tbl.columns)
 
 
 if __name__ == '__main__':
-    ColumnExplorer().report('example')
+
+    ColumnExplorer(get_zipcode_cs()).report('simple_zipcode')
