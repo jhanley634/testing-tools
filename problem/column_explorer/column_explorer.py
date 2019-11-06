@@ -20,6 +20,7 @@
 
 """Systematically finds aggregate stats for a table's columns."""
 
+import click
 import sqlalchemy as sa
 import uszipcode
 
@@ -80,6 +81,13 @@ class ColumnExplorer:
             yield str(col).split('.')[1]
 
 
-if __name__ == '__main__':
+@click.command()
+@click.option('--uri_getter', default='get_zipcode_cs')
+@click.option('--table', default='simple_zipcode')
+def main(uri_getter, table):
+    callable = globals()[uri_getter]
+    ColumnExplorer(callable()).report(table)
 
-    ColumnExplorer(get_zipcode_cs()).report('simple_zipcode')
+
+if __name__ == '__main__':
+    main()
