@@ -42,8 +42,13 @@ class ColumnExplorer:
 
     def report(self, table_name, round_digits=3):
 
+        kwargs = dict(autoload=True)
+        table_short_name = table_name
+        if '.' in table_name:
+            table_short_name, schema = table_name.split('.')
+            kwargs['schema'] = schema
         meta = sa.MetaData(bind=self.engine)
-        tbl = sa.Table(table_name, meta, autoload=True)
+        tbl = sa.Table(table_short_name, meta, **kwargs)
         stat = None
 
         cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
@@ -78,11 +83,11 @@ class ColumnExplorer:
 
     def _get_col_names(self, table):
         for col in table.columns:
-            yield str(col).split('.')[1]
+            yield str(col).split('.')[-1]
 
 
 @click.command()
-@click.option('--uri_getter', default='get_zipcode_cs')
+@click.option('--uri-getter', default='get_zipcode_cs')
 @click.option('--table', default='simple_zipcode')
 def main(uri_getter, table):
     callable = globals()[uri_getter]
