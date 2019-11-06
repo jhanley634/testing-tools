@@ -42,10 +42,12 @@ class ColumnExplorer:
     def report(self, table_name):
         for column in self._get_col_names(table_name):
             print('\n## ' + column)
-            for agg in ['min', 'avg', 'max']:
-                select = f'select {agg}({column}) from {table_name}'
+            for agg in ['min', 'avg', 'max', 'count(distinct ']:
+                if '(' not in agg:
+                    agg += '('
+                select = f'select {agg}{column}) from {table_name}'
                 stat, = self.engine.execute(select).fetchone()
-                print('-', agg, stat)
+                print('-', agg.replace('(', ' '), stat)
 
         cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
         print(f'\n{cnt} rows in {table_name}')
