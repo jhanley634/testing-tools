@@ -22,6 +22,7 @@
 
 import click
 import sqlalchemy as sa
+import sqlalchemy.sql.sqltypes as sqltypes
 import uszipcode
 
 
@@ -45,7 +46,7 @@ class ColumnExplorer:
         kwargs = dict(autoload=True)
         table_short_name = table_name
         if '.' in table_name:
-            table_short_name, schema = table_name.split('.')
+            schema, table_short_name = table_name.split('.')
             kwargs['schema'] = schema
         meta = sa.MetaData(bind=self.engine)
         tbl = sa.Table(table_short_name, meta, **kwargs)
@@ -70,7 +71,7 @@ class ColumnExplorer:
                         or (agg == 'mode count' and stat is None)):
                     select = f'select count(*) from {table_name} where {column} is null'
 
-                stat, = self.engine.execute(select, params).fetchone()
+                stat, = self.engine.execute(sa.text(select), params).fetchone()
 
                 if agg == 'avg':
                     stat = round(stat, round_digits)
@@ -83,7 +84,8 @@ class ColumnExplorer:
 
     def _get_col_names(self, table):
         for col in table.columns:
-            yield str(col).split('.')[-1]
+            if type(col.type) != sqltypes.BOOLEAN:  # Can't take max(B) of boolean B.
+                yield str(col).split('.')[-1]
 
 
 @click.command()
