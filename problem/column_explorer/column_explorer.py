@@ -43,24 +43,32 @@ class ColumnExplorer:
 
         meta = sa.MetaData(bind=self.engine)
         tbl = sa.Table(table_name, meta, autoload=True)
+        stat = None
 
         cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
         print(f'# {table_name}\n{cnt} rows, {len(tbl.c)} columns\n')
 
         for column in self._get_col_names(tbl):
             print('\n## ' + column)
-            for agg in ['min', 'avg', 'max', 'count(distinct ', 'nulls']:
-                if '(' not in agg:
-                    agg += '('
+            for agg in ['min(', 'avg(', 'max(', 'mode',
+                        'mode count', 'nulls', 'count(distinct ']:
+                params = {}
                 select = f'select {agg}{column}) from {table_name}'
-                if agg.startswith('nulls'):
+                if agg == 'mode':
+                    select = (f'select {column}  from {table_name}'
+                              f' group by {column}  order by count(*) desc  limit 1')
+                if agg == 'mode count':
+                    params = dict(val=stat)
+                    select = f'select count(*) from {table_name} where {column} = :val'
+                if ((agg == 'nulls')
+                        or (agg == 'mode count' and stat is None)):
                     select = f'select count(*) from {table_name} where {column} is null'
 
-                stat, = self.engine.execute(select).fetchone()
+                stat, = self.engine.execute(select, params).fetchone()
 
-                if agg.startswith('avg'):
+                if agg == 'avg':
                     stat = round(stat, round_digits)
-                if agg.startswith('nulls'):
+                if agg == 'nulls':
                     pct = round(100 * stat / cnt, round_digits)
                     stat = f'{stat} ({pct} %)'
                 print('-', agg.replace('(', ' '), stat)
