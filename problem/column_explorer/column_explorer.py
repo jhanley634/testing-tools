@@ -23,6 +23,7 @@
 import click
 import sqlalchemy as sa
 import sqlalchemy.sql.sqltypes as sqltypes
+import sqlalchemy.dialects.postgresql.base as pg_base
 import uszipcode
 
 
@@ -51,16 +52,22 @@ class ColumnExplorer:
         meta = sa.MetaData(bind=self.engine)
         tbl = sa.Table(table_short_name, meta, **kwargs)
         stat = None
+        non_numeric = set([
+            sqltypes.TEXT,
+            pg_base.TIMESTAMP,
+        ])
 
         cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
         print(f'# {table_name}\n{cnt} rows, {len(tbl.c)} columns\n')
 
-        for column in self._get_col_names(tbl):
+        for column, typ in self._get_cols(tbl):
             print('\n## ' + column)
             for agg in ['min(', 'avg(', 'max(', 'mode',
                         'mode count', 'nulls', 'count(distinct ']:
                 params = {}
                 select = f'select {agg}{column}) from {table_name}'
+                if agg == 'avg(' and typ in non_numeric:
+                    continue
                 if agg == 'mode':
                     select = (f'select {column}  from {table_name}'
                               f' group by {column}  order by count(*) desc  limit 1')
@@ -82,10 +89,10 @@ class ColumnExplorer:
 
         print(f'\n{cnt} rows in {table_name}')
 
-    def _get_col_names(self, table):
+    def _get_cols(self, table):
         for col in table.columns:
             if type(col.type) != sqltypes.BOOLEAN:  # Can't take max(B) of boolean B.
-                yield str(col).split('.')[-1]
+                yield str(col).split('.')[-1], type(col.type)
 
 
 @click.command()
