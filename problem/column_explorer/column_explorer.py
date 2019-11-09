@@ -69,7 +69,17 @@ class ColumnExplorer:
         tbl = self._get_table(table_name)
         stat = None
         non_numeric = set([
+            sqltypes.BLOB,
+            sqltypes.BOOLEAN,
+            sqltypes.CHAR,
+            sqltypes.DATE,
             sqltypes.TEXT,
+            sqltypes.VARCHAR,
+            pg_base.CIDR,
+            pg_base.ENUM,
+            pg_base.INET,
+            pg_base.INTERVAL,
+            pg_base.TIME,
             pg_base.TIMESTAMP,
         ])
 
@@ -87,6 +97,8 @@ class ColumnExplorer:
                 if agg == 'mode':
                     select = (f'select {column}  from {table_name}'
                               f' group by {column}  order by count(*) desc  limit 1')
+                    if cnt == 0:
+                        continue
                 if agg == 'mode count':
                     params = dict(val=stat)
                     select = f'select count(*) from {table_name} where {column} = :val'
