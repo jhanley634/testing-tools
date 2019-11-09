@@ -42,15 +42,31 @@ class ColumnExplorer:
     def __init__(self, cs_or_engine):
         self.engine = sa.create_engine(cs_or_engine)
 
-    def report(self, table_name, round_digits=3):
-
+    def _get_table(self, table_name):
         kwargs = dict(autoload=True)
         table_short_name = table_name
         if '.' in table_name:
             schema, table_short_name = table_name.split('.')
             kwargs['schema'] = schema
         meta = sa.MetaData(bind=self.engine)
-        tbl = sa.Table(table_short_name, meta, **kwargs)
+        return sa.Table(table_short_name, meta, **kwargs)
+
+    def show_informative_columns(self, table_name):
+        """A column is uninformative if it has a constant value, e.g. always NULL."""
+        tbl = self._get_table(table_name)
+        cnt, = self.engine.execute(f'select count(*) from {table_name}').fetchone()
+        if cnt <= 1:
+            return  # Nothing to see here, by definition there are no informative columns.
+        for column, _ in self._get_cols(tbl):
+            select = f'select count(distinct {column}) from {table_name}'
+            cnt, = self.engine.execute(select).fetchone()
+            # print(f'{cnt:8d}  {column}')
+            if cnt > 1:
+                print(column + ',')
+
+    def report(self, table_name, round_digits=3):
+
+        tbl = self._get_table(table_name)
         stat = None
         non_numeric = set([
             sqltypes.TEXT,
@@ -80,7 +96,7 @@ class ColumnExplorer:
 
                 stat, = self.engine.execute(sa.text(select), params).fetchone()
 
-                if agg == 'avg':
+                if agg == 'avg(' and stat is not None:
                     stat = round(stat, round_digits)
                 if agg == 'nulls':
                     pct = round(100 * stat / cnt, round_digits)
@@ -100,7 +116,9 @@ class ColumnExplorer:
 @click.option('--table', default='simple_zipcode')
 def main(uri_getter, table):
     callable = globals()[uri_getter]
-    ColumnExplorer(callable()).report(table)
+    ce = ColumnExplorer(callable())
+    # ce.show_informative_columns(table)
+    ce.report(table)
 
 
 if __name__ == '__main__':
