@@ -18,4 +18,24 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import os
+
 import lxml
+
+
+def _get_urls(top_dir='.', ext='.html'):
+    pfx = os.path.abspath(top_dir) + os.path.sep
+    for root, dirs, files in os.walk(top_dir):
+        for file in files:
+            if file.endswith(ext):
+                path = os.path.abspath(os.path.join(root, file))[len(pfx):]
+                yield path
+
+
+def gen_sitemap():
+    for url in _get_urls(ext='.txt'):
+        print(url)
+
+
+if __name__ == '__main__':
+    gen_sitemap()
