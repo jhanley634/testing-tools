@@ -18,6 +18,8 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import glob
+import os
 import re
 import subprocess
 
@@ -25,8 +27,7 @@ from ruamel.yaml import YAML
 
 
 def _get_packages_with_versions(fin):
-    with open('environment.yml') as fin:
-        d = YAML().load(fin)
+    d = YAML().load(fin)
     for dep in d['dependencies']:
         if isinstance(dep, dict):
             yield from dep['pip']
@@ -42,7 +43,18 @@ def _get_package_names_and_versions(fin):
             yield m.groups()
 
 
+def _find_file(file):
+    for pfx in ['', '../', '../../']:
+        if os.path.exists(pfx + file):
+            return pfx + file
+    matches = glob.glob('*/' + file)
+    if matches:
+        return matches[0]
+    return file  # Failure case, file does not exist, report diagnostic.
+
+
 def report(file='environment.yml'):
+    file = _find_file(file)
     with open(file) as fin:
         name_to_ver = dict(_get_package_names_and_versions(fin))
 

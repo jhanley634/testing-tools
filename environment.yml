@@ -8,6 +8,7 @@ dependencies:
   - cartopy >= 0.17.0
   - click >= 7.0
   - cvxopt >= 1.2.3
+  - dicttoxml >= 1.7.4
   - flake8 >= 3.7.9
   - flask >= 1.1.1
   - folium >= 0.10.0
