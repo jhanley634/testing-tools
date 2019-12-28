@@ -18,6 +18,7 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from dill.source import getsource
 from pathlib import Path
 import ast
 import inspect
@@ -72,7 +73,7 @@ class SourceCodeExploder:
             print(node)
             print(ast.dump(node))
 
-    def explode_packages(self, top_dir):
+    def explode_packages(self, top_dir, verbose=False):
         # https://stackoverflow.com/questions/16852811/import-modules-in-a-dir
         for loader, name, is_pkg in pkgutil.walk_packages([str(top_dir)]):
 
@@ -91,6 +92,14 @@ class SourceCodeExploder:
                         or '/miniconda3/envs/' in str_value):
                     continue
                 print(module.__name__, name, str(value)[:100])
+                source = ''
+                try:
+                    source = getsource(value)
+                except RuntimeError:
+                    # FlaskAPI may report: Working outside of request context.
+                    pass
+                if verbose:
+                    print(source)
 
 
 @click.command()
@@ -104,6 +113,7 @@ You may want to invoke in this way:
     $ code_explode/exploder.py `git rev-parse --show-toplevel`
     """
     SourceCodeExploder().explode_fs_tree(Path(top_dir))
+    SourceCodeExploder().explode_packages(Path(top_dir))
 
 
 if __name__ == '__main__':

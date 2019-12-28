@@ -2,12 +2,13 @@ name: testing-tools
 channels:
   - conda-forge
 dependencies:
-  - beautifulsoup4 >= 4.8.1
+  - beautifulsoup4 >= 4.8.2
   - boltons >= 19.2.0
   - cartopy >= 0.17.0
   - click >= 7.0
   - cvxopt >= 1.2.3
   - dicttoxml >= 1.7.4
+  - dill >= 0.3.1.1
   - flake8 >= 3.7.9
   - flask >= 1.1.1
   - folium >= 0.10.1
