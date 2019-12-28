@@ -31,10 +31,9 @@ import sqlalchemy.engine.url
 import sqlalchemy.exc
 import sqlalchemy.ext.automap
 import sqlalchemy.orm.session
-import uszipcode
+import uszipcode.search
 
-# from places_table import t_places
-import place_table
+from problem.zipcode_stats.place_table import t_places
 
 
 class ZipcodeStats:
@@ -43,11 +42,11 @@ class ZipcodeStats:
         if places_mgr is None:
             places_mgr = Places2kMgr()
         self.places_mgr = places_mgr
-        self.zse = uszipcode.ZipcodeSearchEngine()
+        self.zse = uszipcode.search.SearchEngine()
 
     def get_city_state(self, zipcode):
         r = self.zse.by_zipcode(zipcode)
-        return '{} {}'.format(r['City'], r['State'])
+        return f'{r.city} {r.state}'
 
     def get_lat_lng(self):
         pass
@@ -117,7 +116,7 @@ class Places2kMgr:
         try:
             self.engine.execute(query).fetchall()
         except sqlalchemy.exc.OperationalError:
-            meta.create_all(tables=[place_table.t_places])
+            meta.create_all(tables=[t_places])
             self.engine.execute(query).fetchall()
         return meta
 
