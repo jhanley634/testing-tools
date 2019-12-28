@@ -70,9 +70,15 @@ class SourceCodeExploder:
         tree = ast.parse(prog_text)
         assert () == tree._attributes, tree
         assert ('body', ) == tree._fields, tree
-        for node in tree.body:
-            print(self._elide_addr(str(node)))
-            print(ast.dump(node))
+        self._dump_recursive(tree, '')
+
+    @classmethod
+    def _dump_recursive(cls, node, indent):
+        print('')
+        print(5, indent, ast.dump(node, annotate_fields=True))
+        body = getattr(node, 'body', [])
+        for child in body:
+            cls._dump_recursive(child, indent + '    ')
 
     _at_hex_addr_re = re.compile(r' at 0x[\da-f]+>$')
 
