@@ -67,7 +67,8 @@ class Places2kMgr:
         self.engine = None
         db_file, in_file = [os.path.join(dir, f) for f in [db_file, in_file]]
 
-        os.unlink(db_file)
+        if os.path.exists(db_file):
+            os.unlink(db_file)
 
         db_url = sqlalchemy.engine.url.URL(
             **dict(drivername='sqlite', database=db_file))
@@ -120,14 +121,20 @@ class Places2kMgr:
             self.engine.execute(query).fetchall()
         return meta
 
-    def _download(self, out_file, zip_url='https://www.cs.rutgers.edu/~pxk'
-                                          '/rutgers/hw/places.zip'):
+    def _download(self, out_file, zip_url=None):
+        if zip_url is None:
+            zip_url = 'https://www.cs.rutgers.edu/~pxk/rutgers/hw/places.zip'
+            zip_url = 'https://web.archive.org/web/20060117091716/' + zip_url
         # Another candidate download location might be
         # https://github.com/petewarden/crunchcrawl/raw/master/places2k.txt
         # but it uses some variant Latin1 encoding for Puerto Rico place names.
         req = requests.get(zip_url)
+        req.raise_for_status()
+        for k, v in req.headers.items():
+            print(k.ljust(30), v)
         assert 200 == req.status_code
-        assert 1110384 == int(req.headers['Content-Length'])
+        # assert 1110384 == int(req.headers['Content-Length'])
+        assert 1110385 == int(req.headers['X-Archive-Orig-Content-Length'])
         assert 'application/zip' == req.headers['Content-Type']
         content = io.BytesIO(req.content)
 
