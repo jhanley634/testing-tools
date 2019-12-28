@@ -51,7 +51,7 @@ class SourceCodeExploder:
     def _is_directory_to_scan(self, dir: str):
         return dir not in self._ignore_dirs
 
-    def explode_tree(self, top_dir):
+    def explode_fs_tree(self, top_dir):
         assert top_dir.is_dir(), f'Need a directory, but got: {top_dir}'
         for root, dirs, files in os.walk(top_dir):
             # We modify dirs in-place, to influence what walk() will visit.
@@ -59,10 +59,18 @@ class SourceCodeExploder:
             root = Path(root)
             for file in files:
                 if file.endswith('.py'):
-                    self.explode_file(root / file)
+                    with open(root / file) as fin:
+                        print('')
+                        print(root/file)
+                        self.explode_file(fin.read())
 
-    def explode_file(self, fspec):
-        ''
+    def explode_file(self, prog_text):
+        tree = ast.parse(prog_text)
+        assert () == tree._attributes, tree
+        assert ('body', ) == tree._fields, tree
+        for node in tree.body:
+            print(node)
+            print(ast.dump(node))
 
     def explode_packages(self, top_dir):
         # https://stackoverflow.com/questions/16852811/import-modules-in-a-dir
@@ -95,7 +103,7 @@ You may want to invoke in this way:
 
     $ code_explode/exploder.py `git rev-parse --show-toplevel`
     """
-    SourceCodeExploder().explode_packages(Path(top_dir))
+    SourceCodeExploder().explode_fs_tree(Path(top_dir))
 
 
 if __name__ == '__main__':
