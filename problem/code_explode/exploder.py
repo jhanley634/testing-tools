@@ -24,6 +24,7 @@ import ast
 import inspect
 import os
 import pkgutil
+import re
 import shutil
 
 import click
@@ -62,7 +63,7 @@ class SourceCodeExploder:
                 if file.endswith('.py'):
                     with open(root / file) as fin:
                         print('')
-                        print(root/file)
+                        print(root / file)
                         self.explode_file(fin.read())
 
     def explode_file(self, prog_text):
@@ -70,8 +71,16 @@ class SourceCodeExploder:
         assert () == tree._attributes, tree
         assert ('body', ) == tree._fields, tree
         for node in tree.body:
-            print(node)
+            print(self._elide_addr(str(node)))
             print(ast.dump(node))
+
+    _at_hex_addr_re = re.compile(r' at 0x[\da-f]+>$')
+
+    @classmethod
+    def _elide_addr(cls, name):
+        """Elides the address at which an object was allocated,
+        as it is uninteresting and will change from run to run."""
+        return cls._at_hex_addr_re.sub('>', name)
 
     def explode_packages(self, top_dir, verbose=False):
         # https://stackoverflow.com/questions/16852811/import-modules-in-a-dir
@@ -85,13 +94,13 @@ class SourceCodeExploder:
             for name, value in inspect.getmembers(module):
                 if name in self._ignore_names_in_module:
                     continue
-                str_value = str(value)
+                str_value = self._elide_addr(str(value))
                 # e.g. <module 'collections'
                 # from '/.../miniconda3/envs/.../lib/python3.7/collections/__init__.py'>
                 if (str_value.endswith(' (built-in)>')
                         or '/miniconda3/envs/' in str_value):
                     continue
-                print(module.__name__, name, str(value)[:100])
+                print(module.__name__, name, str_value[:100])
                 source = ''
                 try:
                     source = getsource(value)
