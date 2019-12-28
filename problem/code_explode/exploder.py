@@ -18,8 +18,6 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-from importlib.resources import contents
-from importlib.util import find_spec
 from pathlib import Path
 import ast
 import inspect
@@ -67,16 +65,13 @@ class SourceCodeExploder:
         ''
 
     def explode_packages(self, top_dir):
-        for x in pkgutil.walk_packages([top_dir]):
-            print(x)
-            print('')
-
         # https://stackoverflow.com/questions/16852811/import-modules-in-a-dir
         for loader, name, is_pkg in pkgutil.walk_packages([str(top_dir)]):
-            print(1, name, is_pkg, loader)
 
             module = loader.find_module(name).load_module(name)
-            print(2, module)
+            # At this point, we could obtain a list of package files
+            # by calling importlib.resources.contents(module).
+            print(f'\n{is_pkg}  {module.__file__}')
 
             for name, value in inspect.getmembers(module):
                 if name in self._ignore_names_in_module:
@@ -87,7 +82,7 @@ class SourceCodeExploder:
                 if (str_value.endswith(' (built-in)>')
                         or '/miniconda3/envs/' in str_value):
                     continue
-                print(3, name, value)
+                print(module.__name__, name, str(value)[:100])
 
 
 @click.command()
