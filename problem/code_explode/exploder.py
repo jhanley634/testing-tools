@@ -20,6 +20,8 @@
 
 from pathlib import Path
 import ast
+import collections
+import hashlib
 import inspect
 import os
 import pkgutil
@@ -34,11 +36,14 @@ import click
 
 class SourceCodeExploder:
 
-    def __init__(self, out_dir=Path('/tmp/code')):
+    def __init__(self, out_dir='/tmp/code', verbose=False):
+        out_dir = Path(out_dir)
         if out_dir.exists():
             shutil.rmtree(out_dir)
         os.mkdir(out_dir)
         self.out_dir = out_dir
+        self.verbose = verbose
+        self.hash_cnt = collections.defaultdict(int)
         self._ignore_dirs = {'.git'}
         self._ignore_names_in_module = {
             '__builtins__',
@@ -65,7 +70,6 @@ class SourceCodeExploder:
                 if file.endswith('.py'):
                     fspec = root / file
                     with open(root / file) as fin:
-                        print('')
                         self.explode_file(fin.read(), fspec)
 
     def explode_file(self, prog_text, fspec):
@@ -76,20 +80,39 @@ class SourceCodeExploder:
         setattr(tree, 'name', os.path.basename(fspec))
         self._dump_recursive(tree, '', [])
 
-    @classmethod
-    def _dump_recursive(cls, node, indent, path):
+    def _dump_recursive(self, node, indent, path):
         path.append(getattr(node, 'name', ''))
         # print(indent, path, ast.dump(node, annotate_fields=True))
         if isinstance(node, ast.FunctionDef):
-            cls._elide_docstring(node.body)
+            self._elide_docstring(node.body)
             code, _ = FormatCode(astor.to_source(node))
-            code = cls._apply_indent(indent, code)
-            names = ' '.join(path)
-            print(f'\n{indent}{names}\n{code}')
+            code = self._apply_indent(indent, code)
+            out_path = '/'.join(path)
+            self._write_file(self.out_dir / out_path, code)
+            if self.verbose:
+                print(f'\n{indent}{out_path}\n{code}')
 
         for child in getattr(node, 'body', []):
-            cls._dump_recursive(child, indent + '    ', path)
+            self._dump_recursive(child, indent + '    ', path)
             path.pop()
+
+    def _write_file(self, fspec, text):
+        hex = self._digest(text)
+        dir_, base = os.path.split(fspec)
+        os.makedirs(dir_, exist_ok=True)
+        with open(f'{dir_}/{base}_{hex}', 'w') as fout:
+            fout.write(text)
+
+        if self.hash_cnt[hex]:
+            print('dup:', hex, fspec)
+        self.hash_cnt[hex] += 1
+
+    @staticmethod
+    def _digest(text: str):
+        """Finds sha224 hash of input, with indent elided."""
+        text = '\n'.join([line.strip()
+                          for line in text.splitlines()])
+        return hashlib.sha224(text.encode()).hexdigest()[:5]
 
     @staticmethod
     def _elide_docstring(body):
@@ -103,7 +126,7 @@ class SourceCodeExploder:
     @staticmethod
     def _apply_indent(indent, str_with_newlines):
         return '\n'.join([indent + line
-                          for line in str_with_newlines.split('\n')])
+                          for line in str_with_newlines.splitlines()])
 
     _at_hex_addr_re = re.compile(r' at 0x[\da-f]+>$')
 
@@ -152,8 +175,10 @@ You may want to invoke in this way:
 
     $ code_explode/exploder.py `git rev-parse --show-toplevel`
     """
-    SourceCodeExploder().explode_fs_tree(Path(top_dir))
-    SourceCodeExploder().explode_packages(Path(top_dir))
+    top_dir = Path(top_dir)
+    expl = SourceCodeExploder()
+    expl.explode_packages(top_dir)
+    expl.explode_fs_tree(top_dir)
 
 
 if __name__ == '__main__':
