@@ -79,16 +79,26 @@ class SourceCodeExploder:
     @classmethod
     def _dump_recursive(cls, node, indent, path):
         path.append(getattr(node, 'name', ''))
-        print('')
-        # print(4, indent, path, ast.dump(node, annotate_fields=True))
+        # print(indent, path, ast.dump(node, annotate_fields=True))
         if isinstance(node, ast.FunctionDef):
+            cls._elide_docstring(node.body)
             code, _ = FormatCode(astor.to_source(node))
             code = cls._apply_indent(indent, code)
-            print(f'{indent}{path}\n{code}')
+            names = ' '.join(path)
+            print(f'\n{indent}{names}\n{code}')
 
         for child in getattr(node, 'body', []):
             cls._dump_recursive(child, indent + '    ', path)
             path.pop()
+
+    @staticmethod
+    def _elide_docstring(body):
+        """Simplifies function definition by removing its docstring, if it has one."""
+        if (len(body) > 1  # docstring plus at least one other stmt
+                and isinstance(body[0], ast.Expr)
+                and isinstance(body[0].value, ast.Str)):
+            # print('docstring:', body[0].value.s)
+            body.pop(0)
 
     @staticmethod
     def _apply_indent(indent, str_with_newlines):
