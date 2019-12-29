@@ -18,7 +18,6 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-from dill.source import getsource
 from pathlib import Path
 import ast
 import inspect
@@ -27,6 +26,9 @@ import pkgutil
 import re
 import shutil
 
+from dill.source import getsource
+from yapf.yapflib.yapf_api import FormatCode
+import astor
 import click
 
 
@@ -61,24 +63,37 @@ class SourceCodeExploder:
             root = Path(root)
             for file in files:
                 if file.endswith('.py'):
+                    fspec = root / file
                     with open(root / file) as fin:
                         print('')
-                        print(root / file)
-                        self.explode_file(fin.read())
+                        self.explode_file(fin.read(), fspec)
 
-    def explode_file(self, prog_text):
+    def explode_file(self, prog_text, fspec):
         tree = ast.parse(prog_text)
         assert () == tree._attributes, tree
         assert ('body', ) == tree._fields, tree
-        self._dump_recursive(tree, '')
+        assert isinstance(tree, ast.Module), tree
+        setattr(tree, 'name', os.path.basename(fspec))
+        self._dump_recursive(tree, '', [])
 
     @classmethod
-    def _dump_recursive(cls, node, indent):
+    def _dump_recursive(cls, node, indent, path):
         print('')
-        print(5, indent, ast.dump(node, annotate_fields=True))
+        print(4, indent, path, type(node), node)
+        # print(4, indent, path, ast.dump(node, annotate_fields=True))
+
+        import pdb
+        # pdb.set_trace()
+
         body = getattr(node, 'body', [])
         for child in body:
-            cls._dump_recursive(child, indent + '    ')
+            child_name = getattr(node, 'name', ' ')
+            print(type(child), child_name)
+            if isinstance(child, ast.FunctionDef):
+                code, _ = FormatCode(astor.to_source(child))
+                print(5, path + [child_name])
+                print(6, code)
+            cls._dump_recursive(child, indent + '    ', path + [child_name])
 
     _at_hex_addr_re = re.compile(r' at 0x[\da-f]+>$')
 
