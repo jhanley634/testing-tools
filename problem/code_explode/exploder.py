@@ -30,6 +30,7 @@ import shutil
 
 from dill.source import getsource
 from yapf.yapflib.yapf_api import FormatCode
+import _pickle
 import astor
 import click
 
@@ -149,18 +150,19 @@ class SourceCodeExploder:
             for name, value in inspect.getmembers(module):
                 if name in self._ignore_names_in_module:
                     continue
-                str_value = self._elide_addr(str(value))
-                # e.g. <module 'collections'
-                # from '/.../miniconda3/envs/.../lib/python3.7/collections/__init__.py'>
-                if (str_value.endswith(' (built-in)>')
-                        or '/miniconda3/envs/' in str_value):
-                    continue
-                print(module.__name__, name, str_value[:100])
                 source = ''
                 try:
+                    str_value = self._elide_addr(str(value))
+                    # e.g. <module 'collections'
+                    # from '/.../miniconda3/envs/.../lib/python3.7/collections/__init__.py'>
+                    if (str_value.endswith(' (built-in)>')
+                            or '/miniconda3/envs/' in str_value):
+                        continue
+                    print(module.__name__, name, str_value[:100])
                     source = getsource(value)
-                except RuntimeError:
+                except (RuntimeError, _pickle.PicklingError):
                     # FlaskAPI may report: Working outside of request context.
+                    # flask_sqlalchemy may want to pickle a DB connection.
                     pass
                 if verbose:
                     print(source)
