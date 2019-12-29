@@ -43,7 +43,7 @@ class SourceCodeExploder:
         os.mkdir(out_dir)
         self.out_dir = out_dir
         self.verbose = verbose
-        self.hash_cnt = collections.defaultdict(int)
+        self.hash_cnt = collections.defaultdict(list)
         self._ignore_dirs = {'.git'}
         self._ignore_names_in_module = {
             '__builtins__',
@@ -103,9 +103,10 @@ class SourceCodeExploder:
         with open(f'{dir_}/{base}_{hex}', 'w') as fout:
             fout.write(text)
 
-        if self.hash_cnt[hex]:
-            print('dup:', hex, fspec)
-        self.hash_cnt[hex] += 1
+        matches = self.hash_cnt[hex]
+        matches.append(str(fspec))
+        if len(matches) > 1:
+            print('dup:', hex, '  '.join(matches))
 
     @staticmethod
     def _digest(text: str):
