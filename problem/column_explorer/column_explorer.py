@@ -22,8 +22,8 @@
 
 import click
 import sqlalchemy as sa
-import sqlalchemy.sql.sqltypes as sqltypes
 import sqlalchemy.dialects.postgresql.base as pg_base
+import sqlalchemy.sql.sqltypes as sqltypes
 import uszipcode
 
 

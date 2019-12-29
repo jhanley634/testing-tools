@@ -22,10 +22,11 @@ import configparser
 import csv
 import datetime
 import os
+
+from sqlalchemy import DATE, DECIMAL, INTEGER, VARCHAR, Column, Table
+from sqlalchemy.orm import scoped_session, sessionmaker
 import sqlalchemy
 import sqlalchemy.ext.declarative
-from sqlalchemy import Table, Column, DATE, DECIMAL, INTEGER, VARCHAR
-from sqlalchemy.orm import scoped_session, sessionmaker
 
 Base = sqlalchemy.ext.declarative.declarative_base()
 Session = scoped_session(sessionmaker())

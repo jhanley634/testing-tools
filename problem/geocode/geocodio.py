@@ -26,11 +26,11 @@ import glob
 import json
 import os
 import re
+import sqlite3
 
 import requests
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-import sqlite3
 
 
 class GeocodeCache:

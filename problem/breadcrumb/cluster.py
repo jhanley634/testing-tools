@@ -18,12 +18,13 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import matplotlib.pyplot as plt
 import os
-import pandas
 import pprint
-import sklearn.svm
+
+import matplotlib.pyplot as plt
+import pandas
 import sklearn.cluster
+import sklearn.svm
 
 import problem.breadcrumb.peninsula as peninsula
 

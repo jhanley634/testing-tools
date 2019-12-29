@@ -21,7 +21,6 @@
 import os
 
 import mapnik
-
 import problem.breadcrumb.world as world  # for styling
 
 

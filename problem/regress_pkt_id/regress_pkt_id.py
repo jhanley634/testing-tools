@@ -25,8 +25,8 @@ import os
 import re
 import urllib.request
 
-import scipy.stats
 from bs4 import BeautifulSoup
+import scipy.stats
 
 
 class HpingIdFinder:

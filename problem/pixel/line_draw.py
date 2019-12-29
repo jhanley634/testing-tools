@@ -18,8 +18,9 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import numpy as np
 import unittest
+
+import numpy as np
 
 
 class Canvas:

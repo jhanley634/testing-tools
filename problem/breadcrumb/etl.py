@@ -25,8 +25,8 @@ import re
 import sys
 import time
 
-import sqlalchemy.ext.declarative
 from sqlalchemy import Table
+import sqlalchemy.ext.declarative
 
 # sys.path.append('.')
 import dbcred

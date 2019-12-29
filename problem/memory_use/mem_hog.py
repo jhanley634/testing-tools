@@ -22,7 +22,7 @@
 
 import click
 
-from memory_use.allocator import ListAllocator, DictAllocator, DfAllocator
+from memory_use.allocator import DfAllocator, DictAllocator, ListAllocator
 
 
 @click.command()

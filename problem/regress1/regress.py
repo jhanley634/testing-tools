@@ -21,8 +21,7 @@
 
 from pathlib import Path
 
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import chi2
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import numpy

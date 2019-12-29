@@ -18,16 +18,14 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import numpy as np
-import matplotlib.pyplot as plt
-import sqlalchemy.ext.declarative
-from sqlalchemy.sql.functions import sum as sum1
 from sqlalchemy import Table
 from sqlalchemy.orm import scoped_session, sessionmaker
-# from sqlalchemy.sql.expression import select, desc
+from sqlalchemy.sql.functions import sum as sum1
+import matplotlib.pyplot as plt
+import numpy as np
+import sqlalchemy.ext.declarative
 
 import problem.retain.etl as etl
-
 
 Base = sqlalchemy.ext.declarative.declarative_base()
 Session = scoped_session(sessionmaker())

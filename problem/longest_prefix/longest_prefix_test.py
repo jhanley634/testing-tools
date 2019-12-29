@@ -20,8 +20,8 @@
 
 import unittest
 
-from problem.longest_prefix.longest_prefix import (longest_prefixes,
-                                                   longest_prefix_match as match)
+from problem.longest_prefix.longest_prefix import longest_prefix_match as match
+from problem.longest_prefix.longest_prefix import longest_prefixes
 
 
 class LongestPrefixTest(unittest.TestCase):

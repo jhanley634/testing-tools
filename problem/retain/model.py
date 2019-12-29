@@ -18,15 +18,14 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from sqlalchemy import Table
+from sqlalchemy.orm import scoped_session, sessionmaker
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn.linear_model
 import sqlalchemy.ext.declarative
-from sqlalchemy import Table
-from sqlalchemy.orm import scoped_session, sessionmaker
 
 import problem.retain.etl as etl
-
 
 Base = sqlalchemy.ext.declarative.declarative_base()
 Session = scoped_session(sessionmaker())

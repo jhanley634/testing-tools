@@ -18,15 +18,16 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-from sqlalchemy import Table
 import collections
 import csv
 import datetime
+import os
+import sys
+
+from sqlalchemy import Table
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import sys
 
 import problem.breadcrumb.dbcred as dbcred
 

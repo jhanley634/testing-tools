@@ -22,8 +22,9 @@ from operator import itemgetter
 from pathlib import Path
 import os
 
-import boto3
 import click
+
+import boto3
 
 
 def _get_bucket_names():

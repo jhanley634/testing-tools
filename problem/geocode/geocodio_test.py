@@ -19,7 +19,7 @@
 
 import unittest
 
-from problem.geocode.geocodio import GeocodioGeocoder, GeocodeCache
+from problem.geocode.geocodio import GeocodeCache, GeocodioGeocoder
 
 
 class GeocodioTest(unittest.TestCase):

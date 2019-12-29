@@ -21,9 +21,8 @@
 import os
 import unittest
 
-import simplekml
-
 import dbcred
+import simplekml
 
 
 def explore():
