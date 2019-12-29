@@ -1,0 +1,4 @@
+
+[style]
+
+blank_line_before_nested_class_or_def = True

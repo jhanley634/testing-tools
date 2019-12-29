@@ -78,22 +78,22 @@ class SourceCodeExploder:
 
     @classmethod
     def _dump_recursive(cls, node, indent, path):
+        path.append(getattr(node, 'name', ''))
         print('')
-        print(4, indent, path, type(node), node)
         # print(4, indent, path, ast.dump(node, annotate_fields=True))
+        if isinstance(node, ast.FunctionDef):
+            code, _ = FormatCode(astor.to_source(node))
+            code = cls._apply_indent(indent, code)
+            print(f'{indent}{path}\n{code}')
 
-        import pdb
-        # pdb.set_trace()
+        for child in getattr(node, 'body', []):
+            cls._dump_recursive(child, indent + '    ', path)
+            path.pop()
 
-        body = getattr(node, 'body', [])
-        for child in body:
-            child_name = getattr(node, 'name', ' ')
-            print(type(child), child_name)
-            if isinstance(child, ast.FunctionDef):
-                code, _ = FormatCode(astor.to_source(child))
-                print(5, path + [child_name])
-                print(6, code)
-            cls._dump_recursive(child, indent + '    ', path + [child_name])
+    @staticmethod
+    def _apply_indent(indent, str_with_newlines):
+        return '\n'.join([indent + line
+                          for line in str_with_newlines.split('\n')])
 
     _at_hex_addr_re = re.compile(r' at 0x[\da-f]+>$')
 
