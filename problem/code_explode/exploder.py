@@ -38,11 +38,11 @@ import click
 
 class SourceCodeExploder:
 
-    def __init__(self, out_dir='/tmp/code', verbose=False):
+    def __init__(self, out_dir='/tmp/code', verbose=False, del_tmp_files=False):
         out_dir = Path(out_dir)
-        if out_dir.exists():
+        if out_dir.exists() and del_tmp_files:
             shutil.rmtree(out_dir)
-        os.mkdir(out_dir)
+        os.makedirs(out_dir, exist_ok=True)
         self.out_dir = out_dir
         self.verbose = verbose
         self.hash_cnt = collections.defaultdict(list)
@@ -146,7 +146,9 @@ class SourceCodeExploder:
             source_file_loader = loader.find_module(name)
             try:
                 module = source_file_loader.load_module(name)
-            except SAInvalidRequestError:
+            except (AttributeError,
+                    SAInvalidRequestError):
+                # e.g. module 'pytest' has no attribute 'config'
                 # Table is already defined for this MetaData, use extend_existing=True.
                 continue
             # At this point, we could obtain a list of package files
@@ -167,9 +169,11 @@ class SourceCodeExploder:
                     print(module.__name__, name, str_value[:100])
                     source = getsource(value)
                 except (_pickle.PicklingError,
+                        OSError,
                         RuntimeError,
                         TypeError):
                     # flask_sqlalchemy may want to pickle a DB connection.
+                    # could not find class definition (e.g. for defaultdict)
                     # FlaskAPI may report: Working outside of request context.
                     # None is not a module, function, or code object.
                     pass
