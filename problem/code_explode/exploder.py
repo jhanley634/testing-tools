@@ -29,6 +29,7 @@ import re
 import shutil
 
 from dill.source import getsource
+from sqlalchemy.exc import InvalidRequestError as SAInvalidRequestError
 from yapf.yapflib.yapf_api import FormatCode
 import _pickle
 import astor
@@ -142,7 +143,12 @@ class SourceCodeExploder:
         # https://stackoverflow.com/questions/16852811/import-modules-in-a-dir
         for loader, name, is_pkg in pkgutil.walk_packages([str(top_dir)]):
 
-            module = loader.find_module(name).load_module(name)
+            source_file_loader = loader.find_module(name)
+            try:
+                module = source_file_loader.load_module(name)
+            except SAInvalidRequestError:
+                # Table is already defined for this MetaData, use extend_existing=True.
+                continue
             # At this point, we could obtain a list of package files
             # by calling importlib.resources.contents(module).
             print(f'\n{is_pkg}  {module.__file__}')
@@ -160,9 +166,12 @@ class SourceCodeExploder:
                         continue
                     print(module.__name__, name, str_value[:100])
                     source = getsource(value)
-                except (RuntimeError, _pickle.PicklingError):
-                    # FlaskAPI may report: Working outside of request context.
+                except (_pickle.PicklingError,
+                        RuntimeError,
+                        TypeError):
                     # flask_sqlalchemy may want to pickle a DB connection.
+                    # FlaskAPI may report: Working outside of request context.
+                    # None is not a module, function, or code object.
                     pass
                 if verbose:
                     print(source)
