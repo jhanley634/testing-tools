@@ -1,1 +1,4 @@
 Generic single-database configuration.
+
+Based on reading v1.3.2 tutorial https://web.archive.org/web/20200103005559/
+https://alembic.sqlalchemy.org/en/latest/tutorial.html

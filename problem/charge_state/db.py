@@ -24,11 +24,15 @@ from problem.charge_state.charge import read_csv
 from problem.charge_state.model import Base
 
 
+def get_url():
+    return 'sqlite:////tmp/charge.db'
+
+
 def insert(uri='sqlite:////tmp/charge.db'):
     df = read_csv()
     assert len(df) > 0
 
-    engine = sa.create_engine(uri)
+    engine = sa.create_engine(get_url())
     Base.metadata.create_all(engine)
 
 

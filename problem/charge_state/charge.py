@@ -23,10 +23,10 @@ import datetime as dt
 import re
 
 from pandas.plotting import register_matplotlib_converters
-import pandas as pd
 import matplotlib
 matplotlib.use('Agg')  # noqa E402
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
 
