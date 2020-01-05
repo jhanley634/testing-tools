@@ -24,13 +24,16 @@ fileConfig(config.config_file_name)
 # ... etc.
 
 
-def get_metadata(verbose=False):
+def get_metadata(verbose=True):
     engine = create_engine(get_url())
     engine.connect()
     meta = Base.metadata
-    meta = MetaData(bind=engine, reflect=True)
+    meta.reflect(engine)
+    # meta = MetaData(bind=engine, reflect=True)
 
     if verbose:
+        online = not context.is_offline_mode()
+        assert online
         print(meta)
         print(list(meta.tables.keys()))
 
