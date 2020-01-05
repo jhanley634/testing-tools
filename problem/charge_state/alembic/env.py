@@ -1,9 +1,14 @@
 from logging.config import fileConfig
 
-from alembic import context
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 
+from alembic import context
 from problem.charge_state.db import get_url
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+from problem.charge_state.model import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -13,16 +18,26 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-target_metadata = None
-
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+
+def get_metadata(verbose=False):
+    engine = create_engine(get_url())
+    engine.connect()
+    meta = Base.metadata
+    meta = MetaData(bind=engine, reflect=True)
+
+    if verbose:
+        print(meta)
+        print(list(meta.tables.keys()))
+
+    return meta
+
+
+target_metadata = get_metadata()
 
 
 def run_migrations_offline():
