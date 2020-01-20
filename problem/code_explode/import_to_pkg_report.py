@@ -19,7 +19,9 @@
 # other dealings in the software.
 
 from pathlib import Path
+import importlib
 import subprocess
+import sys
 
 import pkg_resources as pkg
 
@@ -37,7 +39,7 @@ def report():
         report_on(name)
 
 
-def report_on(name):
+def report_on(name, width=18):
     try:
         meta = pkg.get_distribution(name)
     except pkg.DistributionNotFound:
@@ -47,8 +49,13 @@ def report_on(name):
         import_name = get_imports(folder / 'top_level.txt')[0].rstrip()
     except FileNotFoundError:
         return  # Skips the entrypoints-0.3 package
+    try:
+        importlib.import_module(import_name)
+        sys.modules[import_name]  # Verify that it actually _was_ imported.
+    except ModuleNotFoundError:
+        return  # Skips 'amd' from cvxopt.
     if meta.project_name != import_name:
-        print(meta.project_name.ljust(18), import_name.ljust(18), meta.version)
+        print(meta.project_name.ljust(width), import_name.ljust(width), meta.version)
 
 
 def get_imports(fspec):
