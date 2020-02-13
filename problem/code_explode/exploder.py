@@ -161,8 +161,8 @@ class SourceCodeExploder:
                 source = ''
                 try:
                     str_value = self._elide_addr(str(value))
-                    # e.g. <module 'collections'
-                    # from '/.../miniconda3/envs/.../lib/python3.7/collections/__init__.py'>
+                    # e.g. <module 'collections' from
+                    # '/.../miniconda3/envs/.../lib/python3.7/collections/__init__.py'>
                     if (str_value.endswith(' (built-in)>')
                             or '/miniconda3/envs/' in str_value):
                         continue
