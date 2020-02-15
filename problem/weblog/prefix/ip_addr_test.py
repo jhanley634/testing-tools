@@ -19,7 +19,7 @@
 
 import unittest
 
-from problem.weblog.prefix.ip_addr import IpAddr, Prefix
+from problem.weblog.prefix.ip_addr import IpAddr, Prefix, log_dist
 
 
 class IpAddrTest(unittest.TestCase):
@@ -42,6 +42,25 @@ class IpAddrTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             IpAddr("1.2.300.4")
 
+    def test_comparison(self):
+        a = IpAddr("1.99.3.4")
+        b = IpAddr("1.100.3.4")
+        self.assertLessEqual(a.addr, b.addr)
+        self.assertLessEqual(a, b)
+        self.assertLess(a, b)
+        self.assertGreater(b, a)
+        self.assertGreaterEqual(b, a)
+        self.assertNotEqual(b, a)
+        self.assertNotEqual(a, b)
+        self.assertEqual(a, a)
+        self.assertEqual(b, b)
+        self.assertEqual(b, IpAddr("1.100.3.4"))
+
+        self.assertNotEqual(a, 1)
+        self.assertNotEqual(a, "1.99.3.4")
+        self.assertNotEqual(1, a)
+        self.assertNotEqual("1.99.3.4", a)
+
 
 class CidrPrefixTest(unittest.TestCase):
 
@@ -59,3 +78,24 @@ class CidrPrefixTest(unittest.TestCase):
 
         self.assertTrue(rtr in rtr_prefix)
         self.assertTrue(host not in rtr_prefix)
+
+
+class LogDistTest(unittest.TestCase):
+
+    def test_log_dist(self):
+        rtr = IpAddr("10.3.2.1")
+        self.assertEqual(0, log_dist(rtr, rtr))  # It's a metric, so dist to self is zero.
+        self.assertEqual(0, log_dist(rtr, IpAddr("10.3.2.1")))
+
+        self.assertEqual(1, log_dist(rtr, IpAddr("10.3.2.0")))
+        self.assertEqual(0, log_dist(rtr, IpAddr("10.3.2.1")))
+        self.assertEqual(2, log_dist(rtr, IpAddr("10.3.2.2")))
+        self.assertEqual(2, log_dist(rtr, IpAddr("10.3.2.3")))
+        self.assertEqual(3, log_dist(rtr, IpAddr("10.3.2.4")))
+        self.assertEqual(3, log_dist(rtr, IpAddr("10.3.2.5")))
+        self.assertEqual(3, log_dist(rtr, IpAddr("10.3.2.6")))
+        self.assertEqual(3, log_dist(rtr, IpAddr("10.3.2.7")))
+        self.assertEqual(4, log_dist(rtr, IpAddr("10.3.2.8")))
+        self.assertEqual(4, log_dist(rtr, IpAddr("10.3.2.9")))
+        self.assertEqual(4, log_dist(rtr, IpAddr("10.3.2.15")))
+        self.assertEqual(5, log_dist(rtr, IpAddr("10.3.2.16")))

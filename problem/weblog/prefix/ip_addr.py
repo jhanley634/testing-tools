@@ -17,14 +17,15 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-from functools import lru_cache
+from functools import lru_cache, total_ordering
 import re
 
 
+@total_ordering
 class IpAddr:
     """Models an IPv4 32-bit address."""
 
-    dotted_quad_re = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+    dotted_quad_re = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
 
     def __init__(self, dotted_quad):
         if isinstance(dotted_quad, IpAddr):
@@ -65,6 +66,26 @@ class IpAddr:
         return ".".join([f"{b:03d}"
                          for b in self._get_addr_bytes()])
 
+    # from https://docs.python.org/3/library/functools.html#functools.total_ordering
+    @staticmethod
+    def _is_valid_operand(other):
+        return (hasattr(other, "addr")
+                and isinstance(other.addr, int)
+                and other.addr >= 0)
+
+    @classmethod
+    def _invalid(cls, other):
+        if cls._is_valid_operand(other):
+            return None  # We can keep going.
+        else:
+            return NotImplemented  # Prohibit further processing.
+
+    def __eq__(self, other):
+        return self._invalid(other) or self.addr == other.addr
+
+    def __lt__(self, other):
+        return self._invalid(other) or self.addr < other.addr
+
 
 class Prefix:
     """Models an IPv4 CIDR prefix: 32-bit address + mask."""
@@ -72,9 +93,10 @@ class Prefix:
     def __init__(self, ip: IpAddr, masklen=None):
         if isinstance(ip, str) and "/" in ip:
             ip, masklen = ip.split("/")
-        self.ip = IpAddr(ip)
         self.masklen = int(masklen)
         assert 0 <= self.masklen <= 32, masklen
+        self.ip = IpAddr(ip)
+        self.ip.addr &= self.mask()  # Canonicalize. Host part must be all zero.
 
     def __str__(self):
         return self.ip.decimal() + f"/{self.masklen}"
@@ -98,3 +120,20 @@ class Prefix:
         a1 = self.ip.addr & self.mask()
         a2 = item.addr & self.mask()
         return a1 == a2
+
+
+def log_dist(a: IpAddr, b: IpAddr):
+    """Finds the distance beween IPs, according to a logarithmic distance metric."""
+
+    prefix = Prefix(b, 32)
+    while (prefix.masklen > 0
+           and a not in prefix):
+        assert b in prefix, (b, prefix)
+        prefix.masklen -= 1
+
+    assert b in prefix, (b, prefix)
+    assert a in prefix, (a, prefix)
+    assert 0 <= prefix.masklen <= 32
+
+    log_distance = 32 - prefix.masklen
+    return log_distance
