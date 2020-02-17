@@ -79,6 +79,13 @@ class CidrPrefixTest(unittest.TestCase):
         self.assertTrue(rtr in rtr_prefix)
         self.assertTrue(host not in rtr_prefix)
 
+    def test_comparison(self):
+        a = Prefix(IpAddr("1.99.3.4"), 32)
+        b = Prefix(IpAddr("1.100.3.4"), 32)
+        self.assertEqual(a, a)
+        self.assertEqual(a, Prefix(IpAddr("1.99.3.4"), 32))
+        self.assertLess(a, b)
+
 
 class LogDistTest(unittest.TestCase):
 
@@ -99,3 +106,8 @@ class LogDistTest(unittest.TestCase):
         self.assertEqual(4, log_dist(rtr, IpAddr("10.3.2.9")))
         self.assertEqual(4, log_dist(rtr, IpAddr("10.3.2.15")))
         self.assertEqual(5, log_dist(rtr, IpAddr("10.3.2.16")))
+
+        localhost = IpAddr("127.0.0.1")
+        mimsy = IpAddr("128.8.128.8")  # mimsy.cs.umd.edu
+        self.assertEqual(32, log_dist(localhost, mimsy))
+        self.assertEqual(32, log_dist(localhost, IpAddr("129.8.7.6")))

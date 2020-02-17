@@ -87,6 +87,7 @@ class IpAddr:
         return self._invalid(other) or self.addr < other.addr
 
 
+@total_ordering
 class Prefix:
     """Models an IPv4 CIDR prefix: 32-bit address + mask."""
 
@@ -120,6 +121,26 @@ class Prefix:
         a1 = self.ip.addr & self.mask()
         a2 = item.addr & self.mask()
         return a1 == a2
+
+    @staticmethod
+    def _is_valid_operand(other):  # Other is a prefix that has an IP, and a mask.
+        return (hasattr(other, 'ip')
+                and IpAddr._is_valid_operand(other.ip)
+                and hasattr(other, 'masklen')
+                and 0 <= other.masklen <= 32)
+
+    @classmethod
+    def _invalid(cls, other):
+        if cls._is_valid_operand(other):
+            return None  # We can keep going.
+        else:
+            return NotImplemented  # Prohibit further processing.
+
+    def __eq__(self, other):
+        return self._invalid(other) or (self.ip.addr, self.masklen) == (other.ip.addr, other.masklen)
+
+    def __lt__(self, other):
+        return self._invalid(other) or (self.ip.addr, self.masklen) < (other.ip.addr, other.masklen)
 
 
 def log_dist(a: IpAddr, b: IpAddr):
