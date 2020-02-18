@@ -44,7 +44,6 @@ def compress(ips, max_acl_entries=MAX_ACL_ENTRIES):
 
     while n > 0:
         distances = list(_get_distances(acl))
-        print(distances)
         acl = _get_smaller_acl(acl, n, min(distances))
         n = max(0, len(acl) - max_acl_entries)
 
@@ -73,9 +72,11 @@ def _merge(pfx, ip):
 
 @click.command()
 @click.option("--infile", required=True)
-def main(infile):
+@click.option("--size", default=MAX_ACL_ENTRIES,
+              help="Squeeze the ACL length down to this size.")
+def main(infile, size):
     with open(infile) as fin:
-        compress(map(IpAddr, fin.readlines()), 23)
+        compress(map(IpAddr, fin.readlines()), size)
 
 
 if __name__ == "__main__":
