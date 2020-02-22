@@ -21,8 +21,9 @@
 import sys
 
 from numba import jit
-from problem.numeric.mandelbrot.ppm import PPM
+
 from problem.numeric.mandelbrot.mset import PX_RESOLUTION
+from problem.numeric.mandelbrot.ppm import PPM
 
 
 def mandelbrot_set(xc, yc, sz, fout):

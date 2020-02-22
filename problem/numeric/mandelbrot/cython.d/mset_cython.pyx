@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 
 # Copyright 2020 John Hanley.
 #
@@ -17,28 +18,29 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-OUT = \
- /tmp/1.png \
- /tmp/2.png \
- /tmp/3.png \
+import sys
 
-all: $(OUT)
+from problem.numeric.mandelbrot.mset import PX_RESOLUTION
+from problem.numeric.mandelbrot.ppm import PPM
 
-TOP := $(shell git rev-parse --show-toplevel)
-ENV = time env PYTHONPATH=$(TOP) MSET_PX_RESOLUTION=300
-LOCATION = -.5 0 1  # think four unit squares, centered a bit left of the origin
 
-%1.ppm:
-	$(ENV) ./mset.py $(LOCATION) > $@
+def mandelbrot_set(xc, yc, sz, fout):
+    """Given center x,y and a "radius" size, create a square PPM m-set."""
+    # from https://en.wikipedia.org/wiki/Mandelbrot_set#Computer_drawings
+    ppm = PPM(fout, PX_RESOLUTION)
 
-%2.ppm:
-	$(ENV) ./mset_numba.py $(LOCATION) > $@
+    for x0, y0 in ppm.get_points(xc, yc, sz):
+        ppm.plot(_cycles_to_escape(x0, y0))
 
-%3.ppm:
-	cd cython.d && python setup.py build_ext --inplace
 
-%.png: %.ppm
-	convert $< $@
+def _cycles_to_escape(x0, y0, max_iter=255):
+    x, y, i = 0, 0, 0
+    while x * x + y * y <= 4 and i < max_iter:
+        x, y = x * x - y * y + x0, 2 * x * y + y0
+        i += 1
+    return i
 
-clean:
-	rm -f /tmp/*.ppm $(OUT)
+
+if __name__ == '__main__':
+    args = map(float, sys.argv[1:])
+    mandelbrot_set(*args, sys.stdout)
