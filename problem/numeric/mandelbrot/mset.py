@@ -21,6 +21,8 @@
 import os
 import sys
 
+import colorbrewer
+
 PX_RESOLUTION = int(os.getenv("MSET_PX_RESOLUTION", "100"))  # defaults to 100px square
 
 
@@ -32,10 +34,12 @@ class PPM:
         fout.write(f"{x_px} {y_px}\n")
         fout.write("255\n")  # max val, 8-bit channels, 24-bit color
         self.fout = fout
+        self.cmap = colorbrewer.PRGn[11]
 
     def plot(self, grey_value):
         assert 0 <= grey_value < 256, grey_value
-        r, g, b = grey_value, grey_value, grey_value
+        # r, g, b = grey_value, grey_value, grey_value
+        r, g, b = self.cmap[grey_value % len(self.cmap)]
         self.fout.write(f"{r} {g} {b}\n")
 
 
