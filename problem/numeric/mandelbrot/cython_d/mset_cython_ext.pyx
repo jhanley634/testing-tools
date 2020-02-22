@@ -24,7 +24,7 @@ from problem.numeric.mandelbrot.mset import PX_RESOLUTION
 from problem.numeric.mandelbrot.ppm import PPM
 
 
-def mandelbrot_set(xc, yc, sz, fout):
+def mandelbrot_set(xc: float, yc: float, sz: float, fout):
     """Given center x,y and a "radius" size, create a square PPM m-set."""
     # from https://en.wikipedia.org/wiki/Mandelbrot_set#Computer_drawings
     ppm = PPM(fout, PX_RESOLUTION)
@@ -33,9 +33,10 @@ def mandelbrot_set(xc, yc, sz, fout):
         ppm.plot(_cycles_to_escape(x0, y0))
 
 
-def _cycles_to_escape(double x0, double y0, max_iter=255):
-    cdef int i
-    x, y, i = 0, 0, 0
+cdef int _cycles_to_escape(double x0, double y0, int max_iter=255):
+    cdef int i = 0
+    cdef double x = 0
+    cdef double y = 0
     while x * x + y * y <= 4 and i < max_iter:
         x, y = x * x - y * y + x0, 2 * x * y + y0
         i += 1

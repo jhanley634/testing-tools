@@ -24,7 +24,7 @@ import colorbrewer
 class PPM:
     """Implements square netpbm ascii Portable Pix Map."""
 
-    def __init__(self, fout, size_px):
+    def __init__(self, fout, size_px: int):
         fout.write("P3\n")  # ppm magic number
         fout.write(f"{size_px} {size_px}\n")
         fout.write("255\n")  # max val, 8-bit channels, 24-bit color
@@ -38,7 +38,7 @@ class PPM:
         r, g, b = self.cmap[grey_value % len(self.cmap)]
         self.fout.write(f"{r} {g} {b}\n")
 
-    def get_points(self, xc, yc, sz):
+    def get_points(self, xc: float, yc: float, sz: float):
         """Generates x, y point for each pixel.
         Maps from pixel space to continuous space."""
         step = (2 * sz) / (self.size_px - 1)
