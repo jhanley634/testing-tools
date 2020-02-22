@@ -33,8 +33,7 @@ def mandelbrot_set(xc, yc, sz, fout):
         ppm.plot(_cycles_to_escape(x0, y0))
 
 
-def _cycles_to_escape(x0, y0, max_iter=255):
-    cdef double x, y
+def _cycles_to_escape(double x0, double y0, max_iter=255):
     cdef int i
     x, y, i = 0, 0, 0
     while x * x + y * y <= 4 and i < max_iter:

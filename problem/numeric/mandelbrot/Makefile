@@ -38,14 +38,14 @@ SO = mset_cython_ext.cpython-37m-darwin.so
 %2.ppm:
 	$(ENV) ./mset_numba.py $(LOCATION) > $@
 
-# 1.9s with cdef declarations, 5.2s without
+# .53s with sig + cdef declarations, 1.9s with cdef decls, 5.2s without
 %3.ppm: cython_d/$(SO)
 	cd cython_d && $(ENV) ./mset_cython.py $(LOCATION) > $@
 
 %.png: %.ppm
 	convert $< $@
 
-cython_d/$(SO):
+cython_d/$(SO): cython_d/mset_cython_ext.pyx
 	cd cython_d && python setup.py build_ext --inplace
 
 clean:
