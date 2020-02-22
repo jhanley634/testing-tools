@@ -34,6 +34,8 @@ def mandelbrot_set(xc, yc, sz, fout):
 
 
 def _cycles_to_escape(x0, y0, max_iter=255):
+    cdef double x, y
+    cdef int i
     x, y, i = 0, 0, 0
     while x * x + y * y <= 4 and i < max_iter:
         x, y = x * x - y * y + x0, 2 * x * y + y0

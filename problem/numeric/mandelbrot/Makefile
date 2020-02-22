@@ -38,7 +38,7 @@ SO = mset_cython_ext.cpython-37m-darwin.so
 %2.ppm:
 	$(ENV) ./mset_numba.py $(LOCATION) > $@
 
-# 5.2s
+# 1.9s with cdef declarations, 5.2s without
 %3.ppm: cython_d/$(SO)
 	cd cython_d && $(ENV) ./mset_cython.py $(LOCATION) > $@
 
