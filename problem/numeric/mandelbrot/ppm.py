@@ -18,27 +18,32 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import os
-import sys
-
-from problem.numeric.mandelbrot.ppm import PPM
-
-PX_RESOLUTION = int(os.getenv("MSET_PX_RESOLUTION", "100"))  # defaults to 100px square
+import colorbrewer
 
 
-def mandelbrot_set(xc, yc, sz, fout, max_iter=255):
-    """Given center x,y and a "radius" size, create a square PPM m-set."""
-    # from https://en.wikipedia.org/wiki/Mandelbrot_set#Computer_drawings
-    ppm = PPM(fout, PX_RESOLUTION)
+class PPM:
+    """Implements square netpbm ascii Portable Pix Map."""
 
-    for x0, y0 in ppm.get_points(xc, yc, sz):
-        x, y, i = 0, 0, 0
-        while x * x + y * y <= 4 and i < max_iter:
-            x, y = x * x - y * y + x0, 2 * x * y + y0
-            i += 1
-        ppm.plot(i)
+    def __init__(self, fout, size_px):
+        fout.write("P3\n")  # ppm magic number
+        fout.write(f"{size_px} {size_px}\n")
+        fout.write("255\n")  # max val, 8-bit channels, 24-bit color
+        self.fout = fout
+        self.size_px = size_px
+        self.cmap = colorbrewer.PRGn[11]
 
+    def plot(self, grey_value):
+        assert 0 <= grey_value < 256, grey_value
+        # r, g, b = grey_value, grey_value, grey_value
+        r, g, b = self.cmap[grey_value % len(self.cmap)]
+        self.fout.write(f"{r} {g} {b}\n")
 
-if __name__ == '__main__':
-    args = map(float, sys.argv[1:])
-    mandelbrot_set(*args, sys.stdout)
+    def get_points(self, xc, yc, sz):
+        """Generates x, y point for each pixel.
+        Maps from pixel space to continuous space."""
+        step = (2 * sz) / (self.size_px - 1)
+        for j in range(self.size_px):
+            for i in range(self.size_px):
+                yield (
+                    xc - sz + step * i,
+                    yc - sz + step * j)

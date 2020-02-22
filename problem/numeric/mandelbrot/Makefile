@@ -21,7 +21,8 @@ OUT = /tmp/1.png
 
 all: $(OUT)
 
-ENV = time env MSET_PX_RESOLUTION=300
+TOP := $(shell git rev-parse --show-toplevel)
+ENV = time env PYTHONPATH=$(TOP) MSET_PX_RESOLUTION=300
 
 %.ppm:
 	$(ENV) ./mset.py -.5 0 1 > $@
