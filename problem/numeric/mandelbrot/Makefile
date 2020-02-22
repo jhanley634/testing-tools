@@ -17,15 +17,21 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-OUT = /tmp/1.png
+OUT = \
+ /tmp/1.png \
+ /tmp/2.png \
 
 all: $(OUT)
 
 TOP := $(shell git rev-parse --show-toplevel)
 ENV = time env PYTHONPATH=$(TOP) MSET_PX_RESOLUTION=300
+LOCATION = -.5 0 1  # think four unit squares, centered a bit left of the origin
 
-%.ppm:
-	$(ENV) ./mset.py -.5 0 1 > $@
+%1.ppm:
+	$(ENV) ./mset.py $(LOCATION) > $@
+
+%2.ppm:
+	$(ENV) ./mset_numba.py $(LOCATION) > $@
 
 %.png: %.ppm
 	convert $< $@

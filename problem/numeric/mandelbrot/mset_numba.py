@@ -18,12 +18,11 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import os
 import sys
 
+from numba import jit
 from problem.numeric.mandelbrot.ppm import PPM
-
-PX_RESOLUTION = int(os.getenv("MSET_PX_RESOLUTION", "100"))  # defaults to 100px square
+from problem.numeric.mandelbrot.mset import PX_RESOLUTION
 
 
 def mandelbrot_set(xc, yc, sz, fout):
@@ -35,6 +34,7 @@ def mandelbrot_set(xc, yc, sz, fout):
         ppm.plot(_cycles_to_escape(x0, y0))
 
 
+@jit(nopython=True)
 def _cycles_to_escape(x0, y0, max_iter=255):
     x, y, i = 0, 0, 0
     while x * x + y * y <= 4 and i < max_iter:
