@@ -28,6 +28,8 @@ TOP := $(shell git rev-parse --show-toplevel)
 ENV = time env PYTHONPATH=$(TOP) MSET_PX_RESOLUTION=300
 LOCATION = -.5 0 1  # think four unit squares, centered a bit left of the origin
 
+SO = mset_cython_ext.cpython-37m-darwin.so
+
 %1.ppm:
 	$(ENV) ./mset.py $(LOCATION) > $@
 
@@ -35,10 +37,10 @@ LOCATION = -.5 0 1  # think four unit squares, centered a bit left of the origin
 	$(ENV) ./mset_numba.py $(LOCATION) > $@
 
 %3.ppm:
-	cd cython.d && python setup.py build_ext --inplace
+	cd cython.d && python setup.py build_ext --inplace && ls -l $(SO)
 
 %.png: %.ppm
 	convert $< $@
 
 clean:
-	rm -f /tmp/*.ppm $(OUT)
+	bash -c "rm -rf /tmp/*.ppm cython.d/{build,$(SO)} $(OUT)"

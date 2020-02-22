@@ -20,5 +20,5 @@
 from distutils.core import setup
 from Cython.Build import cythonize
 
-setup(name='mset_cython',
-      ext_modules=cythonize("mset_cython.pyx"))
+setup(name='mset_cython_ext',
+      ext_modules=cythonize("mset_cython_ext.pyx", language_level=3))
