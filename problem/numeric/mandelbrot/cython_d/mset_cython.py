@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 
 # Copyright 2020 John Hanley.
 #
@@ -17,36 +18,11 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-OUT = \
- /tmp/1.png \
- /tmp/2.png \
- /tmp/3.png \
+import sys
 
-all: $(OUT)
+from problem.numeric.mandelbrot.cython_d.mset_cython_ext import mandelbrot_set
 
-TOP := $(shell git rev-parse --show-toplevel)
-ENV = time env PYTHONPATH=$(TOP) MSET_PX_RESOLUTION=500
-LOCATION = -.5 0 1  # think four unit squares, centered a bit left of the origin
 
-SO = mset_cython_ext.cpython-37m-darwin.so
-
-# 8.2s of laptop user-mode CPU
-%1.ppm:
-	$(ENV) ./mset.py $(LOCATION) > $@
-
-# 1.7s
-%2.ppm:
-	$(ENV) ./mset_numba.py $(LOCATION) > $@
-
-# 5.2s
-%3.ppm: cython_d/$(SO)
-	cd cython_d && $(ENV) ./mset_cython.py $(LOCATION) > $@
-
-%.png: %.ppm
-	convert $< $@
-
-cython_d/$(SO):
-	cd cython_d && python setup.py build_ext --inplace
-
-clean:
-	bash -c "rm -rf /tmp/*.ppm cython_d/{build,$(SO)} $(OUT)"
+if __name__ == '__main__':
+    args = map(float, sys.argv[1:])
+    mandelbrot_set(*args, sys.stdout)
