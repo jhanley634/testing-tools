@@ -18,9 +18,11 @@
 # other dealings in the software.
 
 OUT = \
+ cxx_d/mset_cxx \
  /tmp/1.png \
  /tmp/2.png \
  /tmp/3.png \
+ /tmp/4.png \
 
 all: $(OUT)
 
@@ -42,11 +44,17 @@ SO = mset_cython_ext.cpython-37m-darwin.so
 %3.ppm: cython_d/$(SO)
 	cd cython_d && $(ENV) ./mset_cython.py $(LOCATION) > $@
 
+%4.ppm: cxx_d/mset_cxx
+	$< $(LOCATION) > $@
+
 %.png: %.ppm
 	convert $< $@
 
 cython_d/$(SO): cython_d/mset_cython_ext.pyx
 	cd cython_d && python setup.py build_ext --inplace
+
+cxx_d/mset_cxx:
+	make -C cxx_d
 
 clean:
 	bash -c "rm -rf /tmp/*.ppm cython_d/{build,$(SO)} $(OUT)"
