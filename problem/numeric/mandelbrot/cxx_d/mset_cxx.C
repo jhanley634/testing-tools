@@ -18,29 +18,9 @@
 // other dealings in the software.
 
 #include <iostream>
+#include <ppm.h>
 using namespace std;
 
-/*
-class PPM{
-    public:
-    PPM(uint size_px);
-    void plot(uint grey_value);
-};
-*/
-class PPM {
-    public:
-
-    PPM(uint size_px) {
-        cout << "P3" << endl;
-        cout << size_px << " " << size_px << endl;
-        cout << 255 << endl;
-    }
-
-    void plot(uint grey_value) {
-        int v = grey_value;
-        cout << v << " " << v << " " << v << endl;
-    }
-};
 
 int cycles_to_escape(double x0, double y0, uint max_iter) {
     double x = 0.0;

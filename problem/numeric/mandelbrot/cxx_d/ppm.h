@@ -17,17 +17,8 @@
 // arising from, out of or in connection with the software or the use or
 // other dealings in the software.
 
-#include <iostream>
-#include <ppm.h>
-using namespace std;
-
-PPM::PPM(uint size_px) {
-    cout << "P3" << endl;
-    cout << size_px << " " << size_px << endl;
-    cout << 255 << endl;
-}
-
-void PPM::plot(uint grey_value) {
-    int v = grey_value;
-    cout << v << " " << v << " " << v << endl;
-}
+class PPM{
+    public:
+    PPM(uint size_px);
+    void plot(uint grey_value);
+};
