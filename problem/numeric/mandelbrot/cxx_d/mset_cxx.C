@@ -46,7 +46,6 @@ void mandelbrot_set(double xc, double yc, double sz, uint px_resolution) {
         for (int i=0; i < px_resolution; i++) {
             double x0 = xc - sz + step * i;
             double y0 = yc - sz + step * j;
-            // cout << 99 << " " << i << " " << j << " " << x0 << " " << y0 << endl;
             ppm.plot(cycles_to_escape(x0, y0, 255));
         }
     }

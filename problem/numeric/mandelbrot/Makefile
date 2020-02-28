@@ -23,6 +23,7 @@ OUT = \
  /tmp/2.png \
  /tmp/3.png \
  /tmp/4.png \
+ /tmp/5.png \
 
 all: $(OUT)
 
@@ -63,6 +64,10 @@ SO = mset_cython_ext.cpython-37m-darwin.so
 	diff -wu /tmp/{3,4}.ppm
 	ls -l    /tmp/{3,4}.ppm
 	shasum -a 224 $@ | grep $(HASH) > /dev/null
+
+%5.ppm:
+	$(ENV) ./mset.jl $(LOCATION) > $@
+	shasum -a 224 $@
 
 %.png: %.ppm
 	convert $< $@
