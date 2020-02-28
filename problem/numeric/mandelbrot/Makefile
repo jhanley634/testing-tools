@@ -58,8 +58,10 @@ SO = mset_cython_ext.cpython-37m-darwin.so
 	cd cython_d && $(ENV) ./mset_cython.py $(LOCATION) > $@
 	shasum -a 224 $@ | grep $(HASH) > /dev/null
 
-%4.ppm: cxx_d/mset_cxx
-	$< $(LOCATION) > $@
+%4.ppm: cxx_d/mset_cxx /tmp/3.ppm
+	$(ENV) $< $(LOCATION) > $@
+	diff -wu /tmp/{3,4}.ppm
+	ls -l    /tmp/{3,4}.ppm
 	shasum -a 224 $@ | grep $(HASH) > /dev/null
 
 %.png: %.ppm

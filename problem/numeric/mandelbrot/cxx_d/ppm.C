@@ -23,16 +23,13 @@ using namespace std;
 class PPM {
     public:
 
-    int size_px;
-
-    PPM(unsigned int px) {
-        size_px = px;
+    PPM(uint size_px) {
         cout << "P3" << endl;
-        cout << size_px << endl;
+        cout << size_px << " " << size_px << endl;
         cout << 255 << endl;
     }
 
-    void plot(unsigned int grey_value) {
+    void plot(uint grey_value) {
         int v = grey_value;
         cout << v << " " << v << " " << v << endl;
     }
