@@ -29,6 +29,7 @@ all: $(OUT)
 TOP := $(shell git rev-parse --show-toplevel)
 ENV = time env PYTHONPATH=$(TOP) MSET_PX_RESOLUTION=500
 LOCATION = -.5 0 1  # think four unit squares, centered a bit left of the origin
+HASH = 83bbda6988fc003f8f71b4b5d8fee3bbb35d22fc5ef3a8e5c7b33958
 
 SO = mset_cython_ext.cpython-37m-darwin.so
 
@@ -45,17 +46,21 @@ SO = mset_cython_ext.cpython-37m-darwin.so
 # 8.2s of laptop user-mode CPU
 %1.ppm:
 	$(ENV) ./mset.py $(LOCATION) > $@
+	shasum -a 224 $@ | grep $(HASH) > /dev/null
 
 # 1.2s with sig declarations, 1.7s without
 %2.ppm:
 	$(ENV) ./mset_numba.py $(LOCATION) > $@
+	shasum -a 224 $@ | grep $(HASH) > /dev/null
 
 # .53s with sig + cdef declarations, 1.9s with cdef decls, 5.2s without
 %3.ppm: cython_d/$(SO)
 	cd cython_d && $(ENV) ./mset_cython.py $(LOCATION) > $@
+	shasum -a 224 $@ | grep $(HASH) > /dev/null
 
 %4.ppm: cxx_d/mset_cxx
 	$< $(LOCATION) > $@
+	shasum -a 224 $@ | grep $(HASH) > /dev/null
 
 %.png: %.ppm
 	convert $< $@

@@ -18,19 +18,22 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import colorbrewer
+
+def _get_identity_color_map():
+    return {i: (i, i, i)
+            for i in range(256)}
 
 
 class PPM:
     """Implements square netpbm ascii Portable Pix Map."""
 
-    def __init__(self, fout, size_px: int):
+    def __init__(self, fout, size_px: int, cmap=None):
         fout.write("P3\n")  # ppm magic number
         fout.write(f"{size_px} {size_px}\n")
         fout.write("255\n")  # max val, 8-bit channels, 24-bit color
         self.fout = fout
         self.size_px = size_px
-        self.cmap = colorbrewer.PRGn[11]
+        self.cmap = cmap or _get_identity_color_map()
 
     def plot(self, grey_value):
         assert 0 <= grey_value < 256, grey_value

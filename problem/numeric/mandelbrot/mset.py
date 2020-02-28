@@ -21,15 +21,17 @@
 import os
 import sys
 
+import colorbrewer
+
 from problem.numeric.mandelbrot.ppm import PPM
 
 PX_RESOLUTION = int(os.getenv("MSET_PX_RESOLUTION", "100"))  # defaults to 100px square
 
 
-def mandelbrot_set(xc: float, yc: float, sz: float, fout):
+def mandelbrot_set(xc: float, yc: float, sz: float, fout, cmap):
     """Given center x,y and a "radius" size, create a square PPM m-set."""
     # from https://en.wikipedia.org/wiki/Mandelbrot_set#Computer_drawings
-    ppm = PPM(fout, PX_RESOLUTION)
+    ppm = PPM(fout, PX_RESOLUTION, cmap=cmap)
 
     for x0, y0 in ppm.get_points(xc, yc, sz):
         ppm.plot(_cycles_to_escape(x0, y0))
@@ -45,4 +47,6 @@ def _cycles_to_escape(x0: float, y0: float, max_iter=255):
 
 if __name__ == '__main__':
     args = map(float, sys.argv[1:])
-    mandelbrot_set(*args, sys.stdout)
+    cmap = colorbrewer.PRGn[11]
+    cmap = None  # greyscale
+    mandelbrot_set(*args, sys.stdout, cmap)
