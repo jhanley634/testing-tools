@@ -32,6 +32,16 @@ LOCATION = -.5 0 1  # think four unit squares, centered a bit left of the origin
 
 SO = mset_cython_ext.cpython-37m-darwin.so
 
+/tmp/profile_py3:
+	$(ENV) python -m cProfile -o $@ mset.py $(LOCATION) > /dev/null
+	echo stats | python -m pstats $@ | sort -nk2 | tail -90
+	@echo "   ncalls  tottime  percall  cumtime  percall"
+
+/tmp/profile_numba:
+	$(ENV) python -m cProfile -o $@ mset_numba.py $(LOCATION) > /dev/null
+	echo stats | python -m pstats $@ | sort -nk2 | tail -90
+	@echo "   ncalls  tottime  percall  cumtime  percall"
+
 # 8.2s of laptop user-mode CPU
 %1.ppm:
 	$(ENV) ./mset.py $(LOCATION) > $@
