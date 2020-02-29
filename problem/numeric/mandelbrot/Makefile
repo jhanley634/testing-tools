@@ -24,6 +24,7 @@ OUT = \
  /tmp/3.png \
  /tmp/4.png \
  /tmp/5.png \
+ /tmp/6.png \
 
 all: $(OUT)
 
@@ -69,6 +70,9 @@ SO = mset_cython_ext.cpython-37m-darwin.so
 	$(ENV) ./mset.jl $(LOCATION) > $@
 	shasum -a 224 $@
 
+%6.ppm: mset
+	$(ENV) ./mset $(LOCATION) > $@
+
 %.png: %.ppm
 	convert $< $@
 
@@ -77,6 +81,9 @@ cython_d/$(SO): cython_d/mset_cython_ext.pyx
 
 cxx_d/mset_cxx:
 	make -C cxx_d
+
+mset:
+	rustc -g $@.rs
 
 clean:
 	bash -c "rm -rf /tmp/*.ppm cython_d/{build,$(SO)} $(OUT)"

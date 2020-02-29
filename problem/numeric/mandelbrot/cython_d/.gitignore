@@ -1,4 +1,6 @@
 build/
 mset_cython_ext.c
+mset_cython_ext.cpython-36m-darwin.so
 mset_cython_ext.cpython-37m-darwin.so
+mset_cython_ext.cpython-38-darwin.so
 mset_cython_ext.html

@@ -1,0 +1,12 @@
+name: mandelbrot
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - colorbrewer >= 0.2
+  - cython >= 0.29.15
+  - pip >= 20.0.2
+  - numba >= 0.48.0
+  - ruamel.yaml >= 0.16.6
