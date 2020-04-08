@@ -82,8 +82,8 @@ cython_d/$(SO): cython_d/mset_cython_ext.pyx
 cxx_d/mset_cxx:
 	make -C cxx_d
 
-mset:
-	rustc -g $@.rs
+mset: mset.rs
+	rustc -g $<
 
 clean:
 	bash -c "rm -rf /tmp/*.ppm cython_d/{build,$(SO)} $(OUT)"
