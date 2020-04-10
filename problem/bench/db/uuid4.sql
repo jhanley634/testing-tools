@@ -31,8 +31,7 @@ other dealings in the software.
 -- The nybble '8' has hi bit set, next bit cleared, plus two wasted bits.
 -- We deliberately choose to emit just 120 random bits, for simplicity.
 -- The RAND() function returns about 53 bits of entropy in the mantissa,
--- so we call it five times to obtain 265 ( > 256 ) unguessable bits.
--- We wind up needing to do this thrice (15 calls) to gen a guid.
+-- so at end we call it twice to obtain 106 ( > 60 ) unguessable bits.
 -- The standard spelling of a guid, with four '-' dashes, is 36 characters.
 -- We emit 32 hex characters, sans dashes.
 
@@ -45,11 +44,11 @@ CREATE TABLE           guid_test (
 
 INSERT INTO guid_test (guid, updated) VALUES (
   concat(
-    substr(sha2(concat(rand(), rand(), rand(), rand(), rand()), 256), 1, 12),
+    substr(sha2(rand(), 256),                 1, 12),
     '4',
-    substr(sha2(concat(rand(), rand(), rand(), rand(), rand()), 256), 1,  3),
+    substr(sha2(rand(), 256),                 1,  3),
     '8',
-    substr(sha2(concat(rand(), rand(), rand(), rand(), rand()), 256), 1, 15)
+    substr(sha2(concat(rand(), rand()), 256), 1, 15)
   ),
   now()
 );
