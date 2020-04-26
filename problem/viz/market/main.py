@@ -18,9 +18,32 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import bokeh
+from bokeh.io import curdoc
+from bokeh.models import ColumnDataSource
+from bokeh.plotting import figure
 
-"""It has been some months since the market has been in record-setting
-territory. One can express it as X% down from high. A more relevant
-way to phrase it could be: How many months progress have we lost?
-"""
+from . import covid19_stats as c19
+
+
+def modify_doc(doc):
+    """Add a plotted function to the document.
+
+    Arguments:
+        doc: A bokeh document to which elements can be added.
+    """
+    ds = c19.Transform()
+    x_values = ds.us_stat.date
+    y_values = ds.us_stat.cases
+    data_source = ColumnDataSource(data=dict(x=x_values, y=y_values))
+    plot = figure(title="covid cases",
+                  tools="crosshair,pan,reset,save,wheel_zoom", )
+    plot.line('x', 'y', source=data_source, line_width=3, line_alpha=0.6)
+    doc.add_root(plot)
+    doc.title = "covid19 cases"
+
+
+def main():
+    modify_doc(curdoc())
+
+
+main()

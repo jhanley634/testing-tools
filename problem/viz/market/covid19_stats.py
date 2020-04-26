@@ -18,26 +18,41 @@
 # other dealings in the software.
 
 from pathlib import Path
+
 import pandas as pd
 
 """Reads morbidity stats from https://github.com/nytimes/covid-19-data.git"""
 
 
-def _get_nyt_covid_repo():
-    top = Path(f'{__file__}/../../../..')  # git rev-parse --show-toplevel
-    return (top / '../covid-19-data').resolve()
+class Extract:
+
+    @staticmethod
+    def _get_nyt_covid19_repo():
+        top = Path(f'{__file__}/../../../..')  # git rev-parse --show-toplevel
+        return (top / '../covid-19-data').resolve()
+
+    def __init__(self):
+        covid = self._get_nyt_covid19_repo()
+        self.us_stat = pd.read_csv(covid / 'us.csv')
+        self.state_stat = pd.read_csv(covid / 'us-states.csv')
+        self.county_stat = pd.read_csv(covid / 'us-counties.csv')
 
 
-def get_state_stats():
-    df = pd.read_csv(_get_nyt_covid_repo() / 'us-states.csv')
-    df['date'] = pd.to_datetime(df.date)
-    return df
+class Transform(Extract):
+
+    def __init__(self):
+        super().__init__()
+
+        df = self.county_stat
+        df = df[~df.fips.isna()].copy()
+        df['fips'] = df.fips.astype('int32')
+        self.county_stat = df
+
+        for df in [self.us_stat,
+                   self.state_stat,
+                   self.county_stat]:
+            df['date'] = pd.to_datetime(df.date)
 
 
-def get_county_stats():
-    df = pd.read_csv(_get_nyt_covid_repo() / 'us-counties.csv')
-    # df = df[~df.county.isin(['Unknown', 'New York City', 'Kansas City'])]
-    df = df[~df.fips.isna()]
-    df['fips'] = df.fips.astype('int32')
-    df['date'] = pd.to_datetime(df.date)
-    return df
+class Load:
+    """Empty -- we don't upload to a server such as RDBMS or S3."""
