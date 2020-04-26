@@ -2,12 +2,13 @@ name: testing-tools
 channels:
   - conda-forge
 dependencies:
-  - alembic >= 1.4.0
+  - alembic >= 1.4.2
   - astor >= 0.7.1
-  - beautifulsoup4 >= 4.8.2
-  - boltons >= 20.0.0
+  - beautifulsoup4 >= 4.9.0
+  - boltons >= 20.1.0
+  - bokeh >= 2.0.1
   - cartopy >= 0.17.0
-  - click >= 7.0
+  - click >= 7.1.1
   - cvxopt >= 1.2.3
   - cython >= 0.29.14
   - dicttoxml >= 1.7.4
@@ -35,7 +36,7 @@ dependencies:
   - seaborn >= 0.10.0
   - sqlalchemy >= 1.3.5
   - unyt >= 2.7.1
-  - yapf >= 0.28.0
+  - yapf >= 0.29.0
   - pip:
     - colorbrewer >= 0.2.0
     - distlib >= 0.3.0

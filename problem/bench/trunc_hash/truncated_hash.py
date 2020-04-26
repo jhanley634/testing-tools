@@ -22,6 +22,8 @@ from collections import defaultdict
 from functools import partial
 from hashlib import sha3_256
 
+"""Demonstrates why one should fold in XORed bits when truncating."""
+
 
 def _truncating_hash(output_bits, prefix, msg):
     return sha3_256(f'{prefix}{msg}'.encode()).hexdigest()[:output_bits // 4]
