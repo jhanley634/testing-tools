@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 
 # Copyright 2020 John Hanley.
 #
@@ -18,10 +17,27 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import bokeh
+from pathlib import Path
+import pandas as pd
+
+"""Reads morbidity stats from https://github.com/nytimes/covid-19-data.git"""
 
 
-"""It has been some months since the market has been in record-setting
-territory. One can express it as X % down from high. A more relevant
-way to phrase it could be: How many months progress have we lost?
-"""
+def _get_nyt_covid_repo():
+    top = Path(f'{__file__}/../../../..')  # git rev-parse --show-toplevel
+    return (top / '../covid-19-data').resolve()
+
+
+def get_state_stats():
+    df = pd.read_csv(_get_nyt_covid_repo() / 'us-states.csv')
+    df['date'] = pd.to_datetime(df.date)
+    return df
+
+
+def get_county_stats():
+    df = pd.read_csv(_get_nyt_covid_repo() / 'us-counties.csv')
+    # df = df[~df.county.isin(['Unknown', 'New York City', 'Kansas City'])]
+    df = df[~df.fips.isna()]
+    df['fips'] = df.fips.astype('int32')
+    df['date'] = pd.to_datetime(df.date)
+    return df
