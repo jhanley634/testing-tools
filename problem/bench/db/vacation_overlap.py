@@ -40,6 +40,9 @@ class Vacation:
             )
         """
         self.engine.execute(create_emp)
+        for col in ['vac_start', 'vac_end']:
+            create = f"create index  emp_{col}_ix  on emp ({col})"
+            self.engine.execute(create)
 
         create_calendar = """
             CREATE TABLE calendar (
@@ -67,15 +70,14 @@ class Vacation:
         select = """
             SELECT   day, COUNT(*) as cnt
             FROM     calendar c
-            JOIN     emp es  ON es.vac_start <= c.day
-            JOIN     emp ee  ON ee.vac_end   >= c.day
-                             AND es.name = ee.name
+            JOIN     emp e  ON e.vac_start <= c.day
+                            AND c.day <= e.vac_end
             GROUP BY day
             ORDER BY day
         """
         print(select)
         for row in self.engine.execute(select):
-            print(row)
+            print('  '.join(map(str, row)))
 
 
 if __name__ == '__main__':
