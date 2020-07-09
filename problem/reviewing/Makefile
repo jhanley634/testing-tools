@@ -1,5 +1,7 @@
 
-all: out/reviewing.pdf
+all: \
+  out/dbc.pdf \
+  out/reviewing.pdf \
 
 %.pdf: ../%.md
 	pandoc -t beamer -H header.tex -o $@ $<
