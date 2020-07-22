@@ -18,9 +18,82 @@ These are age old questions
 that arise in every environment.
 Today we shall focus on python.
 
-# example code
+# scenario
 
+The USPS delivers letters,
+giving each post office a zipcode.
 
+The Census Bureau offers statistics
+for several region sizes, including zipcodes.
+
+We gathered information, including address,
+from many prospective customers in southern California.
+
+We would like to extract the subset of prospects
+living in places where Census demographic data
+is available.
+
+# generator, 1 of 1
+
+    #! /usr/bin/env python
+
+    def get_good_zips(out_fspec="/tmp/census.csv"):
+        """Finds ZIPS for which Census reports home values."""
+        select = """
+            SELECT  zipcode
+            FROM    simple_zipcode
+            WHERE   median_home_value IS NOT NULL
+        """
+        _rows_to_file(select, out_fspec)
+
+# example code, 1 of 2
+
+    #! /usr/bin/env python
+
+    import csv
+
+    def get_rows(fspec_csv):
+        with open(fspec_csv) as fin:
+            sheet = csv.reader(fin)
+            yield from sheet
+
+    ...
+
+    if __name__ == '__main__':
+        assert 60 == count_matches()
+
+# example code, 2 of 2
+
+    def count_matches(
+            census_csv="/tmp/census.csv",
+            los_angeles_prospects_csv="/tmp/prospects.csv"):
+        count = 0
+        for zipcode in get_rows(los_angeles_prospects_csv):
+            census = sorted(get_rows(census_csv))
+            if zipcode in census:
+                count += 1
+
+        return count
+
+# where did the time go?
+
+Let's ask the machine.
+
+https://docs.python.org/3/library/profile.html#module-cProfile
+
+python -m cProfile reviewing/example/find_matching_zips.py | awk '$2 > .001'
+             3025847 function calls (3025841 primitive calls) in 2.070 seconds
+       Ordered by: standard name
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+         2690    0.005    0.000    0.011    0.000 codecs.py:319(decode)
+            1    0.231    0.231    2.060    2.060 find_matching_zips.py:11(count_matches)
+            1    0.002    0.002    2.070    2.070 find_matching_zips.py:3(<module>)
+      3019201    1.332    0.000    1.354    0.000 find_matching_zips.py:5(get_rows)
+         2690    0.006    0.000    0.006    0.000 {built-in method _codecs.utf_8_decode}
+            1    0.005    0.005    0.005    0.005 {built-in method _imp.create_dynamic}
+           96    0.475    0.005    1.825    0.019 {built-in method builtins.sorted}
+           97    0.010    0.000    0.011    0.000 {built-in method io.open}
+            1    0.002    0.002    0.002    0.002 {method 'read' of '_io.FileIO' objects}
 
 # questions
 
