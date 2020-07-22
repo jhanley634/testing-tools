@@ -14,11 +14,11 @@ Where did the _time_ go?
 
 Why is this code so _slow_?
 
-Does this code make me look fat?
-
 These are age old questions
 that arise in every environment.
 Today we shall focus on python.
+
+# example code
 
 
 
