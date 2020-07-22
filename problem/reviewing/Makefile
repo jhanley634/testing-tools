@@ -2,6 +2,7 @@
 all: \
   out/dbc.pdf \
   out/reviewing.pdf \
+  out/where_the_cycles_went.pdf \
 
 %.pdf: ../%.md
 	pandoc -t beamer -H header.tex -o $@ $<
