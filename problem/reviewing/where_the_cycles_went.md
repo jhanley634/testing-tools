@@ -175,16 +175,20 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
 
 # results, 4 of 4
 
+## set intersection
+
     def count_matches( ... ):
 
         return len(set(get_rows(census_csv))
                  & set(get_rows(los_angeles_prospects_csv)))
 
+\blank
+
     32211 function calls (32205 primitive calls) in 0.027 seconds
        Ordered by: standard name
-       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-            1    0.009    0.009    0.026    0.026 fm_zips.py:11(count_matches)
-        31546    0.017    0.000    0.017    0.000 fm_zips.py:5(get_rows)
+       ncalls tottime percall cumtime  filename:lineno(function)
+            1   0.009   0.009   0.026  fm_zips.py:11(count_matches)
+        31546   0.017   0.000   0.017  fm_zips.py:5(get_rows)
 
 # refactor
 
