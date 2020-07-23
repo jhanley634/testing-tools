@@ -4,6 +4,9 @@ author: John Hanley
 title: Where did the cycles go?
 date: 23\textsuperscript{rd} July 2020
 copyright: 2020, see below
+
+\blank
+[14 slides]
 ---
 
 # Where did the cycles go?
@@ -83,6 +86,7 @@ is available.
 Let's ask the machine.
 
 https://docs.python.org/3/library/profile.html#module-cProfile
+\blank
 
     $ python -m cProfile fm_zips.py | awk '$2 > .001'
        3025848 function calls (3025842 primitive calls) in 2.021 seconds
@@ -168,6 +172,7 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
             if m:
                 print(reversed(m.groups()))
 
+\blank
 
     $ time ./regex1.py  < /tmp/million.txt
     real    0m0.987s
@@ -175,6 +180,7 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
 # regex, 2 of 2
 
 ## constant hoisting
+\blank
 
     def grep2(fin):
         stamp_pod_re = re.compile(
@@ -184,6 +190,8 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
             m = stamp_pod_re.search(line)
             if m:
                 print(reversed(m.groups()))
+
+\blank
 
     $ time ./regex2.py  < /tmp/million.txt
     real    0m0.270s
