@@ -46,7 +46,7 @@ is available.
         """
         _rows_to_file(select, out_fspec)
 
-# example code, 1 of 2
+# example code, 1 of 4
 
     #! /usr/bin/env python
 
@@ -62,7 +62,7 @@ is available.
     if __name__ == '__main__':
         assert 60 == count_matches()
 
-# example code, 2 of 2
+# example code, 2 of 4
 
     def count_matches(
             census_csv="/tmp/census.csv",
@@ -93,6 +93,69 @@ https://docs.python.org/3/library/profile.html#module-cProfile
            96   0.468   0.005   1.790  {builtins.sorted}
            97   0.010   0.000   0.011  {io.open}
 
+# example code, 3 of 4
+
+## hoist constant out of loop
+
+The zipcodes in `census` do not change.
+
+    def count_matches(
+            census_csv="/tmp/census.csv",
+            los_angeles_prospects_csv="/tmp/prospects.csv"):
+        count = 0
+        census = sorted(get_rows(census_csv))
+
+        for zipcode in get_rows(los_angeles_prospects_csv):
+            if zipcode in census:
+                count += 1
+
+        return count
+
+# results, 2 of 3
+
+             32208 function calls (32202 primitive calls) in 0.145 seconds
+       Ordered by: standard name
+       ncalls tottime percall cumtime  filename:lineno(function)
+            1   0.002   0.002   0.003  <frozen importlib._bootstrap_external>:914(get_data)
+            1   0.096   0.096   0.134  fm_zips.py:11(count_matches)
+            1   0.002   0.002   0.145  fm_zips.py:3(<module>)
+        31546   0.030   0.000   0.031  fm_zips.py:5(get_rows)
+            1   0.005   0.005   0.005  {_imp.create_dynamic}
+            1   0.007   0.007   0.035  {builtins.sorted}
+
+# example code, 4 of 4
+
+# accidentally changed complexity
+
+Testing `in` is O(1) for `set`, but O(n) for `list`.
+
+    def count_matches(
+            census_csv="/tmp/census.csv",
+            los_angeles_prospects_csv="/tmp/prospects.csv"):
+        count = 0
+        census = set(zipcode
+                     for zipcode, in get_rows(census_csv))
+
+        for zipcode in get_rows(los_angeles_prospects_csv):
+            census = sorted(get_rows(census_csv))
+            if zipcode in census:
+                count += 1
+
+        return count
+
+# results, 3 of 3
+
+        for zipcode in get_rows(los_angeles_prospects_csv):
+            census = sorted(get_rows(census_csv))
+            if zipcode in census:
+                count += 1
+
+             63656 function calls (63650 primitive calls) in 0.026 seconds
+       Ordered by: standard name
+       ncalls tottime percall cumtime  filename:lineno(function)
+            1   0.006   0.006   0.023  fm_zips.py:11(count_matches)
+        31449   0.006   0.000   0.017  fm_zips.py:15(<genexpr>)
+        31546   0.011   0.000   0.011  fm_zips.py:5(get_rows)
 
 # questions
 
