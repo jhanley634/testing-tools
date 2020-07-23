@@ -97,7 +97,9 @@ https://docs.python.org/3/library/profile.html#module-cProfile
 
 ## hoist constant out of loop
 
+\blank
 The zipcodes in `census` do not change.
+\blank
 
     def count_matches( ... ):
         count = 0
@@ -125,8 +127,8 @@ The zipcodes in `census` do not change.
 
 ## accidentally changed complexity
 
+\blank
 The `in` test is O(1) time for `set`, but O(n) for `list`.
-
 \blank
 
     def count_matches( ... ):
@@ -135,7 +137,6 @@ The `in` test is O(1) time for `set`, but O(n) for `list`.
                      for zipcode, in get_rows(census_csv))
 
         for zipcode in get_rows(los_angeles_prospects_csv):
-            census = sorted(get_rows(census_csv))
             if zipcode in census:
                 count += 1
 
@@ -144,7 +145,6 @@ The `in` test is O(1) time for `set`, but O(n) for `list`.
 # results, 3 of 3
 
         for zipcode in get_rows(los_angeles_prospects_csv):
-            census = sorted(get_rows(census_csv))
             if zipcode in census:
                 count += 1
 
