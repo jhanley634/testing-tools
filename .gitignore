@@ -1,8 +1,8 @@
-.idea/
-*.jl.cov
 *.jl.*.cov
+*.jl.cov
 *.jl.mem
-deps/deps.jl
 *.py~~
+.idea/
 TAGS
 __pycache__
+deps/deps.jl
