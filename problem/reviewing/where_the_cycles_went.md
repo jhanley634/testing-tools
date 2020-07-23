@@ -99,9 +99,7 @@ https://docs.python.org/3/library/profile.html#module-cProfile
 
 The zipcodes in `census` do not change.
 
-    def count_matches(
-            census_csv="/tmp/census.csv",
-            los_angeles_prospects_csv="/tmp/prospects.csv"):
+    def count_matches( ... ):
         count = 0
         census = sorted(get_rows(census_csv))
 
@@ -127,11 +125,11 @@ The zipcodes in `census` do not change.
 
 ## accidentally changed complexity
 
-Testing `in` is O(1) for `set`, but O(n) for `list`.
+The `in` test is O(1) time for `set`, but O(n) for `list`.
 
-    def count_matches(
-            census_csv="/tmp/census.csv",
-            los_angeles_prospects_csv="/tmp/prospects.csv"):
+\blank
+
+    def count_matches( ... ):
         count = 0
         census = set(zipcode
                      for zipcode, in get_rows(census_csv))
