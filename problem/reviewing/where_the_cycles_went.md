@@ -81,19 +81,18 @@ Let's ask the machine.
 
 https://docs.python.org/3/library/profile.html#module-cProfile
 
-python -m cProfile reviewing/example/find_matching_zips.py | awk '$2 > .001'
-             3025847 function calls (3025841 primitive calls) in 2.070 seconds
+    python -m cProfile fm_zips.py | awk '$2 > .001'
+             3025848 function calls (3025842 primitive calls) in 2.021 seconds
        Ordered by: standard name
-       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-         2690    0.005    0.000    0.011    0.000 codecs.py:319(decode)
-            1    0.231    0.231    2.060    2.060 find_matching_zips.py:11(count_matches)
-            1    0.002    0.002    2.070    2.070 find_matching_zips.py:3(<module>)
-      3019201    1.332    0.000    1.354    0.000 find_matching_zips.py:5(get_rows)
-         2690    0.006    0.000    0.006    0.000 {built-in method _codecs.utf_8_decode}
-            1    0.005    0.005    0.005    0.005 {built-in method _imp.create_dynamic}
-           96    0.475    0.005    1.825    0.019 {built-in method builtins.sorted}
-           97    0.010    0.000    0.011    0.000 {built-in method io.open}
-            1    0.002    0.002    0.002    0.002 {method 'read' of '_io.FileIO' objects}
+       ncalls tottime percall cumtime  filename:lineno(function)
+         2690   0.004   0.000   0.010  codecs.py:319(decode)
+            1   0.227   0.227   2.017  fm_zips.py:11(count_matches)
+            1   0.002   0.002   2.021  fm_zips.py:3(<module>)
+      3019201   1.301   0.000   1.323  fm_zips.py:5(get_rows)
+         2690   0.006   0.000   0.006  {_codecs.utf_8_decode}
+           96   0.468   0.005   1.790  {builtins.sorted}
+           97   0.010   0.000   0.011  {io.open}
+
 
 # questions
 
