@@ -12,7 +12,9 @@ Where did the _time_ go?
 
 (elapsed time, wallclock time)
 
+\blank
 Why is this code so _slow_?
+\blank
 
 These are age old questions
 that arise in every environment.
@@ -29,8 +31,9 @@ for several region sizes, including zipcodes.
 We gathered information, including address,
 from many prospective customers in southern California.
 
+\blank
 We would like to extract the subset of prospects
-living in places where Census demographic data
+who live in places where Census demographic data
 is available.
 
 # generator, 1 of 1
@@ -128,7 +131,7 @@ The zipcodes in `census` do not change.
 ## accidentally changed complexity
 
 \blank
-The `in` test is O(1) time for `set`, but O(n) for `list`.
+The `in` test is O(1) time for a `set`, but O(n) for a `list`.
 \blank
 
     def count_matches( ... ):
