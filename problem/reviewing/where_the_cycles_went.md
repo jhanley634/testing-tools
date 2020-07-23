@@ -84,7 +84,7 @@ Let's ask the machine.
 
 https://docs.python.org/3/library/profile.html#module-cProfile
 
-    python -m cProfile fm_zips.py | awk '$2 > .001'
+    $ python -m cProfile fm_zips.py | awk '$2 > .001'
        3025848 function calls (3025842 primitive calls) in 2.021 seconds
        Ordered by: standard name
        ncalls tottime percall cumtime  filename:lineno(function)
@@ -157,6 +157,36 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
             1   0.006   0.006   0.023  fm_zips.py:11(count_matches)
         31449   0.006   0.000   0.017  fm_zips.py:15(<genexpr>)
         31546   0.011   0.000   0.011  fm_zips.py:5(get_rows)
+
+# regex, 1 of 2
+
+    def grep(fin):
+        for line in fin:
+            m = re.search(
+                r'^(\d{4}:\d{2}:\d{2}) ([\w\.-]+)',
+                line)
+            if m:
+                print(reversed(m.groups()))
+
+
+    $ time ./regex1.py  < /tmp/million.txt
+    real    0m0.987s
+
+# regex, 2 of 2
+
+## constant hoisting
+
+    def grep2(fin):
+        stamp_pod_re = re.compile(
+            r'^(\d{4}:\d{2}:\d{2}) ([\w\.-]+)')
+
+        for line in fin:
+            m = stamp_pod_re.search(line)
+            if m:
+                print(reversed(m.groups()))
+
+    $ time ./regex2.py  < /tmp/million.txt
+    real    0m0.270s
 
 # questions
 
