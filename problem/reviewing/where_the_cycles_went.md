@@ -2,11 +2,8 @@
 ---
 author: John Hanley
 title: Where did the cycles go?
-date: 23\textsuperscript{rd} July 2020
+date: 23\textsuperscript{rd} July 2020 [14 slides]
 copyright: 2020, see below
-
-\blank
-[14 slides]
 ---
 
 # Where did the cycles go?
