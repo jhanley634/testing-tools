@@ -82,7 +82,7 @@ Let's ask the machine.
 https://docs.python.org/3/library/profile.html#module-cProfile
 
     python -m cProfile fm_zips.py | awk '$2 > .001'
-             3025848 function calls (3025842 primitive calls) in 2.021 seconds
+       3025848 function calls (3025842 primitive calls) in 2.021 seconds
        Ordered by: standard name
        ncalls tottime percall cumtime  filename:lineno(function)
          2690   0.004   0.000   0.010  codecs.py:319(decode)
@@ -113,7 +113,7 @@ The zipcodes in `census` do not change.
 
 # results, 2 of 3
 
-             32208 function calls (32202 primitive calls) in 0.145 seconds
+       32208 function calls (32202 primitive calls) in 0.145 seconds
        Ordered by: standard name
        ncalls tottime percall cumtime  filename:lineno(function)
             1   0.002   0.002   0.003  <frozen importlib._bootstrap_external>:914(get_data)
@@ -125,7 +125,7 @@ The zipcodes in `census` do not change.
 
 # example code, 4 of 4
 
-# accidentally changed complexity
+## accidentally changed complexity
 
 Testing `in` is O(1) for `set`, but O(n) for `list`.
 
@@ -150,7 +150,7 @@ Testing `in` is O(1) for `set`, but O(n) for `list`.
             if zipcode in census:
                 count += 1
 
-             63656 function calls (63650 primitive calls) in 0.026 seconds
+       63656 function calls (63650 primitive calls) in 0.026 seconds
        Ordered by: standard name
        ncalls tottime percall cumtime  filename:lineno(function)
             1   0.006   0.006   0.023  fm_zips.py:11(count_matches)
