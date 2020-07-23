@@ -2,7 +2,7 @@
 ---
 author: John Hanley
 title: Where did the cycles go?
-date: 23\textsuperscript{rd} July 2020 [14 slides]
+date: 23\textsuperscript{rd} July 2020 [17 slides]
 copyright: 2020, see below
 ---
 
@@ -19,6 +19,19 @@ Why is this code so _slow_?
 These are age old questions
 that arise in every environment.
 Today we shall focus on python.
+
+# simple measurement
+
+    import time
+
+
+    t0 = time.time()
+    do_stuff()
+    ...
+    elapsed = time.time() - t0
+
+\blank
+This function wrapper would make a nice python @decorator.
 
 # scenario
 
@@ -54,6 +67,7 @@ is available.
     #! /usr/bin/env python
 
     import csv
+
 
     def get_rows(fspec_csv):
         with open(fspec_csv) as fin:
@@ -115,7 +129,7 @@ The zipcodes in `census` do not change.
 
         return count
 
-# results, 2 of 3
+# results, 2 of 4
 
        32208 function calls (32202 primitive calls) in 0.145 seconds
        Ordered by: standard name
@@ -146,11 +160,11 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
 
         return count
 
-# results, 3 of 3
+# results, 3 of 4
 
-        for zipcode in get_rows(los_angeles_prospects_csv):
-            if zipcode in census:
-                count += 1
+       for zipcode in get_rows(los_angeles_prospects_csv):
+           if zipcode in census:
+               count += 1
 
        63656 function calls (63650 primitive calls) in 0.026 seconds
        Ordered by: standard name
@@ -158,6 +172,35 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
             1   0.006   0.006   0.023  fm_zips.py:11(count_matches)
         31449   0.006   0.000   0.017  fm_zips.py:15(<genexpr>)
         31546   0.011   0.000   0.011  fm_zips.py:5(get_rows)
+
+# results, 4 of 4
+
+    def count_matches( ... ):
+
+        return len(set(get_rows(census_csv))
+                 & set(get_rows(los_angeles_prospects_csv)))
+
+    32211 function calls (32205 primitive calls) in 0.027 seconds
+       Ordered by: standard name
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+            1    0.009    0.009    0.026    0.026 fm_zips.py:11(count_matches)
+        31546    0.017    0.000    0.017    0.000 fm_zips.py:5(get_rows)
+
+# refactor
+
+## returned list -> tuple
+
+    def get_rows(fspec_csv):
+        with open(fspec_csv) as fin:
+            sheet = csv.reader(fin)
+            yield from map(tuple, sheet)
+
+
+    def count_matches( ... ):
+
+        return len(set(get_rows(census_csv))
+                 & set(get_rows(los_angeles_prospects_csv)))
+
 
 # regex, 1 of 2
 
