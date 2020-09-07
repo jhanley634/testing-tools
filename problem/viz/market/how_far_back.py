@@ -18,7 +18,7 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
-import bokeh
+# import bokeh
 
 """It has been some months since the market has been in record-setting
 territory. One can express it as X% down from high. A more relevant

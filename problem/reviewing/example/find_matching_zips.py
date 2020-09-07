@@ -20,6 +20,7 @@
 
 import csv
 
+
 def get_rows(fspec_csv):
     with open(fspec_csv) as fin:
         sheet = csv.reader(fin)
