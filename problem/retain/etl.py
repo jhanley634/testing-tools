@@ -67,7 +67,7 @@ def get_row_chunks(csv_fspec, n=8000):
             if len(chunk) >= n:
                 yield chunk
                 chunk = []
-        if len(chunk) > 0:
+        if chunk:
             yield chunk
 
 
