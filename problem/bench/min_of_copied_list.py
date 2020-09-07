@@ -72,10 +72,10 @@ def scan_with_two_copies(points):
 
 def assign_box(points):
     # from https://codereview.stackexchange.com/questions/155893/find-nearest
-    x_min = min([p[0] for p in points])
-    x_max = max([p[0] for p in points])
-    y_min = min([p[1] for p in points])
-    y_max = max([p[1] for p in points])
+    x_min = min(p[0] for p in points)
+    x_max = max(p[0] for p in points)
+    y_min = min(p[1] for p in points)
+    y_max = max(p[1] for p in points)
     return x_min, x_max, y_min, y_max
 
 
