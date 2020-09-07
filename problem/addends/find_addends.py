@@ -40,11 +40,11 @@ def find_addends(target, all_vals):
     There can be multiple instances of a given integer, so
     the list essentially is a multi-set.
     '''
-    ret = []
-    for vals in powerset(filter(target, all_vals)):
-        if target == sum(vals):
-            ret.append(list(vals))
-    return ret
+    return [
+        list(vals)
+        for vals in powerset(filter(target, all_vals))
+        if target == sum(vals)
+    ]
 
 
 def test1():
