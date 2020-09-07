@@ -59,8 +59,7 @@ class Canvas:
     def __str__(self):
 
         def wider(text):
-            for ch in text:
-                yield ch
+            yield from text
                 # yield ch  # Optionally make aspect ratio twice as wide.
 
         def line(y):
