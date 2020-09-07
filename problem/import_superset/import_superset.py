@@ -43,11 +43,11 @@ class EnvironmentYmlParser:
         dep_type = None
         for line in fin:
             line = line.strip()
-            if line == 'dependencies:':
-                dep_type = DependencyType.CONDA
-                continue
             if line == '- pip:':
                 dep_type = DependencyType.PIP
+                continue
+            elif line == 'dependencies:':
+                dep_type = DependencyType.CONDA
                 continue
             if dep_type:
                 yield dep_type, self._just_name(line)

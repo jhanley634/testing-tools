@@ -84,6 +84,6 @@ class Compress(unittest.TestCase):
         self.assertEqual('', uncompress_rle(compress_rle('')))
 
     def test_compress_validates_the_input_message(self):
-        msg = 'A24'  # Digits may not appear in the input message -- this is enforced.
         with self.assertRaises(AssertionError):
+            msg = 'A24'  # Digits may not appear in the input message -- this is enforced.
             compress_rle(msg)

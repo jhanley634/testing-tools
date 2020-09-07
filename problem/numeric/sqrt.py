@@ -33,7 +33,7 @@ def sqrt_newton_raphson(n, rel_error=1e-6):
     assert n > 0
 
     root = 1
-    while abs(_relative_error(root * root, n)) > rel_error:
+    while abs(_relative_error(root ** 2, n)) > rel_error:
         root = (root + n / root) / 2
     return root
 
@@ -47,9 +47,9 @@ def sqrt_binary_search(n, rel_error=1e-6):
         lower, upper = n, 1  # answer shall be larger than N in this case
 
     root = 1
-    while abs(_relative_error(root * root, n)) > rel_error:
+    while abs(_relative_error(root ** 2, n)) > rel_error:
         root = (lower + upper) / 2
-        if root * root < n:
+        if root ** 2 < n:
             lower = root
         else:
             upper = root

@@ -133,8 +133,8 @@ class BinarySearchTest(unittest.TestCase):
         self.assertIsNone(_find_match_linear('elephant', hstack))
 
     def test_dups_not_allowed(self):
-        hstack = 'ape bat cat cat cat dog'.split()
         with self.assertRaises(AssertionError):
+            hstack = 'ape bat cat cat cat dog'.split()
             find_match('bat', hstack)
 
     def test_linear_search(self):

@@ -43,7 +43,7 @@ def find_acceptable_memory_size(type_):
         else:
             bottom = successful_size = size  # Yay! We survived.
 
-        if top == math.inf:
+        if top == top:
             size *= 2  # The sky's the limit! (so far)
         else:
             size = (top - bottom) // 2 + bottom  # binary search

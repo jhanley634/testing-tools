@@ -156,5 +156,4 @@ def log_dist(a: IpAddr, b: IpAddr):
     assert a in prefix, (a, prefix)
     assert 0 <= prefix.masklen <= 32
 
-    log_distance = 32 - prefix.masklen
-    return log_distance
+    return 32 - prefix.masklen
