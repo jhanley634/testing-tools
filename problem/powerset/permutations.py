@@ -120,8 +120,8 @@ def _powerset(word):
 
 def main(verbose=False):
     # null = '\u2205'  # symbol for empty set
-    word = '3012'
     if verbose:
+        word = '3012'
         print(' '.join(permutations(''.join(sorted(word)))))  # '0123'
         print('')
         print(', '.join(powerset(word)))  # This shows the '' member.
