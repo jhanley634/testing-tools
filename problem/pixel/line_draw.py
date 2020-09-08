@@ -50,8 +50,8 @@ class Canvas:
         draw_axes()
 
     def num_points(self):
-        return sum([0 if c in Canvas.BG_INK else 1
-                    for c in self.grid.flatten()])
+        return sum(0 if c in Canvas.BG_INK else 1
+                   for c in self.grid.flatten())
         # return sum([0 if self.grid[self._coord(x, y)] in Canvas.BG_INK else 1
         #             for x in self._range()
         #             for y in self._range()])
@@ -59,9 +59,10 @@ class Canvas:
     def __str__(self):
 
         def wider(text):
-            for ch in text:
-                yield ch
-                # yield ch  # Optionally make aspect ratio twice as wide.
+            yield from text
+            # for ch in text:
+            #     yield ch
+            #     yield ch  # Optionally make aspect ratio twice as wide.
 
         def line(y):
             return ''.join(wider([self.grid[self._coord(x, y)]

@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine
 
 from alembic import context
 from problem.charge_state.db import get_url

@@ -40,27 +40,31 @@ def find_addends(target, all_vals):
     There can be multiple instances of a given integer, so
     the list essentially is a multi-set.
     '''
-    ret = []
-    for vals in powerset(filter(target, all_vals)):
-        if target == sum(vals):
-            ret.append(list(vals))
-    return ret
+    return [
+        list(vals)
+        for vals in powerset(filter(target, all_vals))
+        if target == sum(vals)
+    ]
+
+
+def _get_test_data():
+    return [
+        (9, [1, 2, 3], []),
+        (9, [10, 11], []),
+        (9, [10, 11, 1], []),
+        (9, [8, 6, 7], []),
+        (8, [5, 3], [[5, 3]]),
+        (8, [5, 3, 1], [[5, 3]]),
+        (8, [9, 6, 1, 1], [[6, 1, 1]]),
+        (8, [6, 1, 1], [[6, 1, 1]]),
+        (8, [6, 1, 1, 1], [[6, 1, 1], [6, 1, 1], [6, 1, 1]]),
+        (8, [5, 2, 2, 1], [[5, 2, 1], [5, 2, 1]]),
+        (8, [5, 2, 2, 1, 9], [[5, 2, 1], [5, 2, 1]]),
+    ]
 
 
 def test1():
-    for target, vals, expected in [
-            (9, [1, 2, 3], []),
-            (9, [10, 11], []),
-            (9, [10, 11, 1], []),
-            (9, [8, 6, 7], []),
-            (8, [5, 3], [[5, 3]]),
-            (8, [5, 3, 1], [[5, 3]]),
-            (8, [9, 6, 1, 1], [[6, 1, 1]]),
-            (8, [6, 1, 1], [[6, 1, 1]]),
-            (8, [6, 1, 1, 1], [[6, 1, 1], [6, 1, 1], [6, 1, 1]]),
-            (8, [5, 2, 2, 1], [[5, 2, 1], [5, 2, 1]]),
-            (8, [5, 2, 2, 1, 9], [[5, 2, 1], [5, 2, 1]]),
-                 ]:
+    for target, vals, expected in _get_test_data():
         print('')
         print(target, vals)
         answer = find_addends(target, vals)

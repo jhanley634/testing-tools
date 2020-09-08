@@ -56,7 +56,7 @@ class NearbyZips:
                         & zips.c.bounds_west.between(*lng_bounds)))
              .order_by(zips.c.zipcode)
              )
-        return list(set(zipcode for zipcode, in q))
+        return list({zipcode for zipcode, in q})
 
     def plot_zips(self, zipcodes, fspec='~/Desktop/map.html'):
         r = self.search.by_zipcode(zipcodes[0])
@@ -65,34 +65,37 @@ class NearbyZips:
             tiles='Stamen Terrain',
         )
         for zipcode in zipcodes:
-            r = self.search.by_zipcode(zipcode)
-            radius = r.radius_in_miles * unyt.mile
-            nw = r.bounds_north, r.bounds_west
-            se = r.bounds_south, r.bounds_east
-            sp = '&nbsp;'
-
-            msg = f'{zipcode}, radius{sp}={sp}{radius}'
-            folium.Circle(
-                location=[r.lat, r.lng],
-                radius=radius.to_value('m'),
-                tooltip=msg,
-                color='purple',
-            ).add_to(map_)
-            folium.CircleMarker(
-                location=[r.lat, r.lng],
-                radius=6,  # px
-                popup=msg,
-                color='purple',
-                fill=True,
-                fill_opacity=.7,
-            ).add_to(map_)
-            folium.Rectangle(
-                bounds=(nw, se),
-                tooltip=msg,
-                color='DarkBlue',
-            ).add_to(map_)
+            self._plot_zip(zipcode, map_)
 
         map_.save(os.path.expanduser(fspec))
+
+    def _plot_zip(self, zipcode, map_):
+        r = self.search.by_zipcode(zipcode)
+        radius = r.radius_in_miles * unyt.mile
+        nw = r.bounds_north, r.bounds_west
+        se = r.bounds_south, r.bounds_east
+        sp = '&nbsp;'
+
+        msg = f'{zipcode}, radius{sp}={sp}{radius}'
+        folium.Circle(
+            location=[r.lat, r.lng],
+            radius=radius.to_value('m'),
+            tooltip=msg,
+            color='purple',
+        ).add_to(map_)
+        folium.CircleMarker(
+            location=[r.lat, r.lng],
+            radius=6,  # px
+            popup=msg,
+            color='purple',
+            fill=True,
+            fill_opacity=.7,
+        ).add_to(map_)
+        folium.Rectangle(
+            bounds=(nw, se),
+            tooltip=msg,
+            color='DarkBlue',
+        ).add_to(map_)
 
 
 if __name__ == '__main__':
