@@ -59,9 +59,10 @@ class Canvas:
     def __str__(self):
 
         def wider(text):
-            for ch in text:
-                yield ch
-                # yield ch  # Optionally make aspect ratio twice as wide.
+            yield from text
+            # for ch in text:
+            #     yield ch
+            #     yield ch  # Optionally make aspect ratio twice as wide.
 
         def line(y):
             return ''.join(wider([self.grid[self._coord(x, y)]
