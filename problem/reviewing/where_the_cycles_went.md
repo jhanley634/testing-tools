@@ -176,6 +176,7 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
 # results, 4 of 4
 
 ## set intersection
+\blank
 
     def count_matches( ... ):
 
@@ -193,6 +194,7 @@ The `in` test is O(1) time for a `set`, but O(n) for a `list`.
 # refactor
 
 ## returned list -> tuple
+\blank
 
     def get_rows(fspec_csv):
         with open(fspec_csv) as fin:
