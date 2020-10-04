@@ -57,15 +57,24 @@ class Voxels:
 
 def three_d_print(voxels: List[Voxel]) -> str:
     assert len(voxels)
-    width = max(map(itemgetter(0), voxels))
-    height = max(map(itemgetter(1), voxels))
-    depth = max(map(itemgetter(2), voxels))
+    width = 1 + max(map(itemgetter(0), voxels))
+    height = 1 + max(map(itemgetter(1), voxels))
+    depth = 1 + max(map(itemgetter(2), voxels))
     out = np.zeros((width, height, depth), int)
     cur = voxels[0]  # 3-D print head position
     elapsed = 0  # Zero cost to move print head to initial voxel.
-    for x, y, z in voxels:
-        _verify_feasible(out, x, y, z)
-        out[(x, y, z)] = True
+    for voxel in voxels:
+        _verify_feasible(out, *voxel)
+        out[voxel] = True
+        elapsed += _manhattan_distance(cur, voxel)
+    return elapsed, out
+
+
+def _manhattan_distance(a: Voxel, b: Voxel) -> int:
+    return (abs(a.x - b.x)
+            + abs(a.y - b.y)
+            + abs(a.z - b.z))
+
 
 def _verify_feasible(out, x, y, z):
     """Ensure there is a foundation to print a mountain top upon."""
@@ -85,11 +94,11 @@ islands = Voxels("""
            1121                               1
             11
 """)
-print(three_d_print(islands.voxels))
+print(three_d_print(sorted(islands.voxels))[0])
 
 # volcanic voxels
 #
-# Some volcanic islands are depicted below.
+# Some volcanic islands are depicted above.
 # A 3-D printer will create a model of them.
 # The input of (x, y, z) voxels is now in a randomly permuted order.
 # Write a function that puts the voxels in "better than naïve" order.
