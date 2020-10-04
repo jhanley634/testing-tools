@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
 from collections import namedtuple
+from operator import itemgetter
+from typing import List
 import random
 
 import numpy as np
@@ -9,7 +11,7 @@ import numpy as np
 Voxel = namedtuple('Voxel', 'x y z')
 
 
-class VoxelReader:
+class Voxels:
     """Turns text input into a list of Voxels."""
 
     def __init__(self, text: str):
@@ -53,7 +55,25 @@ class VoxelReader:
         return val
 
 
-islands = VoxelReader("""
+def three_d_print(voxels: List[Voxel]) -> str:
+    assert len(voxels)
+    width = max(map(itemgetter(0), voxels))
+    height = max(map(itemgetter(1), voxels))
+    depth = max(map(itemgetter(2), voxels))
+    out = np.zeros((width, height, depth), int)
+    cur = voxels[0]  # 3-D print head position
+    elapsed = 0  # Zero cost to move print head to initial voxel.
+    for x, y, z in voxels:
+        _verify_feasible(out, x, y, z)
+        out[(x, y, z)] = True
+
+def _verify_feasible(out, x, y, z):
+    """Ensure there is a foundation to print a mountain top upon."""
+    for z1 in range(1, z):
+        assert out[(x, y, z1)], (x, y, z)
+
+
+islands = Voxels("""
                   1
     111          1121
  1112211       11223211
@@ -65,7 +85,7 @@ islands = VoxelReader("""
            1121                               1
             11
 """)
-print(islands.render())
+print(three_d_print(islands.voxels))
 
 # volcanic voxels
 #
