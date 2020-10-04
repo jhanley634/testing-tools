@@ -56,11 +56,7 @@ class Voxels:
 
 
 def three_d_print(voxels: List[Voxel]) -> str:
-    assert len(voxels)
-    width = 1 + max(map(itemgetter(0), voxels))
-    height = 1 + max(map(itemgetter(1), voxels))
-    depth = 1 + max(map(itemgetter(2), voxels))
-    out = np.zeros((width, height, depth), int)
+    out = _get_zeros(voxels)
     cur = voxels[0]  # 3-D print head position
     elapsed = 0  # Zero cost to move print head to initial voxel.
     for voxel in voxels:
@@ -68,6 +64,14 @@ def three_d_print(voxels: List[Voxel]) -> str:
         out[voxel] = True
         elapsed += _manhattan_distance(cur, voxel)
     return elapsed, out
+
+
+def _get_zeros(voxels: List[Voxel]):
+    assert len(voxels)
+    width = 1 + max(map(itemgetter(0), voxels))
+    height = 1 + max(map(itemgetter(1), voxels))
+    depth = 1 + max(map(itemgetter(2), voxels))
+    return np.zeros((width, height, depth), int)
 
 
 def _manhattan_distance(a: Voxel, b: Voxel) -> int:
@@ -79,7 +83,8 @@ def _manhattan_distance(a: Voxel, b: Voxel) -> int:
 def _verify_feasible(out, x, y, z):
     """Ensure there is a foundation to print a mountain top upon."""
     for z1 in range(1, z):
-        assert out[(x, y, z1)], (x, y, z)
+        if not out[(x, y, z1)]:
+            raise ValueError(f'No support for ({x}, {y}, {z})')
 
 
 islands = Voxels("""
@@ -94,7 +99,37 @@ islands = Voxels("""
            1121                               1
             11
 """)
-print(three_d_print(sorted(islands.voxels))[0])
+
+
+def xyz(coord):
+    return coord
+
+
+def yxz(coord):
+    return (coord.y,
+            coord.x,
+            coord.z)
+
+
+def zxy(coord):
+    return (coord.z,
+            coord.x,
+            coord.y)
+
+
+def zyx(coord):
+    return tuple(reversed(coord))
+
+
+n1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
+n2, out2 = three_d_print(sorted(islands.voxels, key=zxy))
+n3, out3 = three_d_print(sorted(islands.voxels, key=zyx))
+n4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
+print(n1, n2, n3, n4,
+      np.array_equal(out1, out2),
+      np.array_equal(out1, out3),
+      np.array_equal(out1, out4))
+# print(three_d_print(islands.voxels)[0])  # fails due to No Support
 
 # volcanic voxels
 #
