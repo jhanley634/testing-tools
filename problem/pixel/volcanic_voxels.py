@@ -176,23 +176,26 @@ islands = Voxels("""
 # Name these islands:
 #    A       B     C                          D
 
-t1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
-t2, out2 = three_d_print(sorted(islands.voxels, key=xzy))
-t3, out3 = three_d_print(sorted(islands.voxels, key=zxy))
-t4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
-t5, out5 = three_d_print(sorted(islands.voxels, key=yzx))
-t6, out6 = three_d_print(sorted(islands.voxels, key=zyx))
-# output: 246 246 406 542 760 827 False False False False False
-print(t1, t2, t3, t4, t5, t6,
-      np.array_equal(out1, out2),
-      np.array_equal(out1, out3),
-      np.array_equal(out1, out4),
-      np.array_equal(out1, out5),
-      np.array_equal(out1, out6))
-# print(three_d_print(islands.voxels))  # fails due to No Support
 
-pm = PrintedModel(sorted(islands.voxels))
-print(pm.render())
+if __name__ == '__main__':
+    t1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
+    t2, out2 = three_d_print(sorted(islands.voxels, key=xzy))
+    t3, out3 = three_d_print(sorted(islands.voxels, key=zxy))
+    t4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
+    t5, out5 = three_d_print(sorted(islands.voxels, key=yzx))
+    t6, out6 = three_d_print(sorted(islands.voxels, key=zyx))
+    # output: 246 246 406 542 760 827 False False False False False
+    print(t1, t2, t3, t4, t5, t6,
+          np.array_equal(out1, out2),
+          np.array_equal(out1, out3),
+          np.array_equal(out1, out4),
+          np.array_equal(out1, out5),
+          np.array_equal(out1, out6))
+    # print(three_d_print(islands.voxels))  # fails due to No Support
+
+    pm = PrintedModel(sorted(islands.voxels))
+    print(pm.render())
+
 
 # volcanic voxels
 #
