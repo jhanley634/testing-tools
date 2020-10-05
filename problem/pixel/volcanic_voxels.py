@@ -76,7 +76,7 @@ class Voxels:
 class PrintedModel:
 
     def __init__(self, voxels: List[Voxel]):
-        self.model = _get_zeros(voxels)
+        self.model = self._get_zeros(voxels)
         self._cur = voxels[0]  # 3-D print head position
         self.elapsed = 1  # Unit cost to move print head to initial voxel.
         self._print(voxels)
@@ -87,6 +87,14 @@ class PrintedModel:
             self.elapsed += _manhattan_distance(self._cur, voxel)
             self.model[voxel] = self.elapsed
             self._cur = voxel
+
+    @staticmethod
+    def _get_zeros(voxels: List[Voxel]):
+        assert len(voxels)
+        width = 1 + max(map(itemgetter(0), voxels))
+        height = 1 + max(map(itemgetter(1), voxels))
+        depth = 1 + max(map(itemgetter(2), voxels))
+        return np.zeros((width, height, depth), int)
 
     def render(self):
         height = self.model.shape[1]
@@ -114,23 +122,8 @@ class PrintedModel:
 
 
 def three_d_print(voxels: List[Voxel]) -> str:
-    out = _get_zeros(voxels)
-    cur = voxels[0]  # 3-D print head position
-    elapsed = 0  # Zero cost to move print head to initial voxel.
-    for voxel in voxels:
-        _verify_feasible(out, *voxel)
-        out[voxel] = True
-        elapsed += _manhattan_distance(cur, voxel)
-        cur = voxel
-    return elapsed, out
-
-
-def _get_zeros(voxels: List[Voxel]):
-    assert len(voxels)
-    width = 1 + max(map(itemgetter(0), voxels))
-    height = 1 + max(map(itemgetter(1), voxels))
-    depth = 1 + max(map(itemgetter(2), voxels))
-    return np.zeros((width, height, depth), int)
+    pm = PrintedModel(voxels)
+    return pm.elapsed, pm.model
 
 
 def _manhattan_distance(a: Voxel, b: Voxel) -> int:
