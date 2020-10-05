@@ -122,6 +122,12 @@ def xyz(coord):
     return coord
 
 
+def xzy(coord):
+    return (coord.x,
+            coord.z,
+            coord.y)
+
+
 def yxz(coord):
     return (coord.y,
             coord.x,
@@ -139,14 +145,16 @@ def zyx(coord):
 
 
 n1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
-n2, out2 = three_d_print(sorted(islands.voxels, key=zxy))
-n3, out3 = three_d_print(sorted(islands.voxels, key=yxz))
-n4, out4 = three_d_print(sorted(islands.voxels, key=zyx))
+n2, out2 = three_d_print(sorted(islands.voxels, key=xzy))
+n3, out3 = three_d_print(sorted(islands.voxels, key=zxy))
+n4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
+n5, out5 = three_d_print(sorted(islands.voxels, key=zyx))
 # output: 245 405 541 826 True True True
-print(n1, n2, n3, n4,
+print(n1, n2, n3, n4, n5,
       np.array_equal(out1, out2),
       np.array_equal(out1, out3),
-      np.array_equal(out1, out4))
+      np.array_equal(out1, out4),
+      np.array_equal(out1, out5))
 # print(three_d_print(islands.voxels)[0])  # fails due to No Support
 
 # volcanic voxels
