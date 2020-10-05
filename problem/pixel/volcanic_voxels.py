@@ -1,5 +1,23 @@
 #! /usr/bin/env python
 
+# Copyright 2020 John Hanley.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# The software is provided "AS IS", without warranty of any kind, express or
+# implied, including but not limited to the warranties of merchantability,
+# fitness for a particular purpose and noninfringement. In no event shall
+# the authors or copyright holders be liable for any claim, damages or
+# other liability, whether in an action of contract, tort or otherwise,
+# arising from, out of or in connection with the software or the use or
+# other dealings in the software.
+
 from collections import namedtuple
 from operator import itemgetter
 from typing import List
@@ -82,7 +100,14 @@ class PrintedModel:
             bold = not bold
 
     def _cell(self, x, y, bold):
-        ''
+        cell = '  '  # ocean
+        for z in range(self.model.shape[2]):
+            if self.model[(x, y, z)]:
+                cell = f'{self.model[(x, y, z)]:02d}'
+        if bold:
+            esc = chr(27)
+            cell = f'{esc}[1m{cell}{esc}[0m'
+        return cell
 
 
 def three_d_print(voxels: List[Voxel]) -> str:
