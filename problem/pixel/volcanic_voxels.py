@@ -25,7 +25,6 @@ import random
 
 import numpy as np
 
-
 Voxel = namedtuple('Voxel', 'x y z')
 
 
@@ -83,10 +82,16 @@ class PrintedModel:
 
     def _print(self, voxels: List[Voxel]) -> None:
         for voxel in voxels:
-            _verify_feasible(self.model, *voxel)
+            self._verify_feasible(*voxel)
             self.elapsed += _manhattan_distance(self._cur, voxel)
             self.model[voxel] = self.elapsed
             self._cur = voxel
+
+    def _verify_feasible(self, x, y, z):
+        """Ensure there is a foundation to print a mountain top upon."""
+        for z1 in range(1, z):
+            if not self.model[(x, y, z1)]:
+                raise ValueError(f'No support for ({x}, {y}, {z})')
 
     @staticmethod
     def _get_zeros(voxels: List[Voxel]):
@@ -132,13 +137,6 @@ def _manhattan_distance(a: Voxel, b: Voxel) -> int:
             + abs(a.z - b.z))
 
 
-def _verify_feasible(out, x, y, z):
-    """Ensure there is a foundation to print a mountain top upon."""
-    for z1 in range(1, z):
-        if not out[(x, y, z1)]:
-            raise ValueError(f'No support for ({x}, {y}, {z})')
-
-
 def xyz(coord):
     return coord
 
@@ -175,13 +173,16 @@ islands = Voxels("""
            1121                               1
             11
 """)
+# Name these islands:
+#    A       B     C                          D
+
 t1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
 t2, out2 = three_d_print(sorted(islands.voxels, key=xzy))
 t3, out3 = three_d_print(sorted(islands.voxels, key=zxy))
 t4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
 t5, out5 = three_d_print(sorted(islands.voxels, key=yzx))
 t6, out6 = three_d_print(sorted(islands.voxels, key=zyx))
-# output: 245 405 541 826 True True True
+# output: 246 246 406 542 760 827 False False False False False
 print(t1, t2, t3, t4, t5, t6,
       np.array_equal(out1, out2),
       np.array_equal(out1, out3),
