@@ -78,19 +78,20 @@ class PrintedModel:
     def __init__(self, voxels: List[Voxel]):
         self.model = _get_zeros(voxels)
         self._cur = voxels[0]  # 3-D print head position
-        self.elapsed = 0  # Zero cost to move print head to initial voxel.
-        self.print(voxels)
+        self.elapsed = 1  # Unit cost to move print head to initial voxel.
+        self._print(voxels)
 
-    def print(self, voxels: List[Voxel]) -> None:
+    def _print(self, voxels: List[Voxel]) -> None:
         for voxel in voxels:
             _verify_feasible(self.model, *voxel)
-            self.model[voxel] = self.elapsed
             self.elapsed += _manhattan_distance(self._cur, voxel)
+            self.model[voxel] = self.elapsed
             self._cur = voxel
 
     def render(self):
-        return '\n'.join(self._raster(y, bool(y % 2))
-                         for y in range(self.model.shape[1]))
+        height = self.model.shape[1]
+        return '\n'.join(self._raster(height - 1 - y, bool(y % 2))
+                         for y in range(height))
 
     def _raster(self, y, first_bold=False):
         bold = first_bold
@@ -98,12 +99,14 @@ class PrintedModel:
         for x in range(self.model.shape[0]):
             raster.append(self._cell(x, y, bold))
             bold = not bold
+        return ''.join(raster)
 
     def _cell(self, x, y, bold):
-        cell = '  '  # ocean
+        cell = '..'  # ocean
         for z in range(self.model.shape[2]):
             if self.model[(x, y, z)]:
-                cell = f'{self.model[(x, y, z)]:02d}'
+                elapsed = self.model[(x, y, z)]
+                cell = f'{elapsed % 100:02d}'
         if bold:
             esc = chr(27)
             cell = f'{esc}[1m{cell}{esc}[0m'
@@ -143,20 +146,6 @@ def _verify_feasible(out, x, y, z):
             raise ValueError(f'No support for ({x}, {y}, {z})')
 
 
-islands = Voxels("""
-                  1
-    111          1121
- 1112211       11223211
-1112233211      112321
-  122211          13
-    1211    1      1                         11
-     1     1211                             12321
-          1123211                            121
-           1121                               1
-            11
-""")
-
-
 def xyz(coord):
     return coord
 
@@ -181,20 +170,35 @@ def zxy(coord):
     return coord.z, coord.x, coord.y
 
 
-n1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
-n2, out2 = three_d_print(sorted(islands.voxels, key=xzy))
-n3, out3 = three_d_print(sorted(islands.voxels, key=zxy))
-n4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
-n5, out5 = three_d_print(sorted(islands.voxels, key=yzx))
-n6, out6 = three_d_print(sorted(islands.voxels, key=zyx))
+islands = Voxels("""
+                  1
+    111          1121
+ 1112211       11223211
+1112233211      112321
+  122211          13
+    1211    1      1                         11
+     1     1211                             12321
+          1123211                            121
+           1121                               1
+            11
+""")
+t1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
+t2, out2 = three_d_print(sorted(islands.voxels, key=xzy))
+t3, out3 = three_d_print(sorted(islands.voxels, key=zxy))
+t4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
+t5, out5 = three_d_print(sorted(islands.voxels, key=yzx))
+t6, out6 = three_d_print(sorted(islands.voxels, key=zyx))
 # output: 245 405 541 826 True True True
-print(n1, n2, n3, n4, n5, n6,
+print(t1, t2, t3, t4, t5, t6,
       np.array_equal(out1, out2),
       np.array_equal(out1, out3),
       np.array_equal(out1, out4),
       np.array_equal(out1, out5),
       np.array_equal(out1, out6))
-# print(three_d_print(islands.voxels)[0])  # fails due to No Support
+# print(three_d_print(islands.voxels))  # fails due to No Support
+
+pm = PrintedModel(sorted(islands.voxels))
+print(pm.render())
 
 # volcanic voxels
 #
