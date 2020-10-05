@@ -70,6 +70,20 @@ class PrintedModel:
             self.elapsed += _manhattan_distance(self._cur, voxel)
             self._cur = voxel
 
+    def render(self):
+        return '\n'.join(self._raster(y, bool(y % 2))
+                         for y in range(self.model.shape[1]))
+
+    def _raster(self, y, first_bold=False):
+        bold = first_bold
+        raster = []
+        for x in range(self.model.shape[0]):
+            raster.append(self._cell(x, y, bold))
+            bold = not bold
+
+    def _cell(self, x, y, bold):
+        ''
+
 
 def three_d_print(voxels: List[Voxel]) -> str:
     out = _get_zeros(voxels)
