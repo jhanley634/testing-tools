@@ -123,21 +123,15 @@ def xyz(coord):
 
 
 def xzy(coord):
-    return (coord.x,
-            coord.z,
-            coord.y)
+    return coord.x, coord.z, coord.y
 
 
 def yxz(coord):
-    return (coord.y,
-            coord.x,
-            coord.z)
+    return coord.y, coord.x, coord.z
 
 
 def yzx(coord):
-    return (coord.y,
-            coord.z,
-            coord.x)
+    return coord.y, coord.z, coord.x
 
 
 def zyx(coord):
@@ -145,9 +139,7 @@ def zyx(coord):
 
 
 def zxy(coord):
-    return (coord.z,
-            coord.x,
-            coord.y)
+    return coord.z, coord.x, coord.y
 
 
 n1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
