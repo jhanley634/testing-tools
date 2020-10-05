@@ -55,6 +55,22 @@ class Voxels:
         return val
 
 
+class PrintedModel:
+
+    def __init__(self, voxels: List[Voxel]):
+        self.model = _get_zeros(voxels)
+        self._cur = voxels[0]  # 3-D print head position
+        self.elapsed = 0  # Zero cost to move print head to initial voxel.
+        self.print(voxels)
+
+    def print(self, voxels: List[Voxel]) -> None:
+        for voxel in voxels:
+            _verify_feasible(self.model, *voxel)
+            self.model[voxel] = self.elapsed
+            self.elapsed += _manhattan_distance(self._cur, voxel)
+            self._cur = voxel
+
+
 def three_d_print(voxels: List[Voxel]) -> str:
     out = _get_zeros(voxels)
     cur = voxels[0]  # 3-D print head position
@@ -63,6 +79,7 @@ def three_d_print(voxels: List[Voxel]) -> str:
         _verify_feasible(out, *voxel)
         out[voxel] = True
         elapsed += _manhattan_distance(cur, voxel)
+        cur = voxel
     return elapsed, out
 
 
@@ -123,8 +140,9 @@ def zyx(coord):
 
 n1, out1 = three_d_print(sorted(islands.voxels, key=xyz))
 n2, out2 = three_d_print(sorted(islands.voxels, key=zxy))
-n3, out3 = three_d_print(sorted(islands.voxels, key=zyx))
-n4, out4 = three_d_print(sorted(islands.voxels, key=yxz))
+n3, out3 = three_d_print(sorted(islands.voxels, key=yxz))
+n4, out4 = three_d_print(sorted(islands.voxels, key=zyx))
+# output: 245 405 541 826 True True True
 print(n1, n2, n3, n4,
       np.array_equal(out1, out2),
       np.array_equal(out1, out3),
