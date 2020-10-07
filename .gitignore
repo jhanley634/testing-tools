@@ -2,8 +2,9 @@
 *.jl.cov
 *.jl.mem
 *.py~~
+.DS_Store
 .idea/
 TAGS
 __pycache__
 deps/deps.jl
-problem/reviewing/out/
+problem/text/reviewing/out/
