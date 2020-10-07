@@ -7,4 +7,5 @@
 TAGS
 __pycache__
 deps/deps.jl
-problem/text/reviewing/out/
+problem/text/db/out/*.pdf
+problem/text/reviewing/out/*.pdf
