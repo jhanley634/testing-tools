@@ -17,12 +17,73 @@ copyright: 2020, see below
 Optimizing is all about doing less work.
 
 The compiler / backend asks the question,
-"Can we use a cheaper access path and still get identical results?"
+"Can we use a cheaper access path
+and still get identical results?"
+It wants to avoid
+busy work,
+ computing X only to discard it.
 
 You should be asking,
 "Do we really need _all_ that,
 or could we get by with smaller / weaker results?"
 For example, would an _estimate_ suffice?
+
+# Primary key
+
+Every relation should have a PK.
+
+Enough said.
+
+![](http://tempest.fluidartist.com/wp-content/uploads/2014/10/Receipts.jpeg)
+
+# Mappings
+
+A relation is a function mapping from PK to attribute(s).
+
+\blank
+Example:
+
+    SELECT price  FROM listing  WHERE guid = '123def';
+
+\blank
+This is $f(guid) \rightarrow price$.
+
+# Covering index (1 / 2)
+
+An index "covers" a query if it supplies all values needed,
+so we don't have to seek into the row blocks on disk.
+
+\blank
+Examples:
+
+    CREATE INDEX ON prop(fips_county, apn);
+
+    SELECT    fips_county, COUNT(*)
+    FROM      prop
+    GROUP BY  fips_county;
+
+    SELECT    fips_county, COUNT(*), MAX(apn)
+    FROM      prop
+    GROUP BY  fips_county;
+
+# Covering index (2 / 2)
+
+
+An index "covers" a query if it supplies all values needed,
+so we don't have to seek into the row blocks on disk.
+
+\blank
+**Not** a covering index (for this query):
+
+    CREATE INDEX ON prop(fips_county, apn);
+
+    SELECT    fips_county, MAX(price)
+    FROM      prop
+    GROUP BY  fips_county;
+
+Fix it with:
+
+    CREATE INDEX ON prop(fips_county, apn, price);
 
 # Loops
 
@@ -31,7 +92,36 @@ out of your python code,
 into the backend.
 Ask **big** queries.
 
+Why?
+
+The backend query planner is called a "planner" for a reason.
+Tell it about **all** the rows you'll be asking for,
+and it can avoid dumb busy work, it can make a better plan.
+
+Sending a thousand queries for a thousand zipcodes
+blinds the planner to the fact you're going to send 999 similar queries.
+If it knows all blocks shall be retrieved,
+then it will choose sequential tablescan instead of index.
+
+# Selectivity (1 / 2)
+
+The selectivity of a query is the fraction
+of base rows that appear in the result set.
+
+\blank
+Example:
+
+    SELECT COUNT(*)  FROM mls.property  WHERE zipcode = '91320';
+    3614
+
+    SELECT COUNT(*)  FROM mls.property;
+    19001000
+
+That is .02 % of the base relation's rows, so an index would win.
+
+
 # Why is my query slow?
+
 
 
 
