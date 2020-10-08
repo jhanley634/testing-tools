@@ -20,6 +20,8 @@
 
 from contextlib import closing
 from pathlib import Path
+import time
+import uuid
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -27,7 +29,8 @@ import sqlalchemy.orm as orm
 
 class RandomIoTest:
 
-    def __init__(self, num_rows=1e5, db_fspec='/tmp/big.db'):
+    # A million rows corresponds to ~ 4 GiB, produced within 3 minutes.
+    def __init__(self, num_rows=1e6, db_fspec='/tmp/big.db'):
         self.num_rows = int(num_rows)
         self.db_fspec = Path(db_fspec)
         self.engine = sa.create_engine(
@@ -47,7 +50,8 @@ class RandomIoTest:
         n = 0
         with closing(orm.session.sessionmaker(bind=self.engine)()) as sess:
             while n < self.num_rows:
-                rows = [self._get_parameters(n + i)
+                rows = [dict(id=n + i,
+                             guid=str(uuid.uuid4()))
                         for i in range(batch_size)]
                 ins = lstg.insert().values(rows)
                 sess.execute(ins)
@@ -55,10 +59,17 @@ class RandomIoTest:
                 n += len(rows)
                 print('.', end='', flush=True)
 
+            # Finish with blind update, bulking up all rows.
+            sess.execute(self._get_update(),
+                         params=self._get_params())
+            sess.commit()
+            print('.')
+
     def _get_create(self):
         return """
             CREATE TABLE listing (
                 id            INTEGER  PRIMARY KEY,
+                guid          TEXT  UNIQUE,
                 price         INTEGER,
                 full_address  TEXT,
                 desc1         TEXT,
@@ -68,12 +79,25 @@ class RandomIoTest:
             )
         """
 
+    @staticmethod
+    def _get_update():
+        return sa.text("""
+            UPDATE listing
+            SET    price = :price,
+                   full_address = :full_address,
+                   desc1 = :desc1,
+                   desc2 = :desc2,
+                   desc3 = :desc3,
+                   desc4 = :desc4
+        """)
+
+    HOME_PRICE = 100_000
+
     @classmethod
-    def _get_parameters(cls, id_):
+    def _get_params(cls):
         lorem = cls._de_finibus_bonorum_et_malorum()
         return dict(
-            id=id_,
-            price=100_000,
+            price=cls.HOME_PRICE,
             full_address='1 Main St, Springfield MA 01101',
             desc1=lorem,
             desc2=lorem,
@@ -99,15 +123,27 @@ ea voluptate velit esse quam nihil molestiae consequatur, vel illum
 qui dolorem eum fugiat quo voluptas nulla pariatur?
         """.strip()
 
-    def read_sequential(self):
+    def read_sequential_simple(self):
+        # Reads 1e6 rows in ~ 12s.
         select = """
             SELECT   SUM(price)
             FROM     listing
         """
-        return self.engine.execute(select).fetchone()[0] / 100_000
+        return self.engine.execute(select).first()[0] / self.HOME_PRICE
+
+    def read_sequential(self):
+        # Reads 1e6 rows in ~ 12s.
+        select = """
+            SELECT   SUM(price)
+            FROM     listing
+        """
+        return self.engine.execute(select).first()[0] / self.HOME_PRICE
 
 
 if __name__ == '__main__':
     rit = RandomIoTest()
     rit.create_if_needed()
-    print(rit.read_sequential())
+
+    t0 = time.time()
+    assert rit.num_rows == rit.read_sequential_simple()
+    print(round(time.time() - t0, 3))
