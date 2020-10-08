@@ -18,14 +18,17 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from contextlib import closing
 from pathlib import Path
 
 import sqlalchemy as sa
+import sqlalchemy.orm as orm
 
 
 class RandomIoTest:
 
-    def __init__(self, db_fspec='/tmp/big.db'):
+    def __init__(self, num_rows=1e5, db_fspec='/tmp/big.db'):
+        self.num_rows = int(num_rows)
         self.db_fspec = Path(db_fspec)
         self.engine = sa.create_engine(
             self._get_connect_string(self.db_fspec))
@@ -37,8 +40,20 @@ class RandomIoTest:
     def create(self):
         if self.db_fspec.exists():
             return
-        lorem = self._de_finibus_bonorum_et_malorum()
         self.engine.execute(self._get_create())
+        meta = sa.MetaData(bind=self.engine)
+        lstg = sa.Table('listing', meta, autoload=True)
+        batch_size = int(self.num_rows / 1e2)  # A hundred batches, each with many rows.
+        n = 0
+        with closing(orm.session.sessionmaker(bind=self.engine)()) as sess:
+            while n < self.num_rows:
+                rows = [self._get_parameters(n + i)
+                        for i in range(batch_size)]
+                ins = lstg.insert().values(rows)
+                sess.execute(ins)
+                sess.commit()
+                n += len(rows)
+                print('.', end='', flush=True)
 
     def _get_create(self):
         return """
@@ -52,6 +67,19 @@ class RandomIoTest:
                 desc4         TEXT
             )
         """
+
+    @classmethod
+    def _get_parameters(cls, id_):
+        lorem = cls._de_finibus_bonorum_et_malorum()
+        return dict(
+            id=id_,
+            price=500_000,
+            full_address='1 Main St, Springfield MA 01101',
+            desc1=lorem,
+            desc2=lorem,
+            desc3=lorem,
+            desc4=lorem,
+        )
 
     @staticmethod
     def _de_finibus_bonorum_et_malorum():
