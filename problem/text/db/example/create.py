@@ -37,7 +37,7 @@ class RandomIoTest:
     def _get_connect_string(fspec):
         return f'sqlite:///{fspec}'
 
-    def create(self):
+    def create_if_needed(self):
         if self.db_fspec.exists():
             return
         self.engine.execute(self._get_create())
@@ -73,7 +73,7 @@ class RandomIoTest:
         lorem = cls._de_finibus_bonorum_et_malorum()
         return dict(
             id=id_,
-            price=500_000,
+            price=100_000,
             full_address='1 Main St, Springfield MA 01101',
             desc1=lorem,
             desc2=lorem,
@@ -99,7 +99,15 @@ ea voluptate velit esse quam nihil molestiae consequatur, vel illum
 qui dolorem eum fugiat quo voluptas nulla pariatur?
         """.strip()
 
+    def read_sequential(self):
+        select = """
+            SELECT   SUM(price)
+            FROM     listing
+        """
+        return self.engine.execute(select).fetchone()[0] / 100_000
+
 
 if __name__ == '__main__':
     rit = RandomIoTest()
-    rit.create()
+    rit.create_if_needed()
+    print(rit.read_sequential())
