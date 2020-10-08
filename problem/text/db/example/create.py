@@ -132,12 +132,24 @@ qui dolorem eum fugiat quo voluptas nulla pariatur?
         return self.engine.execute(select).first()[0] / self.HOME_PRICE
 
     def read_sequential(self):
-        # Reads 1e6 rows in ~ 12s.
-        select = """
-            SELECT   SUM(price)
-            FROM     listing
-        """
-        return self.engine.execute(select).first()[0] / self.HOME_PRICE
+        # Reads 1e6 rows within 16s.
+        n = total = 0
+        batch_size = int(self.num_rows / 1e2)
+        sess = orm.sessionmaker(bind=self.engine)()
+        while n < self.num_rows:
+            ids = tuple(n + i
+                        for i in range(batch_size))
+            # Sigh! Sqlite IN won't accept bind params.
+            select = f"""
+                SELECT   SUM(price)
+                FROM     listing
+                WHERE    id in {ids}
+            """
+            total += sess.execute(select).first()[0]
+            n += batch_size
+            print('.', end='', flush=True)
+        print('')
+        return total / self.HOME_PRICE
 
 
 if __name__ == '__main__':
@@ -145,5 +157,5 @@ if __name__ == '__main__':
     rit.create_if_needed()
 
     t0 = time.time()
-    assert rit.num_rows == rit.read_sequential_simple()
+    assert rit.num_rows == rit.read_sequential()
     print(round(time.time() - t0, 3))
