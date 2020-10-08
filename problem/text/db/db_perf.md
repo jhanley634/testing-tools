@@ -119,6 +119,23 @@ Example:
 
 That is .02 % of the base relation's rows, so an index would win.
 
+# Querying in O(log n) time (1 / 3)
+
+binary tree
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Complete_binary2.svg/900px-Complete_binary2.svg.png)
+
+# Querying in logarithmic time (2 / 3)
+
+B tree
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/B-tree.svg/600px-B-tree.svg.png)
+
+# Querying in logarithmic time (3 / 3)
+
+B+ tree
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Bplustree.png/600px-Bplustree.png)
 
 # Why is my query slow?
 
