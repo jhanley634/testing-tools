@@ -2,7 +2,7 @@
 ---
 author: John Hanley
 title: Database Performance
-date: 9\textsuperscript{th} October 2020 [N slides]
+date: 9\textsuperscript{th} October 2020 [20 slides]
 copyright: 2020, see below
 ---
 
@@ -49,6 +49,15 @@ Example:
 
 \blank
 This is $f(guid) \rightarrow price$.
+
+# Random I/O
+
+Random reads are _slower_ than sequential reads.
+
+example timing:
+
+- 16 µs per sequential read (60 K read/sec), vs
+- 90 µs per random read (10 K read/sec)
 
 # Covering index (1 / 2)
 

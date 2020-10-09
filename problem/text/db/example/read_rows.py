@@ -31,7 +31,7 @@ import sqlalchemy.orm as orm
 class RandomIoTest:
 
     # A million rows corresponds to ~ 4 GiB, produced within 3 minutes.
-    def __init__(self, num_rows=2e6, db_fspec='/tmp/big.db'):
+    def __init__(self, num_rows=1e6, db_fspec='/tmp/big.db'):
         self.num_rows = int(num_rows)
         self.db_fspec = Path(db_fspec)
         self.engine = sa.create_engine(
