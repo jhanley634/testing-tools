@@ -6,10 +6,12 @@ date: 9\textsuperscript{th} October 2020 [N slides]
 copyright: 2020, see below
 ---
 
-# Overview: superpowers
+# Overview
 
-- locality of reference
-- sequential over random reads
+- indexes
+- selectivity
+- lookup speed
+- slow queries
 - know the future
 
 # Optimizing queries
@@ -180,16 +182,18 @@ Use COUNT(*) to estimate the filtering throughput.
 Let $a$ and $b$ be number of rows in those tables.
 Then
 
-    SELECT *  FROM A  JOIN B;
+        SELECT *  FROM A  JOIN B;
 
 produces $a \times b$ result rows. An ON clause,
 
-    SELECT *  FROM A  JOIN B ON a.id = b.a_id;
+        SELECT *  FROM A  JOIN B ON a.id = b.a_id;
 
 can cut that down substantially.
 
+\blank
 For an equi-join, say it in the ON, rather than WHERE.
 
+\blank
 Pay attention to PKs of both tables,
 so you don't accidentally omit a column from a compound key.
 
@@ -234,6 +238,20 @@ and won't be able to exploit an index on either column.
 Avoid CAST and similar functions in ON clauses, also:
 
     FROM A  JOIN B  ON unsigned_zipcode::TEXT = zip5
+
+# know the future
+
+Sometimes we _know_ there will be a chrono query tomorrow,
+for rows we've already committed.
+Or perhaps many such queries.
+
+Why wait? Do the work now, and store it on disk.
+We call this an index.
+Or perhaps a derived table, a reporting table.
+Consider using CREATE MATERIALIZED INDEX.
+
+\blank
+Store counts, if that's all the query result will need.
 
 # questions
 
