@@ -278,7 +278,7 @@ Or perhaps many such queries.
 Why wait? Do the work now, and store it on disk.
 We call this an index.
 Or perhaps a derived table, a reporting table.
-Consider using CREATE MATERIALIZED INDEX.
+Consider using CREATE MATERIALIZED VIEW.
 
 \blank
 Store counts, if that's all the query result will need.
