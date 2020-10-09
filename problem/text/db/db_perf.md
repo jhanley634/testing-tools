@@ -234,11 +234,11 @@ Read the EXPLAIN plan -- does it match what you expect?  Try:
 
 Understand that the backend cannot "see through" a function, e.g.
 
-    WHERE x > y
+        WHERE x > y
 
 lets us exploit an index on either column. This is no different:
 
-    WHERE sqrt(x) > sqrt(y)
+        WHERE sqrt(x) > sqrt(y)
 
 except the backend doesn't understand the monotonicity,
 and won't be able to exploit an index on either column.
