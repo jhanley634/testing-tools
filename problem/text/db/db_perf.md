@@ -131,6 +131,27 @@ Example:
 
 That is .02 % of the base relation's rows, so an index would win.
 
+# Selectivity (2 / 2)
+
+Consider this example, which has poor selectivity:
+
+    SELECT COUNT(*) FROM mls.property WHERE zipcode < '97086';
+
+We are ignoring places like Portland and Seattle,
+and asking for the rest of the country.
+On a more complex query, like SUM(price),
+an index would likely lose -- randomly reading
+nearly every row block is slower than sequentially
+table-scanning all of them.
+
+On _this_ particular query, the planner might still
+choose to use a zipcode index. Why? Because it can
+sequentially scan _most_ of the index, and do that
+faster than consulting the rows, since the 1-column
+index is narrower than the rows. Sequentially reading
+a small object is faster than sequentially reading
+a large one.
+
 # Latency numbers every programmer should know
     L1 cache reference ....................... 0.5 ns
     Branch mispredict .......................... 5 ns
