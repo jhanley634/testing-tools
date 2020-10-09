@@ -119,6 +119,27 @@ Example:
 
 That is .02 % of the base relation's rows, so an index would win.
 
+# Latency numbers every programmer should know
+    L1 cache reference ......................... 0.5 ns
+    Branch mispredict ............................ 5 ns
+    L2 cache reference ........................... 7 ns
+    Mutex lock/unlock ........................... 25 ns
+    Main memory reference ...................... 100 ns
+    Compress 1K bytes with Zippy ............. 3,000 ns  =   3 µs
+    Send 2K bytes over 1 Gbps network ....... 20,000 ns  =  20 µs
+    SSD random read ........................ 150,000 ns  = 150 µs
+    Read 1 MB sequentially from memory ..... 250,000 ns  = 250 µs
+    Round trip within same datacenter ...... 500,000 ns  = 0.5 ms
+    Read 1 MB sequentially from SSD* ..... 1,000,000 ns  =   1 ms
+    Disk seek ........................... 10,000,000 ns  =  10 ms
+    Read 1 MB sequentially from disk .... 20,000,000 ns  =  20 ms
+    Send packet CA->Netherlands->CA .... 150,000,000 ns  = 150 ms
+
+\blank
+ref.: https://gist.github.com/hellerbarde/2843375
+
+orig. ref.: https://norvig.com/21-days.html#answers
+
 # Querying in O(log n) time (1 / 3)
 
 binary tree
@@ -137,7 +158,7 @@ B+ tree
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Bplustree.png/600px-Bplustree.png)
 
-# Why is my query slow? (1 / 3)
+# Why is my query slow? (1 / 4)
 
 Maybe it has to be slow.
 If you're asking for a million result rows,
@@ -147,14 +168,72 @@ You might be requesting a dozen result rows,
 but require _filtering_ a million base rows.
 Can you index, so we're not filtering?
 
+\blank
 Measure the $\dfrac{\textrm{rows}}{\textrm{sec}}$
 app level throughput.
 
 Use COUNT(*) to estimate the filtering throughput.
 
-# Why is my query slow? (2 / 3)
-## Cartesian 
+# Why is my query slow? (2 / 4)
+## Cartesian cross product
 
+Let $a$ and $b$ be number of rows in those tables.
+Then
+
+    SELECT *  FROM A  JOIN B;
+
+produces $a \times b$ result rows. An ON clause,
+
+    SELECT *  FROM A  JOIN B ON a.id = b.a_id;
+
+can cut that down substantially.
+
+For an equi-join, say it in the ON, rather than WHERE.
+
+Pay attention to PKs of both tables,
+so you don't accidentally omit a column from a compound key.
+
+# Why is my query slow? (3 / 4)
+## Driving table
+
+Do you have a plan in mind?
+When you read your query,
+can you envision what the backend will do?
+In what order?
+
+If you can't, maybe your query is too hard to read.
+Consider breaking it into separately testable chunks,
+using WITH cte, or CREATE VIEW, or temp table.
+
+What are the table sizes?
+Are they wide?
+What's the selectivity, how much filtering is happening?
+What's likely to be cached?
+
+In a JOIN, prefer to access big tables first.
+
+Read the EXPLAIN plan -- does it match what you expect?  Try:
+
+    EXPLAIN ANALYZE SELECT ...
+
+# Why is my query slow? (4 / 4)
+## Disabled index
+
+Understand that the backend cannot "see through" a function, e.g.
+
+    WHERE x > y
+
+lets us exploit an index on either column. This is no different:
+
+    WHERE sqrt(x) > sqrt(y)
+
+except the backend doesn't understand the monotonicity,
+and won't be able to exploit an index on either column.
+
+\blank
+Avoid CAST and similar functions in ON clauses, also:
+
+    FROM A  JOIN B  ON unsigned_zipcode::TEXT = zip5
 
 # questions
 
