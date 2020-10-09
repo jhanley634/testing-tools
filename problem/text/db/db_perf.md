@@ -54,10 +54,11 @@ This is $f(guid) \rightarrow price$.
 
 Random reads are _slower_ than sequential reads.
 
+\blank
 example timing:
 
-- 16 µs per sequential read (60 K read/sec), vs
-- 90 µs per random read (10 K read/sec)
+- 16 µs per sequential read ( ~ 60 K read/sec), vs
+- 90 µs per random read ( ~ 10 K read/sec)
 
 # Covering index (1 / 2)
 
@@ -147,9 +148,9 @@ That is .02 % of the base relation's rows, so an index would win.
     Send packet CA->Netherlands->CA .. 150,000,000 ns  = 150 ms
 
 \blank
-ref.: https://gist.github.com/hellerbarde/2843375
-
-orig. ref.: https://norvig.com/21-days.html#answers
+\footnotesize{
+ref.: https://gist.github.com/hellerbarde/2843375 \\
+orig. ref.: https://norvig.com/21-days.html#answers}
 
 # Querying in O(log n) time (1 / 3)
 
@@ -246,7 +247,7 @@ and won't be able to exploit an index on either column.
 \blank
 Avoid CAST and similar functions in ON clauses, also:
 
-    FROM A  JOIN B  ON unsigned_zipcode::TEXT = zip5
+    FROM a  JOIN b  ON a.unsigned_zipcode::TEXT = b.zip5
 
 # know the future
 
