@@ -111,10 +111,10 @@ of base rows that appear in the result set.
 \blank
 Example:
 
-    SELECT COUNT(*)  FROM mls.property  WHERE zipcode = '91320';
+    SELECT COUNT(*) FROM mls.property WHERE zipcode = '91320';
     3614
 
-    SELECT COUNT(*)  FROM mls.property;
+    SELECT COUNT(*) FROM mls.property;
     19001000
 
 That is .02 % of the base relation's rows, so an index would win.
@@ -137,10 +137,23 @@ B+ tree
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Bplustree.png/600px-Bplustree.png)
 
-# Why is my query slow?
+# Why is my query slow? (1 / 3)
 
+Maybe it has to be slow.
+If you're asking for a million result rows,
+that's going to take some time.
 
+You might be requesting a dozen result rows,
+but require _filtering_ a million base rows.
+Can you index, so we're not filtering?
 
+Measure the $\dfrac{\textrm{rows}}{\textrm{sec}}$
+app level throughput.
+
+Use COUNT(*) to estimate the filtering throughput.
+
+# Why is my query slow? (2 / 3)
+## Cartesian 
 
 
 # questions
