@@ -148,9 +148,8 @@ That is .02 % of the base relation's rows, so an index would win.
     Send packet CA->Netherlands->CA .. 150,000,000 ns  = 150 ms
 
 \blank
-\footnotesize{
-ref.: https://gist.github.com/hellerbarde/2843375 \\
-orig. ref.: https://norvig.com/21-days.html#answers}
+\footnotesize ref.: https://gist.github.com/hellerbarde/2843375 \newline
+orig. ref.: https://norvig.com/21-days.html#answers
 
 # Querying in O(log n) time (1 / 3)
 
