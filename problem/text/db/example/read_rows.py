@@ -20,6 +20,7 @@
 
 from contextlib import closing
 from pathlib import Path
+import random
 import time
 import uuid
 
@@ -133,8 +134,13 @@ qui dolorem eum fugiat quo voluptas nulla pariatur?
 
     def read_sequential(self):
         # Reads 1e6 rows within 16s.
-        return self.read_rows(tuple(i
-                              for i in range(self.num_rows)))
+        return self.read_rows(tuple(i for i in range(self.num_rows)))
+
+    def read_random(self):
+        # Reads 1e6 rows in ~ 90s.
+        all_ids = [i for i in range(self.num_rows)]
+        random.shuffle(all_ids)  # This costs ~ 1 second.
+        return self.read_rows(tuple(all_ids))
 
     def read_rows(self, all_ids):
         n = total = 0
@@ -160,5 +166,5 @@ if __name__ == '__main__':
     rit.create_if_needed()
 
     t0 = time.time()
-    assert rit.num_rows == rit.read_sequential()
+    assert rit.num_rows == rit.read_random()
     print(round(time.time() - t0, 3))
