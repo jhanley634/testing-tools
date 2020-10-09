@@ -133,13 +133,16 @@ qui dolorem eum fugiat quo voluptas nulla pariatur?
 
     def read_sequential(self):
         # Reads 1e6 rows within 16s.
+        return self.read_rows(tuple(i
+                              for i in range(self.num_rows)))
+
+    def read_rows(self, all_ids):
         n = total = 0
         batch_size = int(self.num_rows / 1e2)
         sess = orm.sessionmaker(bind=self.engine)()
         while n < self.num_rows:
-            ids = tuple(n + i
-                        for i in range(batch_size))
             # Sigh! Sqlite IN won't accept bind params.
+            ids = all_ids[n:n + batch_size]
             select = f"""
                 SELECT   SUM(price)
                 FROM     listing
