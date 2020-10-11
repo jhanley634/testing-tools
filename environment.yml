@@ -3,39 +3,39 @@ channels:
   - conda-forge
 dependencies:
   - alembic >= 1.4.3
-  - astor >= 0.7.1
+  - astor >= 0.8.1
   - beautifulsoup4 >= 4.9.0
-  - bokeh >= 2.0.1
+  - bokeh >= 2.2.1
   - boltons >= 20.1.0
   - cartopy >= 0.17.0
   - click >= 7.1.2
-  - cvxopt >= 1.2.3
+  - cvxopt >= 1.2.5
   - cython >= 0.29.14
   - dicttoxml >= 1.7.4
-  - dill >= 0.3.1.1
+  - dill >= 0.3.2
   - flake8 >= 3.8.4
   - flask >= 1.1.1
-  - folium >= 0.11.1
+  - folium >= 0.11.0
   - geocoder >= 1.38.1
   - geopy >= 1.21.0
-  - html5lib >= 1.0.1
+  - html5lib >= 1.1
   - isort >= 5.6.2
-  - lxml >= 4.5.0
+  - lxml >= 4.5.2
   - matplotlib >= 3.3.2
-  - networkx >= 2.4
+  - networkx >= 2.5
   - numba >= 0.46.0
   - pandas >= 1.1.3
   - pillow >= 6.1.0
   - pip >= 20.2.3
-  - pyarrow >= 0.15.1
+  - pyarrow >= 1.0.1
   - python == 3.7.3
   - quantities >= 0.12.4
-  - requests >= 2.23.0
+  - requests >= 2.24.0
   - ruamel.yaml >= 0.16.6
   - scikit-learn >= 0.23.2
-  - seaborn >= 0.10.0
+  - seaborn >= 0.11.0
   - sqlalchemy >= 1.3.5
-  - unyt >= 2.7.1
+  - unyt >= 2.8.0
   - yapf >= 0.30.0
   - pip:
     - colorbrewer >= 0.2.0
@@ -43,7 +43,7 @@ dependencies:
     - flask-api >= 2.0
     - imgkit >= 1.0.2
     - redis >= 3.4.1
-    - sqlacodegen >= 2.1.0
+    - sqlacodegen >= 2.3.0
     - streamlit >= 0.68.0
     - tspy >= 0.1.1.1
     - uszipcode >= 0.2.4
