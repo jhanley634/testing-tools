@@ -3,9 +3,13 @@
 from pathlib import Path
 import datetime as dt
 
-# import altair as alt
+import altair as alt
 import pandas as pd
 import streamlit as st
+
+
+def _now():
+    return dt.datetime.now().replace(microsecond=0)
 
 
 def _get_nyt_covid19_top_dir():
@@ -27,9 +31,18 @@ def get_cases_and_deaths():
 
 def main():
     df = get_cases_and_deaths()
-    print(dt.datetime.now().replace(microsecond=0))
-    st.line_chart(df)
-    # st.altair_chart(df)
+    # st.line_chart(df)
+    st.altair_chart(alt.Chart(df)
+                    .mark_circle()
+                    .encode(x='date',
+                            y='cases'))
+
+    # import numpy as np
+    # df = pd.DataFrame(np.random.randn(200, 3), columns=["a", "b", "c"])
+    # c = alt.Chart(df).mark_circle().encode(x="a", y="b", size="c", color="c")
+    # st.altair_chart(c)
+
+    print(_now())
 
 
 if __name__ == '__main__':
