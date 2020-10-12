@@ -31,17 +31,10 @@ def get_cases_and_deaths():
 
 def main():
     df = get_cases_and_deaths()
-    # st.line_chart(df)
     st.altair_chart(alt.Chart(df)
                     .mark_circle()
                     .encode(x='date',
                             y='cases'))
-
-    # import numpy as np
-    # df = pd.DataFrame(np.random.randn(200, 3), columns=["a", "b", "c"])
-    # c = alt.Chart(df).mark_circle().encode(x="a", y="b", size="c", color="c")
-    # st.altair_chart(c)
-
     print(_now())
 
 
