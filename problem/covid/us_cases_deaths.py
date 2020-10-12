@@ -31,11 +31,11 @@ def get_cases_and_deaths():
 
 def main():
     df = get_cases_and_deaths()
-    axis = alt.Axis()
+    scale = alt.Scale(type='log')
     st.altair_chart(alt.Chart(df)
                     .mark_circle()
-                    .encode(x=alt.X('date', axis=axis),
-                            y=alt.Y('cases')))
+                    .encode(x=alt.X('date'),
+                            y=alt.Y('cases', scale=scale)))
     print(_now())
 
 
