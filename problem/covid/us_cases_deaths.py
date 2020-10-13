@@ -36,20 +36,13 @@ def get_cases_and_deaths():
 
 def main():
     df = get_cases_and_deaths()
-    scale = alt.Scale(type='log')
-    scale = alt.Scale()
+    scale = alt.Scale(type='symlog')
     st.altair_chart(alt.Chart(df)
                     .mark_line()
                     .encode(x=alt.X('date'),
                             y=alt.Y('val', scale=scale),
                             color='stat',
                             strokeDash='stat'))
-
-    # from vega_datasets import data
-    # source = data.stocks()
-    # source = data.jobs.url
-    # df = pd.read_json(data.jobs.url).set_index('year')
-
     print(_now())
 
 
