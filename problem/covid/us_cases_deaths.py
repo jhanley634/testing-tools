@@ -26,16 +26,30 @@ def get_cases_and_deaths():
 
     df = pd.read_csv(_get_nyt_covid19_top_dir() / 'us.csv')
     df.date = pd.to_datetime(df.date)
-    return df
+
+    rows = []
+    for i, row in df.iterrows():
+        rows.append(dict(date=row.date, stat='cases', val=row.cases))
+        rows.append(dict(date=row.date, stat='deaths', val=row.deaths))
+    return pd.DataFrame(rows)
 
 
 def main():
     df = get_cases_and_deaths()
     scale = alt.Scale(type='log')
+    scale = alt.Scale()
     st.altair_chart(alt.Chart(df)
-                    .mark_circle()
+                    .mark_line()
                     .encode(x=alt.X('date'),
-                            y=alt.Y('cases', scale=scale)))
+                            y=alt.Y('val', scale=scale),
+                            color='stat',
+                            strokeDash='stat'))
+
+    # from vega_datasets import data
+    # source = data.stocks()
+    # source = data.jobs.url
+    # df = pd.read_json(data.jobs.url).set_index('year')
+
     print(_now())
 
 
