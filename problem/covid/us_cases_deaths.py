@@ -34,15 +34,19 @@ def get_cases_and_deaths():
     return pd.DataFrame(rows)
 
 
+def _get_chart(df, scale_type='linear'):
+    return (alt.Chart(df)
+            .mark_line()
+            .encode(x=alt.X('date'),
+                    y=alt.Y('val', scale=alt.Scale(type=scale_type)),
+                    color='stat',
+                    strokeDash='stat'))
+
+
 def main():
     df = get_cases_and_deaths()
-    scale = alt.Scale(type='symlog')
-    st.altair_chart(alt.Chart(df)
-                    .mark_line()
-                    .encode(x=alt.X('date'),
-                            y=alt.Y('val', scale=scale),
-                            color='stat',
-                            strokeDash='stat'))
+    st.altair_chart(_get_chart(df))
+    st.altair_chart(_get_chart(df, 'symlog'))
     print(_now())
 
 
