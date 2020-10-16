@@ -19,6 +19,7 @@
 # other dealings in the software.
 
 from pathlib import Path
+import csv
 import subprocess
 
 import boto3
@@ -35,26 +36,33 @@ class S3Names:
     @property
     def _cache_file(self):
         PREFIX = 'bucket_'  # Arbitrary. This simply sorts them together.
-        return Path(f'{self.directory}/{PREFIX}{self.bucket_name}.txt')
+        return Path(f'{self.directory}/{PREFIX}{self.bucket_name}.csv')
 
-    def _tail1(self, file):
-        return subprocess.check_output(['tail', '-1', file])
+    @staticmethod
+    def _tail1(file):
+        return subprocess.check_output(['tail', '-1', file]).decode().rstrip()
 
-    def _get_names(self, start_after):
+    @staticmethod
+    def _third_field(line: str):
+        return line.split(',', 2)[-1]
+
+    def _get_size_stamp_names(self, start_after):
         s3 = boto3.resource('s3')
         bucket = s3.Bucket(self.bucket_name)
-        for obj in bucket.objects.all(start_after=start_after):
-            print(type(obj), dir(obj))
-            yield obj.key
+        for obj in bucket.objects.all().filter(Marker=start_after):
+            yield obj.size, obj.last_modified, obj.key
 
     def store_names(self):
         start_after = ''
         f = self._cache_file
         if f.exists() and f.stat().st_size > 0:
-            start_after = self._tail1(f)
+            start_after = self._third_field(self._tail1(f))
+        else:
+            f.write_text('size,updated,name\n')
         with open(f, 'a') as fout:
-            for name in self._get_names(start_after):
-                fout.write(f'{name}\n')
+            sheet = csv.writer(fout)
+            for row in self._get_size_stamp_names(start_after):
+                sheet.writerow(row)
 
 
 @click.command()
@@ -64,6 +72,7 @@ class S3Names:
               help='directory in which results are cached across runs')
 def main(bucket, directory):
     s3n = S3Names(bucket, directory)
+    s3n.store_names()
 
 
 if __name__ == '__main__':
