@@ -17,3 +17,33 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
+
+from pathlib import Path
+import boto3
+import click
+
+
+class S3Names:
+
+    def __init__(self, bucket, directory):
+        self.bucket = bucket
+        self.directory = Path(directory)
+        assert self.directory.exists(), directory
+
+    @property
+    def _cache_file(self):
+        PREFIX = 'bucket_'  # Arbitrary. This simply sorts them together.
+        return f'{self.directory}/{PREFIX}{self.bucket}.txt'
+
+
+@click.command()
+@click.option('--bucket', required=True,
+              help='name of S3 bucket to read')
+@click.option('--directory', default='/tmp',
+              help='directory in which results are cached across runs')
+def main(bucket, directory):
+    s3n = S3Names(bucket, directory)
+
+
+if __name__ == '__main__':
+    main()
