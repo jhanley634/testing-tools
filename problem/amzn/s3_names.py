@@ -22,6 +22,7 @@ from pathlib import Path
 import csv
 import subprocess
 
+from tqdm import tqdm
 import boto3
 import click
 
@@ -61,7 +62,7 @@ class S3Names:
             f.write_text('size,updated,name\n')
         with open(f, 'a') as fout:
             sheet = csv.writer(fout)
-            for row in self._get_size_stamp_names(start_after):
+            for row in tqdm(self._get_size_stamp_names(start_after)):
                 sheet.writerow(row)
 
 
