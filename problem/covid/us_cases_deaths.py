@@ -36,23 +36,25 @@ def _get_nyt_covid19_top_dir():
     return sibling_repo.resolve()
 
 
-def get_cases_and_deaths():
+def get_cases_and_deaths(in_file='us.csv', state=''):
     #            date    cases  deaths
     # 0    2020-01-21        1       0
     # ..          ...      ...     ...
     # 263  2020-10-10  7748030  214184
 
-    df = pd.read_csv(_get_nyt_covid19_top_dir() / 'us.csv')
+    df = pd.read_csv(_get_nyt_covid19_top_dir() / in_file)
     df.date = pd.to_datetime(df.date)
 
     rows = []
     for i, row in df.iterrows():
-        rows.append(dict(date=row.date, stat='cases', val=row.cases + 1))
-        rows.append(dict(date=row.date, stat='deaths', val=row.deaths + 1))
+        if state and row.state != state:
+            continue
+        rows.append(dict(date=row.date, stat='cases', val=max(row.cases, 1)))
+        rows.append(dict(date=row.date, stat='deaths', val=max(row.deaths, 1)))
     return pd.DataFrame(rows)
 
 
-def _get_chart(df, scale_type='linear'):
+def get_chart(df, scale_type='linear'):
     return (alt.Chart(df)
             .mark_line()
             .encode(x=alt.X('date'),
@@ -63,8 +65,8 @@ def _get_chart(df, scale_type='linear'):
 
 def main():
     df = get_cases_and_deaths()
-    st.altair_chart(_get_chart(df))
-    st.altair_chart(_get_chart(df, 'log'))
+    st.altair_chart(get_chart(df))
+    st.altair_chart(get_chart(df, 'log'))
     print(_now())
 
 
