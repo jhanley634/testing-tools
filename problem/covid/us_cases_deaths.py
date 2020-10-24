@@ -54,6 +54,22 @@ def get_cases_and_deaths(in_file='us.csv', state=''):
     return pd.DataFrame(rows)
 
 
+def delta(df):
+    """Computes delta values, in place (e.g. daily new cases)."""
+    prev_cases = 0
+    prev_deaths = 0
+    for i, row in df.iterrows():
+        if row.stat == 'cases':
+            d = row.val - prev_cases
+            prev_cases = row.val
+        elif row.stat == 'deaths':
+            d = row.val - prev_deaths
+            prev_deaths = row.val
+        else:
+            assert None, row
+        df.val.iloc[i] = d
+
+
 def get_chart(df, scale_type='linear'):
     return (alt.Chart(df)
             .mark_line()
@@ -67,6 +83,8 @@ def main():
     df = get_cases_and_deaths()
     st.altair_chart(get_chart(df))
     st.altair_chart(get_chart(df, 'log'))
+    delta(df)
+    st.altair_chart(get_chart(df))
     print(_now())
 
 
