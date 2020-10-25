@@ -18,22 +18,23 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from decimal import Decimal
+
 from geopy.distance import distance
 import geopy
 
 
-def main():
+def step_size():
     # https://en.wikipedia.org/wiki/St._Louis_Lambert_International_Airport
     stl = geopy.Point(38.747222, -90.361389)  # population midpoint
     one_grid = distance(miles=64)
     north = one_grid.destination(stl, bearing=0)
     east = one_grid.destination(stl, bearing=90)
-    print(stl.format_decimal())
     lat_step = north.latitude - stl.latitude
     lng_step = east.longitude - stl.longitude
-    print(lat_step)
-    print(lng_step)
+    return map(_round2, (lat_step, lng_step))
 
 
-if __name__ == '__main__':
-    main()
+def _round2(n):
+    """Rounds to nearest hundredths."""
+    return Decimal(str(round(n, 2)))

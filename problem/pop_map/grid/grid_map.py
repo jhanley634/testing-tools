@@ -18,23 +18,59 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+from decimal import Decimal
+
 import pandas as pd
 import pydeck as pdk
 import streamlit as st
 import uszipcode
 
+from pop_map.grid.degree_size import step_size
+
 
 def _get_rows(pop_thresh=30_000):
     select = f"""
-        SELECT    zipcode_type, zipcode, lat, lng AS lon, population, major_city
+        SELECT    lat, lng AS lon, population, major_city
         FROM      simple_zipcode
         WHERE     lat > 0
+                  AND zipcode_type = 'Standard'
                   AND state NOT IN ('AK', 'HI', 'PR')
                   AND population >= {pop_thresh}
-        ORDER BY  1, 2
+        ORDER BY  zipcode
     """
     search = uszipcode.SearchEngine()
     return list(map(dict, search.ses.execute(select)))
+
+
+class Grid:
+
+    def __init__(self, pop_thresh=30_000):
+        self.pop_thresh = pop_thresh
+        self.ses = uszipcode.SearchEngine().ses
+
+    def _get_select(self, bottom, top):
+        return f"""
+        SELECT    lat, lng AS lon, population, major_city
+        FROM      simple_zipcode
+        WHERE     lat > 0
+                  AND zipcode_type = 'Standard'
+                  AND state NOT IN ('AK', 'HI', 'PR')
+                  AND population >= {self.pop_thresh}
+                  AND {bottom} <= lat AND lat < {top}
+        ORDER BY  lng
+    """
+
+    def _get_grid_counts(self):
+        lat_step, lng_step = step_size()
+        oak_island_mn = 49.3  # N lat
+        key_west_fl = Decimal('24.6')
+        lat = key_west_fl
+        while lat <= oak_island_mn:
+            select = self._get_select(lat, lat + lat_step)
+            rows = map(dict, self.ses.execute(select))
+            df = pd.DataFrame(rows)
+            st.map(df)
+            lat += lat_step
 
 
 def foo(df):
@@ -71,8 +107,9 @@ def foo(df):
 def main():
     df = pd.DataFrame(_get_rows())
     # st.map(df)
-    foo(df)
-    print(len(df), len(_get_rows(60_000)))
+    # foo(df)
+    g = Grid()
+    g._get_grid_counts()
 
 
 if __name__ == '__main__':
