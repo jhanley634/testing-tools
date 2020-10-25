@@ -24,7 +24,6 @@ import pprint
 import matplotlib
 import pandas as pd
 import sklearn.linear_model
-import sqlalchemy.orm as orm
 import uszipcode
 import uszipcode.db
 import uszipcode.model
@@ -46,8 +45,7 @@ def _query_by_zip(zipcode=94025):
 
 
 def query_by_state(state='CA'):
-    engine = uszipcode.SearchEngine().ses.connection().engine
-    sess = orm.sessionmaker(bind=engine)()
+    sess = uszipcode.SearchEngine().ses
     tbl = uszipcode.model.SimpleZipcode
     return (sess.query(tbl.zipcode,
                        tbl.population_density,

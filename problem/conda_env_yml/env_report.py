@@ -59,7 +59,7 @@ def report(file='environment.yml'):
         name_to_ver = dict(_get_package_names_and_versions(fin))
 
     name_ver_re = re.compile(r'^([\w\.-]+)\s+([\d\.]+)$')
-    cmd = f'(conda list; pip list)'
+    cmd = 'conda list; pip list'
     lines = subprocess.check_output(cmd, shell=True).decode().split('\n')
     for line in lines:
         m = name_ver_re.search(line.rstrip())

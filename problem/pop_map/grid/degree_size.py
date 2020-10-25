@@ -24,7 +24,7 @@ import geopy
 
 def main():
     # https://en.wikipedia.org/wiki/St._Louis_Lambert_International_Airport
-    stl = geopy.Point(38.747222, -90.361389)
+    stl = geopy.Point(38.747222, -90.361389)  # population midpoint
     one_grid = distance(miles=64)
     north = one_grid.destination(stl, bearing=0)
     east = one_grid.destination(stl, bearing=90)
