@@ -22,14 +22,15 @@ from pathlib import Path
 import pprint
 
 import matplotlib
-matplotlib.use('Agg')  # noqa E402
-import matplotlib.pyplot as plt
 import pandas as pd
 import sklearn.linear_model
 import sqlalchemy.orm as orm
 import uszipcode
 import uszipcode.db
 import uszipcode.model
+
+matplotlib.use('Agg')  # noqa E402
+import matplotlib.pyplot as plt  # noqa E402
 
 
 def _query_by_zip(zipcode=94025):
@@ -45,7 +46,7 @@ def _query_by_zip(zipcode=94025):
 
 
 def query_by_state(state='CA'):
-    engine = uszipcode.db.connect_to_simple_zipcode_db()
+    engine = uszipcode.SearchEngine().ses.connection().engine
     sess = orm.sessionmaker(bind=engine)()
     tbl = uszipcode.model.SimpleZipcode
     return (sess.query(tbl.zipcode,
