@@ -19,6 +19,7 @@
 # other dealings in the software.
 
 import pandas as pd
+import pydeck as pdk
 import streamlit as st
 import uszipcode
 
@@ -36,9 +37,41 @@ def _get_rows(pop_thresh=30_000):
     return list(map(dict, search.ses.execute(select)))
 
 
+def foo(df):
+    st.pydeck_chart(pdk.Deck(
+        map_style='mapbox://styles/mapbox/light-v9',
+        initial_view_state=pdk.ViewState(
+            latitude=37.76,
+            longitude=-122.4,
+            zoom=11,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                'HexagonLayer',
+                data=df,
+                get_position='[lon, lat]',
+                radius=200,
+                elevation_scale=4,
+                elevation_range=[0, 1000],
+                pickable=True,
+                extruded=True,
+            ),
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=df,
+                get_position='[lon, lat]',
+                get_color='[200, 30, 0, 160]',
+                get_radius=200,
+            ),
+        ],
+    ))
+
+
 def main():
     df = pd.DataFrame(_get_rows())
-    st.map(df)
+    # st.map(df)
+    foo(df)
     print(len(df), len(_get_rows(60_000)))
 
 
