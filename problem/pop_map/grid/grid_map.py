@@ -42,7 +42,49 @@ def _get_rows(pop_thresh=30_000):
     return list(map(dict, search.ses.execute(select)))
 
 
-class Grid:
+class GridCell:
+    """Models 1 dimension of a geographic grid.
+
+    Consider a chessboard. Then a grid cell is one of 64 squares.
+    As we scan a raster of 8 cells, left to right,
+    a grid cell models the left and right boundaries of a cell.
+
+    We use repeated addition, rather than base + i * step.
+    This motivates adding Decimals, scaled integers,
+    to avoid annoying roundoff effects.
+    """
+
+    @staticmethod
+    def _dec(n):
+        """Converts to scaled integer, to avoid IEEE-754 roundoff nonsense."""
+        # Repeatedly applying this function won't change n.
+        return Decimal(str(n))  # We use str() because
+        # python 3.1 and later will choose the shortest decimal
+        # using David Gay's algorithm.
+        # https://docs.python.org/3/tutorial/floatingpoint.html
+        # https://docs.python.org/3/whatsnew/3.1.html#other-language-changes
+        # https://web.archive.org/web/2006/http://ftp.ccs.neu.edu/pub/people/will/retrospective.pdf
+        # round-trip: https://people.csail.mit.edu/jaffer/r5rs/Numerical-input-and-output.html
+
+    def __init__(self, west, lng_step):
+        self.west = self._dec(west)
+        self.lng_step = self._dec(lng_step)
+
+    def contains(self, lng):
+        """Predicate."""
+        lng = self._dec(lng)
+        assert self.west <= lng  # Caller must play nice, e.g. Honolulu is west of WA.
+        return lng < self.west + self.lng_step
+
+    def advance_to(self, lng):
+        """Moves western boundary by one or more grids."""
+        assert not self.contains(lng)
+        while not self.contains(lng):
+            self.west += self.lng_step
+        assert self.contains(lng)
+
+
+class GridMap:
 
     def __init__(self, pop_thresh=30_000):
         self.pop_thresh = pop_thresh
@@ -67,10 +109,23 @@ class Grid:
         lat = key_west_fl
         while lat <= oak_island_mn:
             select = self._get_select(lat, lat + lat_step)
-            rows = map(dict, self.ses.execute(select))
-            df = pd.DataFrame(rows)
-            st.map(df)
+            print(list(self._get_raster_counts(select, lng_step)))
             lat += lat_step
+
+    def _get_raster_counts(self, select, lng_step):
+        neah_bay_wa = -125  # degrees W lng, approximately
+        grid = GridCell(neah_bay_wa, lng_step)
+        count = total_pop = 0
+        for lat, lng, pop, city in self.ses.execute(select):
+            if not grid.contains(lng):
+                yield dict(west=grid.west, count=count, total_pop=total_pop)
+                grid.advance_to(lng)
+                count = total_pop = 0
+            assert grid.contains(lng)
+            count += 1
+            total_pop += pop
+        if count:  # final, most eastern grid in a raster
+            yield dict(west=grid.west, count=count, total_pop=total_pop)
 
 
 def foo(df):
@@ -108,7 +163,7 @@ def main():
     df = pd.DataFrame(_get_rows())
     # st.map(df)
     # foo(df)
-    g = Grid()
+    g = GridMap()
     g._get_grid_counts()
 
 
