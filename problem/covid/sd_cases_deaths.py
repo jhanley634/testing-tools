@@ -21,7 +21,7 @@
 import datetime as dt
 
 from altair import datum
-from covid.us_cases_deaths import delta, get_cases_and_deaths, get_chart
+from covid.us_cases_deaths import delta, get_cases_and_deaths, get_chart, smooth
 import altair as alt
 import streamlit as st
 
@@ -51,6 +51,7 @@ def main():
     st.altair_chart(get_chart(df) + _get_annotation(df))
     st.altair_chart(get_chart(df, 'log') + _get_annotation(df))
     delta(df)
+    smooth(df, span=7)
     st.altair_chart(get_chart(df) + _get_annotation(df))
 
 

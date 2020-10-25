@@ -54,6 +54,16 @@ def get_cases_and_deaths(in_file='us.csv', state=''):
     return pd.DataFrame(rows)
 
 
+def smooth(df, span=7):
+    cases = df[df.stat == 'cases'].val.ewm(span=span).mean()
+    deaths = df[df.stat == 'deaths'].val.ewm(span=span).mean()
+    for i in range(0, len(df), 2):
+        assert df.stat.iloc[i] == 'cases'
+        assert df.stat.iloc[i + 1] == 'deaths'
+        df.loc[i, 'val'] = cases.iloc[i // 2]
+        df.loc[i + 1, 'val'] = deaths.iloc[i // 2]
+
+
 def delta(df):
     """Computes delta values, in place (e.g. daily new cases)."""
     prev_cases = 0
@@ -67,7 +77,7 @@ def delta(df):
             prev_deaths = row.val
         else:
             assert None, row
-        df.val.iloc[i] = d
+        df.loc[i, 'val'] = d
 
 
 def get_chart(df, scale_type='linear'):
@@ -84,6 +94,7 @@ def main():
     st.altair_chart(get_chart(df))
     st.altair_chart(get_chart(df, 'log'))
     delta(df)
+    smooth(df)
     st.altair_chart(get_chart(df))
     print(_now())
 
