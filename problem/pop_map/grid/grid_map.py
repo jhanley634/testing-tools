@@ -124,11 +124,11 @@ class GridMap:
         lat = key_west_fl
         while lat <= oak_island_mn:
             select = _get_select(lat, lat + lat_step)
-            rows += self._get_raster_counts(select, lng_step)
+            rows += self._get_raster_counts(select, lng_step, lat)
             lat += lat_step
         return rows
 
-    def _get_raster_counts(self, select, lng_step, show_grid=False):
+    def _get_raster_counts(self, select, lng_step, south=None):
 
         def _get_dict():
             return dict(count=count,
@@ -145,11 +145,11 @@ class GridMap:
             if not grid.contains(lng):
                 if count:
                     yield _get_dict()
-                    if show_grid:
+                    if south:  # if caller wants grid cells displayed
                         west = float(grid.west)
                         while west + lng_step < lng:
                             yield dict(count=100, total_pop=100_000,
-                                       lat=b_lat, lon=west)
+                                       lat=float(south), lon=west)
                             west += lng_step
                 grid.advance_to(lng)
                 count = total_pop = 0
