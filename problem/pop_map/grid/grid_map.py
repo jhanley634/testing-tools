@@ -25,7 +25,7 @@ import pydeck as pdk
 import streamlit as st
 import uszipcode
 
-from pop_map.grid.degree_size import step_size
+from problem.pop_map.grid.degree_size import step_size
 
 
 def _get_rows(pop_thresh=30_000):
@@ -102,30 +102,47 @@ class GridMap:
         ORDER BY  lng
     """
 
-    def _get_grid_counts(self):
+    def get_grid_counts(self):
+        rows = []
         lat_step, lng_step = step_size()
         oak_island_mn = 49.3  # N lat
         key_west_fl = Decimal('24.6')
         lat = key_west_fl
         while lat <= oak_island_mn:
             select = self._get_select(lat, lat + lat_step)
-            print(list(self._get_raster_counts(select, lng_step)))
+            rows += self._get_raster_counts(select, lng_step)
             lat += lat_step
+        return rows
 
     def _get_raster_counts(self, select, lng_step):
+
+        def _get_dict():
+            return dict(count=count,
+                        total_pop=total_pop,
+                        lat=b_lat,
+                        lon=b_lng)
+
         neah_bay_wa = -125  # degrees W lng, approximately
         grid = GridCell(neah_bay_wa, lng_step)
         count = total_pop = 0
+        b_lat = b_lng = b_pop = 0  # Biggest city within a grid.
+
         for lat, lng, pop, city in self.ses.execute(select):
             if not grid.contains(lng):
-                yield dict(west=grid.west, count=count, total_pop=total_pop)
+                if count:
+                    yield _get_dict()
                 grid.advance_to(lng)
                 count = total_pop = 0
+                b_lat = b_lng = b_pop = 0
             assert grid.contains(lng)
             count += 1
             total_pop += pop
+            if b_pop < pop:  # new max?
+                b_pop = pop
+                b_lat = lat
+                b_lng = lng
         if count:  # final, most eastern grid in a raster
-            yield dict(west=grid.west, count=count, total_pop=total_pop)
+            yield _get_dict()
 
 
 def foo(df):
@@ -160,11 +177,10 @@ def foo(df):
 
 
 def main():
-    df = pd.DataFrame(_get_rows())
-    # st.map(df)
-    # foo(df)
-    g = GridMap()
-    g._get_grid_counts()
+    # df = pd.DataFrame(_get_rows())
+    df = pd.DataFrame(GridMap().get_grid_counts())
+    print(df)
+    st.map(df)
 
 
 if __name__ == '__main__':
