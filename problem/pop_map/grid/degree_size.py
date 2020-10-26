@@ -32,9 +32,9 @@ def step_size():
     east = one_grid.destination(stl, bearing=90)
     lat_step = north.latitude - stl.latitude
     lng_step = east.longitude - stl.longitude
-    return map(_round2, (lat_step, lng_step))
+    return map(_round2, (Decimal(f'{lat_step}'), lng_step))
 
 
 def _round2(n):
     """Rounds to nearest hundredths."""
-    return Decimal(str(round(n, 2)))
+    return round(n, 2)

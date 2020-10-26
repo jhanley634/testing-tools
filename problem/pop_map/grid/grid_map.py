@@ -114,7 +114,7 @@ class GridMap:
             lat += lat_step
         return rows
 
-    def _get_raster_counts(self, select, lng_step):
+    def _get_raster_counts(self, select, lng_step, show_grid=False):
 
         def _get_dict():
             return dict(count=count,
@@ -131,6 +131,12 @@ class GridMap:
             if not grid.contains(lng):
                 if count:
                     yield _get_dict()
+                    if show_grid:
+                        west = float(grid.west)
+                        while west + lng_step < lng:
+                            yield dict(count=100, total_pop=100_000,
+                                       lat=b_lat, lon=west)
+                            west += lng_step
                 grid.advance_to(lng)
                 count = total_pop = 0
                 b_lat = b_lng = b_pop = 0
