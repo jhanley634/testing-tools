@@ -86,7 +86,7 @@ class GridCell:
 
 class GridMap:
 
-    def __init__(self, pop_thresh=30_000):
+    def __init__(self, pop_thresh=10_000):
         self.pop_thresh = pop_thresh
         self.ses = uszipcode.SearchEngine().ses
 
@@ -145,32 +145,26 @@ class GridMap:
             yield _get_dict()
 
 
-def foo(df):
+def column_layer(df):
     st.pydeck_chart(pdk.Deck(
         map_style='mapbox://styles/mapbox/light-v9',
         initial_view_state=pdk.ViewState(
-            latitude=37.76,
-            longitude=-122.4,
-            zoom=11,
+            latitude=38,
+            longitude=-97,
+            zoom=4,
             pitch=50,
         ),
         layers=[
             pdk.Layer(
-                'HexagonLayer',
+                'ColumnLayer',
                 data=df,
                 get_position='[lon, lat]',
-                radius=200,
-                elevation_scale=4,
-                elevation_range=[0, 1000],
+                radius=2_000,
+                get_elevation="total_pop / 1000",
+                elevation_scale=100,
+                # elevation_range=[0, 1000],
                 pickable=True,
                 extruded=True,
-            ),
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=df,
-                get_position='[lon, lat]',
-                get_color='[200, 30, 0, 160]',
-                get_radius=200,
             ),
         ],
     ))
@@ -180,7 +174,8 @@ def main():
     # df = pd.DataFrame(_get_rows())
     df = pd.DataFrame(GridMap().get_grid_counts())
     print(df)
-    st.map(df)
+    # st.map(df)
+    column_layer(df)
 
 
 if __name__ == '__main__':
