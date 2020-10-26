@@ -27,6 +27,7 @@ import pydeck as pdk
 import streamlit as st
 import uszipcode
 
+
 def step_size():
     # https://en.wikipedia.org/wiki/St._Louis_Lambert_International_Airport
     stl = geopy.Point(38.747222, -90.361389)  # population midpoint
@@ -35,26 +36,36 @@ def step_size():
     east = one_grid.destination(stl, bearing=90)
     lat_step = north.latitude - stl.latitude
     lng_step = east.longitude - stl.longitude
-    return map(_round2, (Decimal(f'{lat_step}'), lng_step))
+    return map(_round3, (Decimal(f'{lat_step}'), lng_step))
 
 
-def _round2(n):
-    """Rounds to nearest hundredths."""
-    return round(n, 2)
+def _round3(n):
+    """Rounds to nearest thousandth."""
+    return round(n, 3)
 
 
-def _get_rows(pop_thresh=30_000):
-    select = f"""
+def _get_select(bottom=None, top=None, pop_thresh=30_000):
+    order_by = 'zipcode'
+    in_continental_48 = "state NOT IN ('AK', 'HI', 'PR')"
+    in_raster = "TRUE"
+    if top:
+        in_raster = f"{bottom} <= lat AND lat < {top}"
+        order_by = 'lng'
+    return f"""
         SELECT    lat, lng AS lon, population, major_city
         FROM      simple_zipcode
         WHERE     lat > 0
                   AND zipcode_type = 'Standard'
-                  AND state NOT IN ('AK', 'HI', 'PR')
                   AND population >= {pop_thresh}
-        ORDER BY  zipcode
+                  AND {in_continental_48}
+                  AND {in_raster}
+        ORDER BY  {order_by}
     """
+
+
+def _get_rows():
     search = uszipcode.SearchEngine()
-    return list(map(dict, search.ses.execute(select)))
+    return list(map(dict, search.ses.execute(_get_select())))
 
 
 class GridCell:
@@ -105,18 +116,6 @@ class GridMap:
         self.pop_thresh = pop_thresh
         self.ses = uszipcode.SearchEngine().ses
 
-    def _get_select(self, bottom, top):
-        return f"""
-        SELECT    lat, lng AS lon, population, major_city
-        FROM      simple_zipcode
-        WHERE     lat > 0
-                  AND zipcode_type = 'Standard'
-                  AND state NOT IN ('AK', 'HI', 'PR')
-                  AND population >= {self.pop_thresh}
-                  AND {bottom} <= lat AND lat < {top}
-        ORDER BY  lng
-    """
-
     def get_grid_counts(self):
         rows = []
         lat_step, lng_step = step_size()
@@ -124,7 +123,7 @@ class GridMap:
         key_west_fl = Decimal('24.6')
         lat = key_west_fl
         while lat <= oak_island_mn:
-            select = self._get_select(lat, lat + lat_step)
+            select = _get_select(lat, lat + lat_step)
             rows += self._get_raster_counts(select, lng_step)
             lat += lat_step
         return rows
