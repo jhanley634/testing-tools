@@ -183,6 +183,8 @@ def column_layer(df):
                 'ColumnLayer',
                 data=df,
                 get_position='[lon, lat]',
+                get_fill_color='total_pop == 10000'
+                               ' ? [0, 0, 0, 64] : [255, 0, 255]',
                 get_elevation="total_pop / 1000",
                 elevation_scale=100,
                 radius=2_000,
