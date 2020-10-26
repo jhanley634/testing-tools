@@ -120,7 +120,7 @@ class GridMap:
         rows = []
         lat_step, lng_step = step_size()
         oak_island_mn = 49.3  # N lat
-        key_west_fl = Decimal('24.6')
+        key_west_fl = Decimal(f'{int(24.6)}')
         lat = key_west_fl
         while lat <= oak_island_mn:
             select = _get_select(lat, lat + lat_step)
@@ -146,11 +146,8 @@ class GridMap:
                 if count:
                     yield _get_dict()
                     if south:  # if caller wants grid cells displayed
-                        west = float(grid.west)
-                        while west + lng_step < lng:
-                            yield dict(count=100, total_pop=100_000,
-                                       lat=float(south), lon=west)
-                            west += lng_step
+                        yield from self._show_grid_cell_pattern(
+                            south, float(grid.west), lng_step, lng)
                 grid.advance_to(lng)
                 count = total_pop = 0
                 b_lat = b_lng = b_pop = 0
@@ -161,8 +158,15 @@ class GridMap:
                 b_pop = pop
                 b_lat = lat
                 b_lng = lng
-        if count:  # final, most eastern grid in a raster
+        if count:  # finally, the most eastern grid in a raster
             yield _get_dict()
+
+    @staticmethod
+    def _show_grid_cell_pattern(south, west, lng_step, lng):
+        while west + lng_step < lng:
+            yield dict(count=1, total_pop=10_000,
+                       lat=float(south), lon=west)
+            west += lng_step
 
 
 def column_layer(df):
@@ -179,12 +183,9 @@ def column_layer(df):
                 'ColumnLayer',
                 data=df,
                 get_position='[lon, lat]',
-                radius=2_000,
                 get_elevation="total_pop / 1000",
                 elevation_scale=100,
-                # elevation_range=[0, 1000],
-                pickable=True,
-                extruded=True,
+                radius=2_000,
             ),
         ],
     ))
