@@ -17,24 +17,3 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
-
-from decimal import Decimal
-
-from geopy.distance import distance
-import geopy
-
-
-def step_size():
-    # https://en.wikipedia.org/wiki/St._Louis_Lambert_International_Airport
-    stl = geopy.Point(38.747222, -90.361389)  # population midpoint
-    one_grid = distance(miles=64)
-    north = one_grid.destination(stl, bearing=0)
-    east = one_grid.destination(stl, bearing=90)
-    lat_step = north.latitude - stl.latitude
-    lng_step = east.longitude - stl.longitude
-    return map(_round2, (Decimal(f'{lat_step}'), lng_step))
-
-
-def _round2(n):
-    """Rounds to nearest hundredths."""
-    return round(n, 2)
