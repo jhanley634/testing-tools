@@ -21,15 +21,15 @@ use std::env;
 
 const MAX_ITER: i32 = 255;  // Rust lacks adequate support for default args.
 
-fn _cycles_to_escape(x0: f64, y0: f64) {
-    let mut x = 0.0;
-    let mut y = 0.0;
+fn _cycles_to_escape(x0: f64, y0: f64) -> i32 {
+    let x = 0.0;
+    let y = 0.0;
     let mut i = 0;
     while x * x + y * y <= 4.0 && i < MAX_ITER {
         let (x, y) = (x * x - y * y + x0, 2.0 * x * y + y0);
         i += 1;
     }
-    i;
+    return i;
 }
 
 fn getenv(key: &str) -> f64 {
@@ -51,5 +51,7 @@ fn main() {
     let xc = stof(args[1].to_string());
     let yc = stof(args[2].to_string());
     let sz = stof(args[3].to_string());
-    println!("{}", xc);
+
+    println!("P3\n{} {}\n255", sz, sz);
+    println!("{}", _cycles_to_escape(xc, yc));
 }
