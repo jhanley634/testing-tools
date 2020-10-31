@@ -28,10 +28,10 @@ import streamlit as st
 import uszipcode
 
 
-def step_size():
+def step_size(miles=64):
     # https://en.wikipedia.org/wiki/St._Louis_Lambert_International_Airport
     stl = geopy.Point(38.747222, -90.361389)  # population midpoint
-    one_grid = distance(miles=64)
+    one_grid = distance(miles=miles)
     north = one_grid.destination(stl, bearing=0)
     east = one_grid.destination(stl, bearing=90)
     lat_step = north.latitude - stl.latitude
@@ -194,6 +194,7 @@ def column_layer(df):
 
 
 def main():
+    # scale = st.slider('scale', 0, 3)
     # df = pd.DataFrame(_get_rows())
     df = pd.DataFrame(GridMap().get_grid_counts())
     print(df)
