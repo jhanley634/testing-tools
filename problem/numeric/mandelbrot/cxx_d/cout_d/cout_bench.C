@@ -22,12 +22,18 @@
 using namespace std;
 
 
-void bench_cout(const uint n) {
-    cout << "cout!" << endl;
+#define VAL 100
+
+void bench_cout(const uint n) {  // 10x slower than printf
+    for (uint i = 0; i < n; i++) {
+        cout << VAL << " " << VAL << " " << VAL << " " << endl;
+    }
 }
 
 void bench_printf(const uint n) {
-    cout << "printf!" << endl;
+    for (uint i = 0; i < n; i++) {
+        printf("%u %u %u\n", VAL, VAL, VAL);
+    }
 }
 
 
@@ -55,9 +61,9 @@ int main(int argc, char *argv[]) {
     }
     chrono::steady_clock::time_point t0 = chrono::steady_clock::now();
 
-    fn(10);
+    fn(1e6);
 
     float elapsed = chrono::duration_cast<chrono::milliseconds>(
          chrono::steady_clock::now() - t0).count() / 1e3;
-    cerr << elapsed << " seconds" << endl;
+    cerr << elapsed << " seconds for " << opt << endl;
 }
