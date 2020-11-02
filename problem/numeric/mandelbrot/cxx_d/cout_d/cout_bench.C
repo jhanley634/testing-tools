@@ -26,7 +26,7 @@ using namespace std;
 
 void bench_cout(const uint n) {  // 10x slower than printf
     for (uint i = 0; i < n; i++) {
-        cout << VAL << " " << VAL << " " << VAL << " " << endl;
+        cout << VAL << " " << VAL << " " << VAL << endl;
     }
 }
 

@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 
 # Copyright 2020 John Hanley.
 #
@@ -17,13 +18,15 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import pandas as pd
 
-all: cout_bench
 
-OBJS = cout_bench.o
+# https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2
 
-%.o: %.C
-	$(CXX) $(CFLAGS) -Wall -O0 -g -c $<
+def _get_num_districts(in_file='/tmp/1976-2018-house2.csv'):
+    df = pd.read_csv(in_file)
+    return df
 
-cout_bench: $(OBJS)
-	$(CXX) $(OBJS) -o $@
+
+if __name__ == '__main__':
+    print(_get_num_districts())
