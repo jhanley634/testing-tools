@@ -34,12 +34,28 @@ def _get_num_districts(in_file='/tmp/1976-2018-house2.csv'):
     return df.append([dict(state='DC', district=42)])
 
 
-def main():
-    df = _get_num_districts().groupby('state').agg('count').rename(columns={
-        'district': 'electors'})
+def _get_num_electors():
+    df = _get_num_districts().groupby('state').agg('count')
+    df = df.rename(columns={'district': 'electors'})
     df.electors += 2
-    print(df)
+    return df
+
+
+def find_ties(target=269):
+    xs = sorted(_get_num_electors().electors, reverse=True)
+    assert 51 == len(xs)
+    assert 2 * target == sum(xs)
+
+    # greedy
+    s1 = s2 = 0
+    for x in xs:
+        if s1 <= s2:
+            s1 += x
+        else:
+            s2 += x
+        if s1 == s2:
+            print(s1, s2, x)
 
 
 if __name__ == '__main__':
-    main()
+    find_ties()
