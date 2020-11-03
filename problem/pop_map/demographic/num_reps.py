@@ -26,13 +26,20 @@ import pandas as pd
 
 def _get_num_districts(in_file='/tmp/1976-2018-house2.csv'):
     df = pd.read_csv(in_file, encoding='latin-1')
-    print(df.dtypes)
     df = df[(df.year == 2018) & (df.district >= 0) & ~df.writein]
     df = df[['state_po', 'district', 'candidate', 'party', 'candidatevotes']]
-    df = df[['state_po', 'district']]
-    df = df.drop_duplicates(['state_po', 'district'])
-    return df
+    df = df.rename(columns={'state_po': 'state'})
+    df = df[['state', 'district']]
+    df = df.drop_duplicates(['state', 'district'])
+    return df.append([dict(state='DC', district=42)])
+
+
+def main():
+    df = _get_num_districts().groupby('state').agg('count').rename(columns={
+        'district': 'electors'})
+    df.electors += 2
+    print(df)
 
 
 if __name__ == '__main__':
-    print(_get_num_districts())
+    main()
