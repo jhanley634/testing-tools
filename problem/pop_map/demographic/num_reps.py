@@ -22,9 +22,15 @@ import pandas as pd
 
 
 # https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2
+# https://dataverse.harvard.edu/api/access/datafile/3814252?format=original&gbrecs=true
 
 def _get_num_districts(in_file='/tmp/1976-2018-house2.csv'):
-    df = pd.read_csv(in_file)
+    df = pd.read_csv(in_file, encoding='latin-1')
+    print(df.dtypes)
+    df = df[(df.year == 2018) & (df.district >= 0) & ~df.writein]
+    df = df[['state_po', 'district', 'candidate', 'party', 'candidatevotes']]
+    df = df[['state_po', 'district']]
+    df = df.drop_duplicates(['state_po', 'district'])
     return df
 
 
