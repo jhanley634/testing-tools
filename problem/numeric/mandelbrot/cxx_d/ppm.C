@@ -28,7 +28,7 @@ PPM::PPM(uint size_px) {
 }
 
 void PPM::plot(uint grey_value) {
-    int v = grey_value;
+    uint v = grey_value;
     // slower:  cout << v << " " << v << " " << v << endl;
     printf("%u %u %u\n", v, v, v);
 }
