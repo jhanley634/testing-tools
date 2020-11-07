@@ -41,8 +41,3 @@ cdef int _cycles_to_escape(double x0, double y0, int max_iter=255):
         x, y = x * x - y * y + x0, 2 * x * y + y0
         i += 1
     return i
-
-
-if __name__ == '__main__':
-    args = map(float, sys.argv[1:])
-    mandelbrot_set(*args, sys.stdout)

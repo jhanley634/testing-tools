@@ -17,15 +17,16 @@
 // arising from, out of or in connection with the software or the use or
 // other dealings in the software.
 
+#include <chrono>
 #include <iostream>
 #include <ppm.h>
 using namespace std;
 
 
-int cycles_to_escape(double x0, double y0, uint max_iter) {
+uint cycles_to_escape(double x0, double y0, uint max_iter) {
     double x = 0.0;
     double y = 0.0;
-    int i = 0;
+    uint i = 0;
     while (x * x + y * y <= 4 && i < max_iter) {
         double xt = x;
         x = x * x - y * y + x0;
@@ -42,8 +43,8 @@ void mandelbrot_set(double xc, double yc, double sz, uint px_resolution) {
 
     double step = (2 * sz) / (px_resolution - 1);
 
-    for (int j=0; j < px_resolution; j++) {
-        for (int i=0; i < px_resolution; i++) {
+    for (uint j=0; j < px_resolution; j++) {
+        for (uint i=0; i < px_resolution; i++) {
             double x0 = xc - sz + step * i;
             double y0 = yc - sz + step * j;
             ppm.plot(cycles_to_escape(x0, y0, 255));
@@ -68,7 +69,12 @@ int main(int argc, char *argv[]) {
     float yc = atof(argv[2]);
     float sz = atof(argv[3]);
     uint px_resolution = atoi(get_res());
+    chrono::steady_clock::time_point t0 = chrono::steady_clock::now();
 
     mandelbrot_set(xc, yc, sz, px_resolution);
+
+    float elapsed = chrono::duration_cast<chrono::milliseconds>(
+        chrono::steady_clock::now() - t0).count() / 1e3;
+    cerr << elapsed << " seconds" << endl;
     return 0;
 }

@@ -19,6 +19,7 @@
 # other dealings in the software.
 
 import sys
+import time
 
 from numba import jit
 import colorbrewer
@@ -46,7 +47,13 @@ def _cycles_to_escape(x0: float, y0: float, max_iter=255):
 
 
 if __name__ == '__main__':
-    args = map(float, sys.argv[1:])
+    args = list(map(float, sys.argv[1:]))
     cmap = colorbrewer.PRGn[11]
     cmap = None  # greyscale
+    mandelbrot_set(*args, open('/dev/null', 'w'), cmap)  # 100 msec warmup
+    t0 = time.time()
+
     mandelbrot_set(*args, sys.stdout, cmap)
+
+    elapsed = round(time.time() - t0, 3)
+    print(f'{elapsed} elapsed seconds', file=sys.stderr)

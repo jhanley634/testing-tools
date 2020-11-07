@@ -24,7 +24,7 @@ struct PPM
     function PPM(size_px)
         println("P3")
         println(size_px, " ", size_px)
-        println("255\n")
+        println("255")
     end
 end
     function plot(grey_value)
@@ -33,7 +33,12 @@ end
     end
 
 
-function mandelbrot_set(xc, yc, sz, px_resolution=500)
+function _get_px_res()
+    return parse(UInt32, ENV["MSET_PX_RESOLUTION"])
+end
+
+
+function mandelbrot_set(xc, yc, sz, px_resolution=_get_px_res())
     PPM(px_resolution)
     step = (2 * sz) / (px_resolution - 1)
 
@@ -60,4 +65,9 @@ end
 xc = parse(Float64, ARGS[1])
 yc = parse(Float64, ARGS[2])
 sz = parse(Float64, ARGS[3])
+t0 = time()
+
 mandelbrot_set(xc, yc, sz)
+
+elapsed = round(time() - t0, digits=3)
+println(stderr, elapsed, " seconds")

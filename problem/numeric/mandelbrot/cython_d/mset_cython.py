@@ -19,10 +19,16 @@
 # other dealings in the software.
 
 import sys
+import time
 
 from problem.numeric.mandelbrot.cython_d.mset_cython_ext import mandelbrot_set
 
 
 if __name__ == '__main__':
     args = map(float, sys.argv[1:])
+    t0 = time.time()
+
     mandelbrot_set(*args, sys.stdout)
+
+    elapsed = round(time.time() - t0, 3)
+    print(elapsed, "seconds", file=sys.stderr)
