@@ -24,8 +24,8 @@ const MAX_ITER: i32 = 255;  // Rust lacks adequate support for default args.
 fn mandelbrot_set(xc: f64, yc: f64, sz: f64, px_resolution: i32) {
     let step = (2.0 * sz) / (px_resolution as f64 - 1.0);
 
-    for j in 0 .. px_resolution - 1 {
-        for i in 0 .. px_resolution - 1 {
+    for j in 0 .. px_resolution {
+        for i in 0 .. px_resolution {
             let x0 = xc - sz + step * i as f64;
             let y0 = yc - sz + step * j as f64;
             plot(_cycles_to_escape(x0, y0));
@@ -38,9 +38,11 @@ fn _cycles_to_escape(x0: f64, y0: f64) -> i32 {
     let mut y = 0.0;
     let mut i = 0;
     while x * x + y * y <= 4.0 && i < MAX_ITER {
-        x = x * x - y * y + x0;
-        y = 2.0 * x * y + y0;
+        let (a, b) = (x * x - y * y + x0, 2.0 * x * y + y0);
+        x = a;
+        y = b; // rust lacks tuple unpack, aka destructuring assignment
         i += 1;
+        // println!("{} {} {} {} {}", x0, y0, i, x, y);
     }
     return i;
 }
