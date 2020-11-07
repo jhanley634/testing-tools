@@ -21,24 +21,47 @@ use std::env;
 
 const MAX_ITER: i32 = 255;  // Rust lacks adequate support for default args.
 
+fn mandelbrot_set(xc: f64, yc: f64, sz: f64, px_resolution: i32) {
+    let step = (2.0 * sz) / (px_resolution as f64 - 1.0);
+
+    for j in 0 .. px_resolution - 1 {
+        for i in 0 .. px_resolution - 1 {
+            let x0 = xc - sz + step * i as f64;
+            let y0 = yc - sz + step * j as f64;
+            plot(_cycles_to_escape(x0, y0));
+        }
+    }
+}
+
 fn _cycles_to_escape(x0: f64, y0: f64) -> i32 {
-    let x = 0.0;
-    let y = 0.0;
+    let mut x = 0.0;
+    let mut y = 0.0;
     let mut i = 0;
     while x * x + y * y <= 4.0 && i < MAX_ITER {
-        let (x, y) = (x * x - y * y + x0, 2.0 * x * y + y0);
+        x = x * x - y * y + x0;
+        y = 2.0 * x * y + y0;
         i += 1;
     }
     return i;
 }
 
-fn getenv(key: &str) -> f64 {
+fn plot(grey_value: i32) {
+    let v = grey_value;
+    println!("{} {} {}", v, v, v);
+}
+
+
+fn getenv(key: &str) -> i32 {
     let s: String;
     match env::var(key) {
         Ok(v) => s = v,
         Err(_) => s = "400".to_string()
     }
-    return stof(s);
+    return stoi(s);
+}
+
+fn stoi(s: String) -> i32 {
+    return s.parse::<i32>().unwrap();
 }
 
 fn stof(s: String) -> f64 {
@@ -52,6 +75,6 @@ fn main() {
     let yc = stof(args[2].to_string());
     let sz = stof(args[3].to_string());
 
-    println!("P3\n{} {}\n255", sz, sz);
-    println!("{}", _cycles_to_escape(xc, yc));
+    println!("P3\n{} {}\n255", px_resolution, px_resolution);
+    mandelbrot_set(xc, yc, sz, px_resolution);
 }

@@ -46,7 +46,7 @@ function mandelbrot_set(xc, yc, sz, px_resolution=_get_px_res())
         for i in 0 : px_resolution-1
             x0 = xc - sz + step * i
             y0 = yc - sz + step * j
-            plot(_cycles_to_escape(x0, y0, 255))
+            plot(_cycles_to_escape(x0, y0))
         end
     end
 end
