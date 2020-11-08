@@ -32,6 +32,7 @@ fn mandelbrot_set(xc: f64, yc: f64, sz: f64, px_resolution: i32) {
             plot(_cycles_to_escape(x0, y0));
         }
     }
+    // io::stdout().flush().ok().expect("flush failed");
 }
 
 fn _cycles_to_escape(x0: f64, y0: f64) -> i32 {
@@ -48,21 +49,19 @@ fn _cycles_to_escape(x0: f64, y0: f64) -> i32 {
 }
 
 fn plot(grey_value: i32) {
-    let v = &grey_value.to_string();
-    let mut rgb :String = v.to_owned();
-    rgb.push_str(" ");
-    rgb.push_str(v);
-    rgb.push_str(" ");
-    rgb.push_str(v);
-    rgb.push_str("\n");
-    print!("{}", v);
-}
-pub fn plot_slow(grey_value: i32) {
-    // If _cycles_to_escape costs 220 msec, this costs 840 msec,
-    // while the verbose plot costs 730 msec. The to_string
-    // alone costs 270 msec. Appending a SPACE costs 140 msec.
+    // If _cycles_to_escape costs 220 msec, this costs 840 msec.
     let v = &grey_value;
     println!("{} {} {}", &v, &v, &v);
+}
+pub fn plot_verbose(grey_value: i32) {
+    let v :&str = &grey_value.to_string();
+    let mut rgb = String::with_capacity(14);
+    rgb.push_str(&v);
+    rgb.push(' ');
+    rgb.push_str(&v);
+    rgb.push(' ');
+    rgb.push_str(&v);
+    println!("{}", &rgb);
 }
 
 
