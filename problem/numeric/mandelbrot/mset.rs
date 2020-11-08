@@ -18,6 +18,7 @@
 // other dealings in the software.
 
 use std::env;
+use std::time::Instant;
 
 const MAX_ITER: i32 = 255;  // Rust lacks adequate support for default args.
 
@@ -40,9 +41,8 @@ fn _cycles_to_escape(x0: f64, y0: f64) -> i32 {
     while x * x + y * y <= 4.0 && i < MAX_ITER {
         let (a, b) = (x * x - y * y + x0, 2.0 * x * y + y0);
         x = a;
-        y = b; // rust lacks tuple unpack, aka destructuring assignment
+        y = b;  // rust 1.47 lacks tuple unpack, aka destructuring assignment
         i += 1;
-        // println!("{} {} {} {} {}", x0, y0, i, x, y);
     }
     return i;
 }
@@ -70,13 +70,17 @@ fn stof(s: String) -> f64 {
     return s.parse::<f64>().unwrap();
 }
 
-fn main() {
+pub fn main() {
     let px_resolution = getenv("MSET_PX_RESOLUTION");
     let args: Vec<String> = env::args().into_iter().collect();
     let xc = stof(args[1].to_string());
     let yc = stof(args[2].to_string());
     let sz = stof(args[3].to_string());
-
     println!("P3\n{} {}\n255", px_resolution, px_resolution);
+    let t0 = Instant::now();
+
     mandelbrot_set(xc, yc, sz, px_resolution);
+
+    let elapsed = t0.elapsed().as_millis() as f64;
+    eprintln!("{} seconds", elapsed / 1e3);
 }
