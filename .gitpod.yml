@@ -1,0 +1,4 @@
+
+tasks:
+  - init: conda env update
+    command: true
