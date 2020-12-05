@@ -1,2 +1,6 @@
 [flake8]
 max-line-length = 101
+per-file-ignores =
+    # E402 module level import not at top of file
+    stores_and_cust/top_pop_cities.py: E402
+    charge_state/charge.py: E402
