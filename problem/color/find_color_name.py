@@ -14,12 +14,12 @@ def get_name_to_srgb():
     keys = sns.xkcd_rgb.keys()
     return dict(zip(keys, sns.xkcd_palette(keys)))
 
-if __name__ == '__main__':
-    print(sns.xkcd_rgb['bright red'])
+def red_check():
     red = get_name_to_srgb()['bright red']
     red = co.sRGBColor(*red)
-    print(red, red.is_upscaled)
-    print(co.sRGBColor(*red.get_value_tuple()),
-          co.sRGBColor(*red.get_value_tuple()).is_upscaled)
-    up = co.sRGBColor(*red.get_upscaled_value_tuple())
-    print(up, up.is_upscaled)
+    assert not red.is_upscaled
+    assert '#ff000d' == red.get_rgb_hex() == sns.xkcd_rgb['bright red']
+
+
+if __name__ == '__main__':
+    red_check()
