@@ -1,22 +1,50 @@
 #! /usr/bin/env python
 
+# Copyright 2020 John Hanley.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# The software is provided "AS IS", without warranty of any kind, express or
+# implied, including but not limited to the warranties of merchantability,
+# fitness for a particular purpose and noninfringement. In no event shall
+# the authors or copyright holders be liable for any claim, damages or
+# other liability, whether in an action of contract, tort or otherwise,
+# arising from, out of or in connection with the software or the use or
+# other dealings in the software.
+
+from binascii import unhexlify
 from functools import lru_cache
 
+import colormath.color_conversions as cv
 import colormath.color_diff as cd
 import colormath.color_objects as co
-import colormath.color_conversions as cv
 import seaborn as sns
 
 assert 949 == len(sns.xkcd_rgb)  # e.g. 'very light green': '#d1ffbd'
 
 
+def _hex_to_rgb(hx: str) -> tuple:
+    hx = hx.replace('#', '')
+    assert 6 == len(hx), hx
+    r, g, b = unhexlify(hx)
+    return r, g, b
+
+
 @lru_cache()
-def get_name_to_srgb():
+def get_name_to_srgb() -> dict:
     keys = sns.xkcd_rgb.keys()
     return dict(zip(keys, sns.xkcd_palette(keys)))
 
 
 def _red_check():
+    red = co.BaseRGBColor(*_hex_to_rgb('#ff000d'), is_upscaled=True)
+    assert red.is_upscaled
     red = get_name_to_srgb()['bright red']
     red = co.sRGBColor(*red)
     assert not red.is_upscaled
@@ -30,7 +58,7 @@ def get_color_by_name(name):
 
 def distance_between_colors(c1: co.sRGBColor,
                             c2: co.sRGBColor):
-    c1.rgb_r  # pass in some proper colors, please
+    assert isinstance(c1, co.sRGBColor), 'pass a proper color, please'
     return cd.delta_e_cie2000(cv.convert_color(c1, co.LabColor),
                               cv.convert_color(c2, co.LabColor))
 
