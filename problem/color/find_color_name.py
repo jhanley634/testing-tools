@@ -22,6 +22,7 @@ from binascii import unhexlify
 from functools import lru_cache
 from operator import itemgetter
 import json
+import click
 
 import colormath.color_conversions as cv
 import colormath.color_diff as cd
@@ -37,6 +38,12 @@ def _hex_to_rgb(hx: str) -> tuple:
     r, g, b = unhexlify(hx)
     return r, g, b
 
+
+def _hex_to_color(hx: str) -> co.sRGBColor:
+    c = co.BaseRGBColor(*_hex_to_rgb(hx))
+    return co.sRGBColor(c.rgb_r / 256,
+                        c.rgb_g / 256,
+                        c.rgb_b / 256)
 
 @lru_cache()
 def get_name_to_srgb() -> dict:
@@ -74,7 +81,7 @@ def distance_to_all_colors(c1: co.sRGBColor, thresh_dist=22):
     return dist
 
 
-if __name__ == '__main__':
+def demo():
     _red_check()
 
     red = get_color_by_name('bright red')
@@ -85,3 +92,14 @@ if __name__ == '__main__':
     d = distance_to_all_colors(red)
     print('')
     print(json.dumps(d, indent=4))
+
+
+@click.command()
+@click.argument('rgb-hex')
+def main(rgb_hex):
+    d = distance_to_all_colors(_hex_to_color(rgb_hex))
+    print(json.dumps(d, indent=4))
+
+
+if __name__ == '__main__':
+    main()
