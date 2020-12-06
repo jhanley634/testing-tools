@@ -45,6 +45,7 @@ def _hex_to_color(hx: str) -> co.sRGBColor:
                         c.rgb_g / 256,
                         c.rgb_b / 256)
 
+
 @lru_cache()
 def get_name_to_srgb() -> dict:
     keys = sns.xkcd_rgb.keys()
