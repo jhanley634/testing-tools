@@ -49,7 +49,7 @@ def display_ascii_horiz_height2_example(n=3, reps=4):
         print('\n'.join(map(_sub, (line1, line2))))
 
 
-def display_ascii_horiz_height3_example(n=3, reps=4, hex=hex_horiz):
+def display_ascii_horiz_height3_example(n=3, reps=4):
     line1 = (r' /   \  y ' * n).replace('y', x_super)
     line2 = r'(  x  )---' * n
     line3 = r' \___/  . ' * n
@@ -57,7 +57,17 @@ def display_ascii_horiz_height3_example(n=3, reps=4, hex=hex_horiz):
         print('\n'.join((line1, line2, line3)))
 
 
+def display_ascii_horiz_height4_example(n=3, reps=4):
+    line1 = r' /   \    ' * n
+    line2 = r'/     \___' * n
+    line3 = r'\     /   ' * n
+    line4 = r' \___/    ' * n
+    for i in range(reps):
+        print('\n'.join(map(_sub, (line1, line2, line3, line4))))
+
+
 if __name__ == '__main__':
     display_unicode_example()
     display_ascii_horiz_height2_example()
     display_ascii_horiz_height3_example()
+    display_ascii_horiz_height4_example()
