@@ -28,6 +28,7 @@ hex_pointy = '\u2b21'
 black_horiz = '\u2b23'
 black_pointy = '\u2b22'
 x_super = '\u2093'
+ne_arrow = '\N{Heavy North East Arrow}'
 
 
 def display_unicode_example():
@@ -40,9 +41,19 @@ def display_unicode_example():
         _display_unicode_row(hex)
 
 
+def slash(n=3, reps=4):
+    div = '\N{division slash}'
+    div = ne_arrow
+    line = f'{div} ' * n
+    for i in range(reps):
+        if i % 2:
+            print(' ', end='')
+        print(line)
+
+
 def _sub(s: str, hx=hex_horiz):
-    s = s.replace('a', '\u2597')  # Quadrant lower right
-    s = s.replace('b', '\u2596')  # Quadrant lower left
+    s = s.replace('a', '\N{Quadrant lower right}')
+    s = s.replace('b', '\N{Quadrant lower left}')
     s = s.replace(':', '\u268F')  # ⚏ diagram for greater yin
     s = s.replace('M', '\N{SNOW CAPPED MOUNTAIN}')
     s = s.replace('C', '\N{OFFICE BUILDING}')
@@ -76,5 +87,4 @@ def display_ascii_horiz_height4_example(n=3, reps=4):
 if __name__ == '__main__':
     display_unicode_example()
     display_ascii_horiz_height2_example()
-    # display_ascii_horiz_height3_example()
     display_ascii_horiz_height4_example()
