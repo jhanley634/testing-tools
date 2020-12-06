@@ -33,9 +33,9 @@ x_super = '\u2093'
 def display_unicode_example():
     for hex in [
         hex_horiz,
-        hex_pointy,
+        # hex_pointy,
         black_horiz,
-        black_pointy,
+        # black_pointy,
     ]:
         _display_unicode_row(hex)
 
