@@ -27,6 +27,7 @@ hex_horiz = '\u2394'
 hex_pointy = '\u2b21'
 black_horiz = '\u2b23'
 black_pointy = '\u2b22'
+x_super = '\u2093'
 
 
 def display_unicode_example():
@@ -47,11 +48,11 @@ def display_ascii_horiz_height2_example(n=3, reps=4):
 
 
 def display_ascii_horiz_height3_example(n=3, reps=4, hex=hex_horiz):
-    line1 = r' /   \  x ' * n
+    line1 = (r' /   \  y ' * n).replace('y', x_super)
     line2 = r'(  x  )---' * n
-    line3 = r' \___/  x ' * n
+    line3 = r' \___/  . ' * n
     for i in range(reps):
-        print('\n'.join(map(_sub, (line1, line2, line3))))
+        print('\n'.join((line1, line2, line3)))
 
 
 if __name__ == '__main__':
