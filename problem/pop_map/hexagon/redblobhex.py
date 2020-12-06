@@ -9,8 +9,6 @@ import math
 Point = collections.namedtuple("Point", ["x", "y"])
 
 
-
-
 _Hex = collections.namedtuple("Hex", ["q", "r", "s"])
 
 
