@@ -23,23 +23,38 @@ def _display_unicode_row(ch: str, n=4):
     print(f"{line}\n  {line}\n{line}\n")
 
 
+hex_horiz = '\u2394'
+hex_pointy = '\u2b21'
+black_horiz = '\u2b23'
+black_pointy = '\u2b22'
+
+
 def display_unicode_example():
-    hex_horiz = '\u2394'
-    hex_pointy = '\u2b21'
-    black_horiz = '\u2b23'
-    black_pointy = '\u2b22'
     for hex in [hex_horiz, hex_pointy,
                 black_horiz, black_pointy]:
         _display_unicode_row(hex)
+
+
+def _sub(s: str, hx=hex_horiz):
+    return s.replace('x', hx)
 
 
 def display_ascii_horiz_height2_example(n=3, reps=4):
     line1 = r'/  \__' * n
     line2 = r'\__/  ' * n
     for i in range(reps):
-        print('\n'.join((line1, line2)))
+        print('\n'.join(map(_sub, (line1, line2))))
+
+
+def display_ascii_horiz_height3_example(n=3, reps=4, hex=hex_horiz):
+    line1 = r' /   \  x ' * n
+    line2 = r'(  x  )---' * n
+    line3 = r' \___/  x ' * n
+    for i in range(reps):
+        print('\n'.join(map(_sub, (line1, line2, line3))))
 
 
 if __name__ == '__main__':
     display_unicode_example()
     display_ascii_horiz_height2_example()
+    display_ascii_horiz_height3_example()
