@@ -40,8 +40,7 @@ def _sub(s: str, hx=hex_horiz):
     s = s.replace('a', '\u2597')  # Quadrant lower right
     s = s.replace('b', '\u2596')  # Quadrant lower left
     s = s.replace(':', '\u268F')  # ⚏ diagram for greater yin
-    # double wide: kawaii, cute, Diamond Shape with a Dot Inside Emoji
-    s = s.replace('m', '\U0001F4A0')
+    s = s.replace('M', '\N{SNOW CAPPED MOUNTAIN}')
     return s.replace('x', hx)
 
 
@@ -61,10 +60,10 @@ def display_ascii_horiz_height3_example(n=3, reps=4):
 
 
 def display_ascii_horiz_height4_example(n=3, reps=4):
-    line1 = r' /   \  m' * n
-    line2 = r'/ m  \___' * n
-    line3 = r'\  m /   ' * n
-    line4 = r' \___/ m ' * n
+    line1 = r' /   \  M ' * n
+    line2 = r'/ M   \___' * n
+    line3 = r'\  M  /   ' * n
+    line4 = r' \___/ M  ' * n
     for i in range(reps):
         print('\n'.join(map(_sub, (line1, line2, line3, line4))))
 
