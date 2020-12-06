@@ -58,10 +58,10 @@ def display_ascii_horiz_height3_example(n=3, reps=4):
 
 
 def display_ascii_horiz_height4_example(n=3, reps=4):
-    line1 = r' /   \    ' * n
-    line2 = r'/     \___' * n
-    line3 = r'\     /   ' * n
-    line4 = r' \___/    ' * n
+    line1 = r' /   \ DEF' * n
+    line2 = r'/ ABC \___' * n
+    line3 = r'\ DEF /   ' * n
+    line4 = r' \___/ ABC' * n
     for i in range(reps):
         print('\n'.join(map(_sub, (line1, line2, line3, line4))))
 
