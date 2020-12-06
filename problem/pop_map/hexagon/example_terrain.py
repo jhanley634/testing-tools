@@ -20,7 +20,7 @@
 
 def _display_unicode_row(ch: str, n=4):
     line = f'{ch}   ' * n
-    print(f"\n{line}\n  {line}\n{line}")
+    print(f"{line}\n  {line}\n{line}\n")
 
 
 def display_unicode_example():
@@ -33,9 +33,13 @@ def display_unicode_example():
         _display_unicode_row(hex)
 
 
-def display_tall_ascii_horiz_example(n=3):
-    ''
+def display_ascii_horiz_height2_example(n=3, reps=4):
+    line1 = r'/  \__' * n
+    line2 = r'\__/  ' * n
+    for i in range(reps):
+        print('\n'.join((line1, line2)))
 
 
 if __name__ == '__main__':
     display_unicode_example()
+    display_ascii_horiz_height2_example()
