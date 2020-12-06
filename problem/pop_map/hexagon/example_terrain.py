@@ -37,12 +37,14 @@ def display_unicode_example():
 
 
 def _sub(s: str, hx=hex_horiz):
+    s = s.replace('a', '\u2597')  # Quadrant lower right
+    s = s.replace('b', '\u2596')  # Quadrant lower left
     return s.replace('x', hx)
 
 
 def display_ascii_horiz_height2_example(n=3, reps=4):
-    line1 = r'/  \__' * n
-    line2 = r'\__/  ' * n
+    line1 = r'/ab\__' * n
+    line2 = r'\__/ab' * n
     for i in range(reps):
         print('\n'.join(map(_sub, (line1, line2))))
 
