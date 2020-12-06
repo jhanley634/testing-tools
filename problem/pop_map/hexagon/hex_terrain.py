@@ -23,15 +23,16 @@
 https://www.redblobgames.com/grids/hexagons
 """
 # We choose flat-top rather than pointy-top hexes,
-# with odd-q vertical layout, and doubleheight.
+# with odd-q vertical layout, and axial coords for storage.
 # We adopt Amit's "origin at upper left" convention,
 # which implies that angles resemble compass angles,
 # with small positive angles in quadrant IV rather than I.
 
-from dataclasses import dataclass
 from enum import Enum, auto
 
 import numpy as np
+
+from problem.pop_map.hexagon.redblobhex import OffsetCoord, Hex, Point
 
 
 class Direction(Enum):
@@ -58,56 +59,30 @@ class CellContent(Enum):
     MOUNTAIN = auto()  # impassable, like Wall in a maz
 
 
-@dataclass
-class UnusedOffsetCoord:
-    col = 0
-    row = 0
-
-
-@dataclass
-class DoubledCoord:
-    col = 0
-    row = 0
-
-
-@dataclass
-class Cube:
-    x = 0
-    y = 0
-    z = 0
-
-
-def _cube_to_oddq(cube):
+def cube_to_oddq(cube):
     # from Amit
     col = cube.x
     row = cube.z + (cube.x - (cube.x & 1)) // 2
-    return UnusedOffsetCoord(col, row)
+    return OffsetCoord(col, row)
 
 
-def _oddq_to_cube(hex):
+def oddq_to_cube(hex):
     # from Amit
     x = hex.col
     z = hex.row - (hex.col - (hex.col & 1)) // 2
     y = -x - z
-    return Cube(x, y, z)
-
-
-def cube_to_doubleheight(cube):
-    col = cube.x
-    row = 2 * cube.z + cube.x
-    return DoubledCoord(col, row)
-
-
-def doubleheight_to_cube(hex):
-    # from Amit
-    x = hex.col
-    z = (hex.row - hex.col) // 2
-    y = -x - z
-    return Cube(x, y, z)
+    return Hex(x, y, z)
 
 
 class HexTerrain:
     ''
+
+
+class Car:
+
+    def __init__(self, terr: HexTerrain, x=1, y=1):
+        self.terr = terr
+        self.loc = Point(x, y)
 
 
 if __name__ == '__main__':
