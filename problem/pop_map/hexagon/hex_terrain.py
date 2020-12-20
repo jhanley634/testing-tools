@@ -59,6 +59,9 @@ class CellContent(Enum):
     MOUNTAIN = auto()  # impassable, like Wall in a maz
 
 
+CELL_GLYPH = 'ZeswWNE.cM'
+
+
 def cube_to_oddq(cube):
     # from Amit
     col = cube.x
@@ -75,7 +78,28 @@ def oddq_to_cube(hex):
 
 
 class HexTerrain:
-    ''
+
+    def __init__(self):
+        self.width = 10
+        self.height = 4
+        self.cell = np.zeros((self.width * 2, self.height), int)
+        self.cell[:][:] = CellContent.UNMARKED.value
+
+    def _q_r_to_x_y(self, q, r) -> tuple:
+        """Maps col, row hexagon to x, y numpy storage cell."""
+        offset = self.width
+        return ()
+
+    def __str__(self):
+        s = []
+        for row in range(self.height):
+            print(row,
+                  self.cell[0, row],
+                  self.cell[1, row])
+            print(CELL_GLYPH[self.cell[0, row]])
+            s.append(''.join(CELL_GLYPH[self.cell[col, row]]
+                             for col in range(self.width)))
+        return '\n'.join(s)
 
 
 class Car:
@@ -86,4 +110,6 @@ class Car:
 
 
 if __name__ == '__main__':
-    HexTerrain()
+    print(CellContent.MARKED_SE.value)
+    terr = HexTerrain()
+    print(terr)
