@@ -82,7 +82,7 @@ class HexTerrain:
     def __init__(self, width=10, height=6):
         self.width = width
         self.height = height
-        self._cell = np.zeros((self.width * 2, self.height), int)
+        self._cell = np.zeros((self.height, self.width * 1), int)
         self._cell[:][:] = CellContent.UNMARKED.value
 
     def _q_r_to_x_y(self, q, r) -> tuple:
@@ -92,48 +92,46 @@ class HexTerrain:
 
     def plot(self, loc: Point, color=CellContent.MARKED_NORTH.value):
         q, r = loc.x, loc.y
-        self._cell[q][r] = color
+        self._cell[r, q] = color
 
     def is_passable(self, loc: Point):
         q, r = loc.x, loc.y
-        return self._cell[r][q] not in (
+        return self._cell[r, q] not in (
             CellContent.MOUNTAIN.value,  # impassable
             CellContent.CITY.value,      # end of journey
         )
 
     def is_goal(self, loc: Point):
         q, r = loc.x, loc.y
-        return self._cell[r][q] == CellContent.CITY.value  # end of journey
+        return self._cell[r, q] == CellContent.CITY.value  # end of journey
 
     def _glyph(self, col, row):
-        if col >= self.width:
-            return str(row % 10)
         if row < 0:
             return str(col % 10)
         assert 0 <= col < self.width
         assert 0 <= row < self.height
-        return CELL_GLYPH[self._cell[col][row]]
+        return CELL_GLYPH[self._cell[row, col]]
 
     def display(self):
         rows = ['' for _ in range(self.height * 4)]
-        for row in range(self.height - 1, -1, -1):
+        for row in range(self.height):
             for col in range(0, self.width, 2):
                 q, r = col, row
-                print(q, r)
                 v1 = self._glyph(q + 1, r - 1)
                 v2 = self._glyph(q + 0, r)
                 v3 = self._glyph(q + 1, r)
-                rows[4 * r + 0] += r' /   \  3 '.replace('3', v3)
-                rows[4 * r + 1] += r'/  2  \___'.replace('2', v2)
-                rows[4 * r + 2] += r'\ : : /   '
-                rows[4 * r + 3] += r' \___/ 1  '.replace('1', v1)
+                start = 4 * (self.height - row - 1)
+                rows[start + 0] += r' /   \  3 '.replace('3', v3)
+                rows[start + 1] += r'/  2  \___'.replace('2', v2)
+                rows[start + 2] += r'\ : : /   '
+                rows[start + 3] += r' \___/ 1  '.replace('1', v1)
         return '\n'.join(rows)
 
     def __str__(self):
         print(self.display())
         s = []
         for row in range(self.height - 1, -1, -1):
-            s.append(''.join(CELL_GLYPH[self._cell[col, row]]
+            s.append(''.join(CELL_GLYPH[self._cell[row, col]]
                              for col in range(self.width)))
         return '\n'.join(s)
 
@@ -167,7 +165,7 @@ if __name__ == '__main__':
     truck = Truck(HexTerrain(), x=0)
 
     truck.steer(Direction.NORTH)
-    truck.move(3)
+    truck.move(2)
 
     truck.steer(Direction.SE)
     # truck.move(4)
