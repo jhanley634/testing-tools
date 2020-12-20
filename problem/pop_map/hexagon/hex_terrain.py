@@ -142,32 +142,36 @@ class Truck:
                  terr: HexTerrain,
                  x=1, y=1,
                  direction=Direction.NORTH):
-        self.terr = terr
-        self.loc = Point(x, y)
-        self.terr.plot(self.loc)
-        self.direction = direction
+        self._terr = terr
+        self._loc = Point(x, y)
+        self._terr.plot(self._loc)
+        self._direction = direction
 
     def steer(self, direction: Direction):
-        self.direction = direction
+        self._direction = direction
 
     def move(self, distance=1):
-        dir_idx = list(Direction).index(self.direction)
-        dx, dy = self.direction.value
+        dir_idx = list(Direction).index(self._direction)
+        dx, dy = self._direction.value
         for i in range(distance):
-            new_x = self.loc.x + dx
-            new_y = self.loc.y + dy
-            if self.terr.is_passable(Point(new_x, new_y)):
-                self.terr.plot(self.loc, 1 + dir_idx)
-                self.loc = Point(new_x, new_y)
+            new_x = self._loc.x + dx
+            new_y = self._loc.y + dy
+            if self._terr.is_passable(Point(new_x, new_y)):
+                print(self._direction.value, self._direction)
+                self._loc = Point(new_x, new_y)
+                self._terr.plot(self._loc, 1 + dir_idx)
 
 
 if __name__ == '__main__':
     truck = Truck(HexTerrain(), x=0)
 
     truck.steer(Direction.NORTH)
-    truck.move(2)
+    truck.move(1)
+    # truck._loc = Point(1, 1)
+    # truck._terr.plot(truck._loc)
+    # truck.move(1)
 
-    truck.steer(Direction.SE)
-    # truck.move(4)
+    truck.steer(Direction.NE)
+    truck.move(1)
 
-    print(truck.terr)
+    print(truck._terr)
