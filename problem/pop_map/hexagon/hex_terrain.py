@@ -38,11 +38,11 @@ from problem.pop_map.hexagon.redblobhex import OffsetCoord, Hex, Point
 class Direction(Enum):
     # (col, row) deltas
     SE = (1, 0)
-    SOUTH = (0, 1)
+    SOUTH = (0, -1)
     SW = (-1, 0)
-    NW = (-1, -1)
-    NORTH = (0, -1)
-    NE = (1, -1)
+    NW = (-1, 1)
+    NORTH = (0, 1)
+    NE = (1, 1)
 
 
 class CellContent(Enum):
@@ -79,11 +79,11 @@ def oddq_to_cube(hex):
 
 class HexTerrain:
 
-    def __init__(self, width=10, height=4):
+    def __init__(self, width=10, height=6):
         self.width = width
         self.height = height
-        self.cell = np.zeros((self.width * 2, self.height), int)
-        self.cell[:][:] = CellContent.UNMARKED.value
+        self._cell = np.zeros((self.width * 2, self.height), int)
+        self._cell[:][:] = CellContent.UNMARKED.value
 
     def _q_r_to_x_y(self, q, r) -> tuple:
         """Maps col, row hexagon to x, y numpy storage cell."""
@@ -92,23 +92,23 @@ class HexTerrain:
 
     def plot(self, loc: Point, color=CellContent.MARKED_NORTH.value):
         q, r = loc.x, loc.y
-        self.cell[r][q] = color
+        self._cell[q][r] = color
 
     def is_passable(self, loc: Point):
         q, r = loc.x, loc.y
-        return self.cell[r][q] not in (
+        return self._cell[r][q] not in (
             CellContent.MOUNTAIN.value,  # impassable
             CellContent.CITY.value,      # end of journey
         )
 
     def is_goal(self, loc: Point):
         q, r = loc.x, loc.y
-        return self.cell[r][q] == CellContent.CITY.value  # end of journey
+        return self._cell[r][q] == CellContent.CITY.value  # end of journey
 
     def __str__(self):
         s = []
-        for row in range(self.height):
-            s.append(''.join(CELL_GLYPH[self.cell[col, row]]
+        for row in range(self.height - 1, -1, -1):
+            s.append(''.join(CELL_GLYPH[self._cell[col, row]]
                              for col in range(self.width)))
         return '\n'.join(s)
 
@@ -141,5 +141,5 @@ class Truck:
 if __name__ == '__main__':
     truck = Truck(HexTerrain())
     truck.steer(Direction.NE)
-    truck.move(2)
+    truck.move(4)
     print(truck.terr)
