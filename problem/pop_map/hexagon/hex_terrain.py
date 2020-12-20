@@ -79,9 +79,9 @@ def oddq_to_cube(hex):
 
 class HexTerrain:
 
-    def __init__(self):
-        self.width = 10
-        self.height = 4
+    def __init__(self, width=10, height=4):
+        self.width = width
+        self.height = height
         self.cell = np.zeros((self.width * 2, self.height), int)
         self.cell[:][:] = CellContent.UNMARKED.value
 
@@ -90,26 +90,56 @@ class HexTerrain:
         offset = self.width
         return ()
 
+    def plot(self, loc: Point, color=CellContent.MARKED_NORTH.value):
+        q, r = loc.x, loc.y
+        self.cell[r][q] = color
+
+    def is_passable(self, loc: Point):
+        q, r = loc.x, loc.y
+        return self.cell[r][q] not in (
+            CellContent.MOUNTAIN.value,  # impassable
+            CellContent.CITY.value,      # end of journey
+        )
+
+    def is_goal(self, loc: Point):
+        q, r = loc.x, loc.y
+        return self.cell[r][q] == CellContent.CITY.value  # end of journey
+
     def __str__(self):
         s = []
         for row in range(self.height):
-            print(row,
-                  self.cell[0, row],
-                  self.cell[1, row])
-            print(CELL_GLYPH[self.cell[0, row]])
             s.append(''.join(CELL_GLYPH[self.cell[col, row]]
                              for col in range(self.width)))
         return '\n'.join(s)
 
 
-class Car:
+class Truck:
 
-    def __init__(self, terr: HexTerrain, x=1, y=1):
+    def __init__(self,
+                 terr: HexTerrain,
+                 x=1, y=1,
+                 direction=Direction.NORTH):
         self.terr = terr
         self.loc = Point(x, y)
+        self.terr.plot(self.loc)
+        self.direction = direction
+
+    def steer(self, direction: Direction):
+        self.direction = direction
+
+    def move(self, distance=1):
+        dir_idx = list(Direction).index(self.direction)
+        dx, dy = self.direction.value
+        for i in range(distance):
+            new_x = self.loc.x + dx
+            new_y = self.loc.y + dy
+            if self.terr.is_passable(Point(new_x, new_y)):
+                self.terr.plot(self.loc, 1 + dir_idx)
+                self.loc = Point(new_x, new_y)
 
 
 if __name__ == '__main__':
-    print(CellContent.MARKED_SE.value)
-    terr = HexTerrain()
-    print(terr)
+    truck = Truck(HexTerrain())
+    truck.steer(Direction.NE)
+    truck.move(2)
+    print(truck.terr)
