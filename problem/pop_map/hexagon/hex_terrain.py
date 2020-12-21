@@ -106,10 +106,12 @@ class HexTerrain:
         return self._cell[r, q] == CellContent.CITY.value  # end of journey
 
     def _glyph(self, col, row):
-        if row < 0:
+        if col < 0:
+            return str(row % 10)
+        if not (0 <= row < self.height):
             return str(col % 10)
-        assert 0 <= col < self.width
-        assert 0 <= row < self.height
+        assert 0 <= col < self.width, col
+        assert 0 <= row < self.height, row
         return CELL_GLYPH[self._cell[row, col]]
 
     def display(self):
@@ -172,6 +174,15 @@ if __name__ == '__main__':
     # truck.move(1)
 
     truck.steer(Direction.NE)
-    truck.move(1)
+    truck.move(2)
+
+    truck.steer(Direction.SOUTH)
+    truck.move(2)
+
+    truck.steer(Direction.NE)
+    truck.move(2)
+
+    truck.steer(Direction.SE)
+    truck.move(3)
 
     print(truck._terr)
