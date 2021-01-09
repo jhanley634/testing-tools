@@ -22,28 +22,48 @@ from hypothesis import given
 import hypothesis.strategies as st
 
 from problem.numeric.sqrt import _relative_error
-from problem.numeric.sqrt import sqrt_binary_search as bin_sqrt
-from problem.numeric.sqrt import sqrt_newton_raphson as nr_sqrt
+import problem.numeric.sqrt as approx
+
+# Recall that a 64-bit float has this layout:
+#    1 bit:   sign
+#   11 bits:  exponent
+#   52 bits:  a 53-bit mantissa, with implicit leading '1' bit
+# https://en.wikipedia.org/wiki/Double-precision_floating-point_format
+# The exponent is in biased form: a stored value of 1023 represents zero.
+# Exponents of −1023 (all 0s) and +1024 (all 1s) are reserved for special numbers.
+# Exponents range from −1022 to +1023.
+# We additionally fill in some 1s in the mantissa.
+big_float = 2 ** 1023.99999999999994315658113
 
 ϵ = 1e-12
-big_float = 2 ** 1023.9999999999999
 
 
 @given(st.floats(min_value=ϵ ** 26, max_value=big_float))
-def hypo_test_sqrt_rel_error_binary(n: float):
-    r = bin_sqrt(n, rel_error=ϵ)
+def hypo_test_sqrt_log(n: float):
+    r = approx.sqrt_logarithm(n)
     assert abs(_relative_error(r * r, n)) < ϵ
 
 
 @given(st.floats(min_value=ϵ ** 26, max_value=big_float))
-def hypo_test_sqrt_rel_error_newton_raphson(n: float):
-    r = nr_sqrt(n, rel_error=ϵ)
+def hypo_test_sqrt_binary(n: float):
+    r = approx.sqrt_binary_search(n, rel_error=ϵ)
+    assert abs(_relative_error(r * r, n)) < ϵ
+
+
+@given(st.floats(min_value=ϵ ** 26, max_value=big_float))
+def hypo_test_sqrt_newton_raphson(n: float):
+    r = approx.sqrt_newton_raphson(n, rel_error=ϵ)
     assert abs(_relative_error(r * r, n)) < ϵ
 
 
 if __name__ == '__main__':
-    assert ϵ ** 26 == 1e-312
+
+    # Corresponding value for 32-bit float
+    # would be 3.40282346639e+38, stored as 0x7f7fffff.
     assert big_float == 1.7976931348621742e+308
 
-    hypo_test_sqrt_rel_error_binary()
-    hypo_test_sqrt_rel_error_newton_raphson()
+    assert ϵ ** 26 == 1e-312
+
+    hypo_test_sqrt_log()
+    hypo_test_sqrt_binary()
+    hypo_test_sqrt_log()
