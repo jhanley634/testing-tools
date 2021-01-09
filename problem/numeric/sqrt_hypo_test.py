@@ -26,7 +26,7 @@ from problem.numeric.sqrt import sqrt_binary_search as bin_sqrt
 from problem.numeric.sqrt import sqrt_newton_raphson as nr_sqrt
 
 ϵ = 1e-12
-big_float = 1.797e308
+big_float = 2 ** 1023.9999999999999
 
 
 @given(st.floats(min_value=ϵ ** 26, max_value=big_float))
@@ -43,5 +43,7 @@ def hypo_test_sqrt_rel_error_newton_raphson(n: float):
 
 if __name__ == '__main__':
     assert ϵ ** 26 == 1e-312
+    assert big_float == 1.7976931348621742e+308
+
     hypo_test_sqrt_rel_error_binary()
     hypo_test_sqrt_rel_error_newton_raphson()
