@@ -3,6 +3,7 @@
 *.jl.mem
 *.py~~
 .DS_Store
+.hypothesis/
 .idea/
 TAGS
 __pycache__
