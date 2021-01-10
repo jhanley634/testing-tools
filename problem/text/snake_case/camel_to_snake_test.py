@@ -26,14 +26,18 @@ import hypothesis.strategies as st
 from problem.text.snake_case.camel_to_snake import (camel_to_snake,
                                                     snake_to_camel)
 
-make_snake_re = re.compile(r'^[a-z]+(_[a-z]+)*$')  # matches method names for python
+# https://docs.python.org/3/library/re.html
+# \Z: Matches only at the end of the string. (unlike $, which also matches newline)
+make_snake_re = re.compile(r'^[a-z]+(_[a-z][\w]+)*\Z')  # matches method names for python
 
 
 @given(st.from_regex(make_snake_re))
 def hypo_test_camel_snake_roundtrip(snake: str):
 
+    snake = snake[0] + snake[1:].lower()
+    snake = snake.replace('__', '_')
     camel = snake_to_camel(snake)
-    assert camel_to_snake(camel) == snake
+    assert camel_to_snake(camel) == snake, (snake, camel, camel_to_snake(camel))
 
 
 if __name__ == '__main__':
