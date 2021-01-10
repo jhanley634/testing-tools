@@ -18,6 +18,8 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 
+import struct
+
 from hypothesis import given
 import hypothesis.strategies as st
 
@@ -36,6 +38,31 @@ import problem.numeric.sqrt as approx
 big_float = 2 ** 1023.99999999999994315658113
 
 ϵ = 1e-12
+
+
+def _float_to_bits(dbl: float) -> int:
+    """Retrieves the IEEE-754 binary representation of a double-precision input."""
+    s = struct.pack('>d', dbl)  # network order, big-endian
+    assert isinstance(s, bytes)
+    return struct.unpack('>Q', s)[0]  # unsigned
+
+
+def _hex64(n: int) -> str:
+    """Formats a 64-bit unsigned integer."""
+    return f'0x{n:016x}'
+
+
+def _walk_bit_to_right():
+    n = 1.0
+    while n > 0:
+        print(float.hex(n).ljust(24), _hex64(_float_to_bits(n)), ' ', n)
+        n /= 2
+
+def _get_bigger(n=1.7976931348e+308, factor=1.000000000000001):
+    """Fills in more and more 1s in the high-order bit positions."""
+    while n < float('inf'):
+        print(float.hex(n).ljust(24), _hex64(_float_to_bits(n)), ' ', n)
+        n *= factor
 
 
 @given(st.floats(min_value=ϵ ** 26, max_value=big_float))
@@ -61,6 +88,8 @@ if __name__ == '__main__':
     # Corresponding value for 32-bit float
     # would be 3.40282346639e+38, stored as 0x7f7fffff.
     assert big_float == 1.7976931348621742e+308
+    assert big_float.hex() == '0x1.ffffffffffd3ap+1023'
+    assert 1.7976931348623157e+308.hex()  == '0x1.fffffffffffffp+1023'
 
     assert ϵ ** 26 == 1e-312
 
