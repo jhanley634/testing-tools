@@ -19,6 +19,7 @@
 # other dealings in the software.
 
 from pathlib import Path
+import re
 import sys
 
 
@@ -30,11 +31,22 @@ class FileReporter:
     def report_on_source(self):
         with open(self.infile) as fin:
             lines = fin.readlines()
+            self._restate_imports(lines)
             self._show_file_contents(lines)
+
+    def _restate_imports(self, lines):
+        """Duplicates some import lines so it's easy to: grep ': import FavePkg'.
+        """
+        from_re = re.compile(r'^from\s+(\w+) import ')
+        for line in lines:
+            m = from_re.search(line)
+            if m:
+                pkg = m.group(1)
+                print(f'{self.infile}:0: import {pkg}')
 
     def _show_file_contents(self, lines):
         for i, line in enumerate(lines):
-            print(f'{self.infile}:{i}: {line.rstrip()}')
+            print(f'{self.infile}:{i + 1}: {line.rstrip()}')
 
 
 def main(files):
