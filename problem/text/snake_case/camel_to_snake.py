@@ -41,7 +41,8 @@ def camel_to_snake(s: str) -> str:
     snake = s[0]
 
     for c in s[1:]:
-        if c.isupper():
+        is_digit = (not c.islower()) and (not c.isupper())
+        if c.isupper() and not is_digit:
             snake += '_'
         snake += c.lower()
 

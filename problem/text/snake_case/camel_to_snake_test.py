@@ -26,6 +26,15 @@ import hypothesis.strategies as st
 from problem.text.snake_case.camel_to_snake import (camel_to_snake,
                                                     snake_to_camel)
 
+armenian_small_ligature = '\u0587'  # .upper() gives a pair of independent letters(!)
+
+
+def _is_sensible_char(c: str) -> bool:
+    """Returns False for certain oddly accented characters, such as İ."""
+    assert len(c) == 1
+    return c.upper().lower() == c.lower()  # Will it roundtrip, as US-ASCII chars do?
+
+
 # https://docs.python.org/3/library/re.html
 # \Z: Matches only at the end of the string. (unlike $, which also matches newline)
 make_snake_re = re.compile(r'^[a-z]+(_[a-z][\w]+)*\Z')  # matches method names for python
@@ -33,6 +42,14 @@ make_snake_re = re.compile(r'^[a-z]+(_[a-z][\w]+)*\Z')  # matches method names f
 
 @given(st.from_regex(make_snake_re))
 def hypo_test_camel_snake_roundtrip(snake: str):
+
+    snake1 = ''.join(filter(_is_sensible_char, snake))
+    print(len(snake), snake, snake1, len(snake1))
+    snake = snake1
+
+    u = snake.upper()
+    assert snake.lower().upper() == u
+    assert u.lower().upper() == u
 
     snake = snake[0] + snake[1:].lower()
     snake = snake.replace('__', '_')
