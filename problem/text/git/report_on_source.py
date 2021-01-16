@@ -22,15 +22,24 @@ from pathlib import Path
 import sys
 
 
-def report_on_source(infile: Path):
-    with open(infile) as fin:
-        for i, line in enumerate(fin):
-            print(f'{infile}:{i}: {line.rstrip()}')
+class FileReporter:
+
+    def __init__(self, infile):
+        self.infile = Path(infile)
+
+    def report_on_source(self):
+        with open(self.infile) as fin:
+            lines = fin.readlines()
+            self._show_file_contents(lines)
+
+    def _show_file_contents(self, lines):
+        for i, line in enumerate(lines):
+            print(f'{self.infile}:{i}: {line.rstrip()}')
 
 
 def main(files):
     for file in files:
-        report_on_source(file)
+        FileReporter(file).report_on_source()
 
 
 if __name__ == '__main__':
