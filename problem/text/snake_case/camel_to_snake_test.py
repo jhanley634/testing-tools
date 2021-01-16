@@ -39,19 +39,23 @@ def _is_sensible_char(c: str) -> bool:
 # \Z: Matches only at the end of the string. (unlike $, which also matches newline)
 make_snake_re = re.compile(r'^[a-z]+(_[a-z][\w]+)*\Z')  # matches method names for python
 
+# e.g. a_0 --> a0
+underscore_digit_re = re.compile(r'_(\d)')
+
 
 @given(st.from_regex(make_snake_re))
 def hypo_test_camel_snake_roundtrip(snake: str):
 
-    snake1 = ''.join(filter(_is_sensible_char, snake))
-    print(len(snake), snake, snake1, len(snake1))
-    snake = snake1
+    snake = ''.join(filter(_is_sensible_char, snake)).rstrip('_').lower()
+
+    snake = underscore_digit_re.sub(r'\1', snake)
 
     u = snake.upper()
+    print(len(snake), snake, u)
     assert snake.lower().upper() == u
     assert u.lower().upper() == u
 
-    snake = snake[0] + snake[1:].lower()
+    snake = snake[0] + snake[1:]
     snake = snake.replace('__', '_')
     camel = snake_to_camel(snake)
     assert camel_to_snake(camel) == snake, (snake, camel, camel_to_snake(camel))

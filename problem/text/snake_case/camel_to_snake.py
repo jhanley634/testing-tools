@@ -18,6 +18,14 @@
 # other dealings in the software.
 
 
+def _title(s: str) -> str:
+    return s[0].upper() + s[1:].lower()
+
+
+assert 'a0a'.title() == 'A0A'
+assert _title('a0a') == 'A0a'
+
+
 def snake_to_camel(s: str) -> str:
     """foo_bar --> fooBar.
 
@@ -26,7 +34,7 @@ def snake_to_camel(s: str) -> str:
     assert s > '', s
     assert '__' not in s, s
     assert s == s.strip('_')
-    words = list(map(str.title, s.split('_')))
+    words = list(map(_title, s.split('_')))
     if s[0].islower():
         words[0] = words[0].lower()
     return ''.join(words)
