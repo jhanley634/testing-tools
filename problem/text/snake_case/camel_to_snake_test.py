@@ -32,7 +32,9 @@ armenian_small_ligature = '\u0587'  # .upper() gives a pair of independent lette
 def _is_sensible_char(c: str) -> bool:
     """Returns False for certain oddly accented characters, such as İ."""
     assert len(c) == 1
-    return c.upper().lower() == c.lower()  # Will it roundtrip, as US-ASCII chars do?
+    roundtrip = c.upper().lower() == c.lower()  # Will it roundtrip, as US-ASCII chars do?
+    digit_or_normal_letter = c.isdigit() or (c.lower() != c.upper())  # rejects e.g. ƍ
+    return roundtrip and digit_or_normal_letter
 
 
 # https://docs.python.org/3/library/re.html
