@@ -19,6 +19,7 @@
 # other dealings in the software.
 
 from pathlib import Path
+from subprocess import check_output
 import re
 import sys
 
@@ -30,9 +31,18 @@ class FileReporter:
 
     def report_on_source(self):
         with open(self.infile) as fin:
+            self._shortlog()
             lines = fin.readlines()
             self._restate_imports(lines)
             self._show_file_contents(lines)
+
+    def _shortlog(self):
+        cmd = f'git shortlog -s {self.infile}'
+        log = check_output(cmd.split()).decode()
+        print(f'*** {log} ***.')
+
+        for line in log.splitlines():
+            print(f'{self.infile}:0:  {line}')
 
     def _restate_imports(self, lines):
         """Duplicates some import lines so it's easy to: grep ': import FavePkg'.
@@ -51,7 +61,8 @@ class FileReporter:
 
 def main(files):
     for file in files:
-        FileReporter(file).report_on_source()
+        if ' ' not in file:  # Quoting? Meh!
+            FileReporter(file).report_on_source()
 
 
 if __name__ == '__main__':
