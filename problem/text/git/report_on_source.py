@@ -20,6 +20,7 @@
 
 from pathlib import Path
 from subprocess import check_output
+import os
 import re
 import sys
 
@@ -37,12 +38,12 @@ class FileReporter:
             self._show_file_contents(lines)
 
     def _shortlog(self):
-        cmd = f'git shortlog -s {self.infile}'
-        log = check_output(cmd.split()).decode()
-        print(f'*** {log} ***.')
+        # cmd = f'git shortlog -s {self.infile}'  # Doesn't work?!?
+        cmd = f'git log --pretty=%ae {self.infile} | sort | uniq -c'
+        log = check_output(cmd, shell=True).decode()
 
         for line in log.splitlines():
-            print(f'{self.infile}:0:  {line}')
+            print(f'{self.infile}:0:   commits:  {line}')
 
     def _restate_imports(self, lines):
         """Duplicates some import lines so it's easy to: grep ': import FavePkg'.
