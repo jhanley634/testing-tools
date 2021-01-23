@@ -27,7 +27,7 @@ FIND = find . -name '*.py' | sed 's;^./;;' | sort
 REPORT = problem/text/git/report_on_source.py
 
 /tmp/py.txt:
-	cd $(TOP) && $(FIND) | xargs -n2 $(REPORT) | tee $@
+	cd $(TOP) && $(FIND) | xargs $(REPORT) | tee $@
 
 clean:
 	rm -f $(OUT)
