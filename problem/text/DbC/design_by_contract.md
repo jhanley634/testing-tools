@@ -70,6 +70,12 @@ then it is time to Extract Helper,
 to whittle the implementation down to something that _can_
 be held in the mind all at once upon the first reading.
 
+### induction
+
+If you can demonstrate a working base case, such as in a unit test,
+and you have an induction step that always works,
+well, then you can correctly solve an infinite class of problems.
+
 ### exceptions
 
 An important tool!
@@ -77,6 +83,57 @@ More on this later.
 
 ### composition
 
-Another important tool.
-Let us study this outside of Turing Machines for a moment,
-and then return to it.
+Let `o` denote composition.
+Consider functions `f(x)` and `g(x)`.
+
+Then `f o g`, or `f` composed with `g`, is `f(g(x))`.
+
+Layered software needs to exploit composition routinely.
+Making it work correctly is at the heart of DbC.
+
+## contracts
+
+Every software component has a specification, a "contract" it
+must conform to.
+
+### mowing example
+
+Alice's lawn needs mowing.
+She offers Bob $20 to cut the grass.
+This is a contract.
+
+There are some pre-conditions that must be satisfied, or the contract is void:
+
+- Bob needs access to the lawn,
+- and to a mower.
+
+There are some post-conditions:
+
+- At day's end the grass shall be cut, and
+- Alice shall hand the cash to Bob.
+
+### sqrt() example
+
+Let's examine the contract of this root-finding function.
+
+Pre-condition:
+
+- Offer a non-negative real input.
+
+Post-condition:
+
+- Squaring the output shall (approximately) give the input number.
+
+So the square root function is making a **promise** about its output.
+And we can test it, we can verify it.
+
+### impossible to compute
+
+What if a pre-condition is violated, as with input of `-1` ?
+Should `sqrt` return a sentinel like `0` ? No.
+It is literally impossible to compute a sensible result,
+to return something that satisfies the post-condition.
+
+In that case, we compute "nothing"!
+We un-ask the original question,
+we raise fatal error rather than returning a result.
