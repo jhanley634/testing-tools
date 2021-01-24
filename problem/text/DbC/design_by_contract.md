@@ -48,6 +48,15 @@ Shooting for Tony's first case is the way to go:
 >
 > ---C. A. R. Hoare
 
+### single responsibility
+
+A method, or class, should do One Thing well.
+Write it down, in a sentence.
+If it takes two sentences, that's a hint you need two methods,
+that you should Extract Helper.
+
+Sometimes we refer to this as Separation of Concerns.
+
 ### local analysis
 
 We must be able to reason about the correctness of a function
@@ -137,3 +146,53 @@ to return something that satisfies the post-condition.
 In that case, we compute "nothing"!
 We un-ask the original question,
 we raise fatal error rather than returning a result.
+
+    def sqrt(n: float) -> float:
+        if n < 0:
+            raise ValueError('need a non-negative real input')
+        ...
+        assert is_small_relative_error(root * root, n)
+        return root
+
+This is the magic of Design By Contract!
+If we can't satisfy the contract, we compute "nothing",
+it's like it never happened.
+There's no reason to try making "false promises",
+such as returning a sentinel value.
+
+### contracts compose
+
+    def twice_radical(x: float) -> float:
+        return 2 * sqrt(x)
+
+Notice how we get the relevant guarantees "for free" here.
+If `x` is a bad input, the Right Thing will happen.
+No need for other layers to know about the negative constraint.
+Checking happens where it ought to, and
+an error will bubble up  the call stack.
+
+    def rad_x_on_x(x: float) -> float:
+        """Given a positive input, computes √X̅ / X."""
+        return sqrt(x) / x
+
+There is one more value to avoid here: zero.
+But again the check comes for free, since `operator.__truediv__()`
+will helpfully raise ZeroDivisionError when necessary.
+
+### environment is a global variable
+
+Consider a report that queries a remote database,
+writes a few temp files, and returns summary statistics.
+There are some implicit pre-conditions for the caller:
+
+- We shall have network connectivity.
+- DB server shall be available.
+- /tmp shall have adequate free space available.
+
+The caller needn't check them beforehand.
+It's not even desirable, as it's not his concern.
+Disk and net conditions could change at any time
+during a lengthy report run, and they will be checked
+at the appropriate instant by the appropriate layer.
+You get your report, or you don't.
+
