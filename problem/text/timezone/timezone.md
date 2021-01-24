@@ -1,6 +1,8 @@
 
 # on timezones
 
+Copyright 2021 by John Hanley
+
 Time _should_ be a simple concept to model in a machine,
 but apparently there are several pitfalls.
 To avoid seeing folks trip over them time and time again,
@@ -116,3 +118,19 @@ In the contiguous 48, five zones are currently used. Their rule names are:
 - America/Phoenix, -7 always
 - America/Chicago, -6 modulo Daylight Saving
 - America/New_York, -5 modulo Daylight Saving
+
+# computing
+
+## serialized form
+
+When storing a timestamp,
+_always_ put the UTC form in persistent storage.
+
+Upon retrieving it from disk,
+we can _then_ apply a zone offset
+so that numeric output will match position of Mickey's hands
+for the user viewing the result.
+Note that we will need to know the user's favorite timezone
+in order to show the expected result.
+Consider making the applied offset **explicit** in the output,
+e.g. by appending "ET", "EST", or "EDT".
