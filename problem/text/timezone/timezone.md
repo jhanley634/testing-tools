@@ -124,7 +124,7 @@ In the contiguous 48, five zones are currently used. Their rule names are:
 ## serialized form
 
 When storing a timestamp,
-_always_ put the UTC form in persistent storage.
+_always_ write the UTC form to persistent storage.
 
 Upon retrieving it from disk,
 we can _then_ apply a zone offset
@@ -134,3 +134,40 @@ Note that we will need to know the user's favorite timezone
 in order to show the expected result.
 Consider making the applied offset **explicit** in the output,
 e.g. by appending "ET", "EST", or "EDT".
+
+When serializing in text (.csv) or JSON form,
+consider appending "Z" or, better, "-0000".
+Then it will be clear to anyone reading it that these are UTC stamps.
+
+## python datetime
+
+The standard library has the curious notion of naïve and aware instances.
+Using the default, naïve, works tolerably well.
+
+For any _new_ development effort,
+consider using stamps that look like this:
+
+    import datetime as dt
+
+    ts = dt.datetime(2020, 10, 31).replace(tzinfo=dt.timezone.utc)
+
+This makes things nicely explicit.
+
+Note that you will probably want all timestamps in your codebase
+to follow this practice, since naïve and aware are not comparable.
+You cannot e.g. mix them in `stamps` and then use `sorted(stamps)`.
+
+## pytz
+
+For timezone conversions, you will certainly want
+[`import pytz`](https://pythonhosted.org/pytz).
+
+Prefer the five "America/" timezone names mentioned above.
+
+## uszipcode
+
+Given a ZIP code, it is easy to learn which TZ jurisdiction it is in.
+
+Use [`import uszipcode`](https://pypi.org/project/uszipcode)
+and query the `timezone` field to obtain the local TZ rule name.
+Then feed that to `pytz`.
