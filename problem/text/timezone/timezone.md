@@ -15,7 +15,104 @@ At a constant rate.
 (With apologies to H.G.Wells, and to Einstein --
 we consider only ordinary earth-bound observers.)
 
-## timekeeping
+# timekeeping
 
 We'll skip over
+[clepsydræ](https://en.wikipedia.org/wiki/Water_clock#Greco-Roman_world)
+to focus on manually wound watches
+and Internet-connected digital displays.
 
+![a Mickey Mouse watch](https://upload.wikimedia.org/wikipedia/en/1/1f/Mickey_Mouse_Ingersoll_watch_1933.jpg)
+
+Mickey's hands in the hostage position correspond to 12-noon.
+
+Often our time troubles relate to predicting where Mickey's hands would point.
+
+## TAI
+
+Temps Atomique International is our best available measure
+of the passage of time on the Earth's surface.
+Among other things it powers GPS time,
+with a 19-second offset.
+
+## UTC
+
+Temps universel coordonné is
+[TAI](https://en.wikipedia.org/wiki/International_Atomic_Time)
+plus leap seconds, occasionally inserted by
+[IERS](https://en.wikipedia.org/wiki/International_Earth_Rotation_and_Reference_Systems_Service)
+as Earth's rotation slows down.
+The value of the UTC time standard always matches
+current time within the GMT timezone.
+Calibrate your sundial against UTC,
+if you don't want to wait for the next equinox.
+
+Wait for a caesium-133 atom to oscillate 9,192,631,770 times.
+Finished already? Good, that's 1 second!
+
+## NTP
+The [Network Time Protocol](https://en.wikipedia.org/wiki/Network_Time_Protocol)
+is how your laptop or linux machine became closely synced with
+[UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time).
+
+## zone offset
+
+Lunch time in Phoenix is typically noon.
+Relative to UTC that is 12:00-0700, a zone offset of seven hours westward,
+or 420 minutes.
+
+A particular lunch timestamp might be 2020-10-31 12:00-0700.
+
+Def: a zone offset is a number (like -420) attached to a timestamp.
+
+## timezone
+
+Lunch time in Denver is typically noon MT.
+Relative to UTC, in recent years that might be either
+
+- 12:00-0700 MST from November through March, or
+- 12:00-0600 MDT from March through November.
+
+In the 1960's, or even in 2005, it would be either
+
+- 12:00-0700 MST from October through April, or
+- 12:00-0600 MDT from April through October
+
+since we start observing
+[Daylight Saving Time](https://en.wikipedia.org/wiki/Daylight_saving_time_in_the_United_States#1966%E2%80%931972:_Federal_standard_established)
+according to the current whim of Congress.
+Future whims are fundamentally not predictable.
+
+In the past many changes have been enacted, including
+the Federal Fire Prevention and Control Act of 1986 and
+the Energy Policy Act of 2005.
+
+States do not _always_ delegate timezone details to Congress.
+Eleven entries in the TZ database document the
+[illustrious history](https://en.wikipedia.org/wiki/Time_in_Indiana#1960s)
+of how Indiana farmers have chosen to synchronize milking time
+with interstate commerce.
+
+Note that so-called "standard" time is now observed for only one-third of the year.
+
+Def: a timezone names a **rule** for mapping timestamp to zone offset
+in a particular jurisdiction.
+
+Example: America/Denver, which is quite different from America/Phoenix.
+
+As a counter-example, MDT (Mountain Daylight Time) is _not_ a timezone.
+Rather, it is a zone offset.
+It is essentially the same thing to append MDT or -0600 to a timestamp.
+
+Knowing the Y-M-D is essential to predicting the proper offset,
+since the start of DST varies unpredictably over the years.
+
+## U.S. timezones
+
+In the contiguous 48, five zones are currently used. Their rule names are:
+
+- America/Los_Angeles, -8 modulo Daylight Saving
+- America/Denver, -7 modulo Daylight Saving
+- America/Phoenix, -7 always
+- America/Chicago, -6 modulo Daylight Saving
+- America/New_York, -5 modulo Daylight Saving
