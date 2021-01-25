@@ -57,6 +57,22 @@ The [Network Time Protocol](https://en.wikipedia.org/wiki/Network_Time_Protocol)
 is how your laptop or linux machine became closely synced with
 [UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time).
 
+## simultaneous
+
+Time happens simultaneously everywhere.
+The last NYSE opening bell of 2020 happened at a single instant at time.
+Various observers might choose to describe that moment as
+
+- 2020-12-31 14:30-0000
+- 2020-12-31 09:30-0500
+- 2020-12-31 08:30-0600
+- 2020-12-31 07:30-0700
+- 2020-12-31 06:30-0800
+
+They all mean the same thing.
+If you write 9:30am, that means _nothing_, it is far too ambiguous.
+We need a zone offset if we are to make sense of it.
+
 ## zone offset
 
 Lunch time in Phoenix is typically noon.
