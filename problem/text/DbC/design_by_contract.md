@@ -3,6 +3,10 @@
 
 Copyright 2021 by John Hanley
 
+---
+monofont: DejaVuSansMono.ttf
+---
+
 ## correctness
 
 There are two kinds of programs:

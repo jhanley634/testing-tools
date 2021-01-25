@@ -9,4 +9,7 @@ all: $(OUT)
 	pandoc -o $@ $<
 
 %.pdf: %.md
-	pandoc -o $@ $<
+	pandoc --pdf-engine=xelatex -o $@ $<
+
+clean:
+	rm -f $(OUT)
