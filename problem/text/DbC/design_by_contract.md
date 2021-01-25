@@ -85,11 +85,6 @@ If you can demonstrate a working base case, such as in a unit test,
 and you have an induction step that always works,
 well, then you can correctly solve an infinite class of problems.
 
-### exceptions
-
-An important tool!
-More on this later.
-
 ### composition
 
 Let `o` denote composition.
@@ -195,4 +190,74 @@ Disk and net conditions could change at any time
 during a lengthy report run, and they will be checked
 at the appropriate instant by the appropriate layer.
 You get your report, or you don't.
+
+## exception handling
+
+Some people view exceptions, or stack traces, as a Bad thing.
+Not so!
+They are wonderfully freeing.
+They give you latitude to give up when a problem turns out to be impossible,
+and then the rest of the time you return correct results.
+Either satisfy the spec, the contract,
+or else declare it null and void.
+
+Knowing when to catch an exception,
+and when to let it bubble on up the stack
+can be a bit subtle.
+(In python we use `try` ... `except` to catch.)
+
+### catch at the bottom
+
+A low-level utility function like `sqrt` is usually
+at or near the bottom of the call stack, it is a leaf node.
+Such functions typically may raise errors but they do not catch.
+They have few dependencies, few additional calls.
+Either the pre-conditions were satisfied upon entry, or they weren't.
+
+### catch near the bottom
+
+Functions that implement the lower layers of an application
+may similarly raise, on their own or due to a dep.
+But should they catch?
+
+Almost always the answer is "no!" Here is a pair of (rare) "yes" situations:
+
+#### extra logging
+
+The author might find it surprising that a dep raised,
+and he wants to know about it. So he logs it.
+
+    try:
+        x = shake(input)
+        y = bake(x)
+    except Exception:
+        logger.exception('chicken unavailable')
+        raise
+    z = ...
+
+Note that we `raise` same exception at the end.
+This is essential!
+A thing we depend on failed, so we must fail,
+and report that up the call stack.
+
+We do not ask for `e` using `except Exception -> e:`,
+and we do not use `logger.error(f'trouble with {e}'`,
+since the `.exception()` method has it implicitly
+and will do a fine job of reporting the details.
+
+#### retry
+
+Perhaps you have two implementations to try.
+If `bake()` fails, perhaps you could call `fry()`.
+Or you have two XML parsers, each with their own rough edges, so
+error from one might not imply you'll get same error from the other.
+In such a case you legitimately can "handle" the error,
+by catching an trying it the other way,
+in an effort to make good on the contract, on the promise.
+If retry fails, be sure to let that error go up the stack.
+
+A special case of this approach is to retry
+calling the _same_ function more than once,
+in the hopes that a future call will offer a different result.
+There are pitfalls here.
 
