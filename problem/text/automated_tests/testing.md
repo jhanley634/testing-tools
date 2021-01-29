@@ -303,6 +303,13 @@ If it _does_ start exhibiting Heisenbugs that you want to
 focus on, track down, and prevent from recurring,
 then you will be motivated to create a small unit test just for it.
 
+In a similar vein, suppose we marked `_world()` a private helper.
+A test suite might choose to focus on testing public functions,
+ignoring anything _private.
+If there's trouble,
+again that would motivate writing small unit tests
+that focus on the trouble.
+
 Suppose we inject a code defect:
 
     def world():
