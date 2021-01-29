@@ -534,8 +534,9 @@ To run it, rather than `python -m unittest` we will use:
     $ coverage run -m unittest test_*.py
 
 Actually, it's a bit more involved than that.
-You see, the `coverage` module essentially
-puts a counter on every source line of code,
+You see, the `coverage`
+[module](https://coverage.readthedocs.io/en/coverage-5.4/)
+essentially puts a counter on every source line of code,
 during interpreter bytecode generation.
 And those counters are persisted to disk,
 so they can be accumulated across several runs.
@@ -554,6 +555,11 @@ accumulate counts, then produce both HTML and text summary reports:
 Use `conda` (or `pip`) to install the `coverage` package,
 add the above commands to a convenient `make` target,
 and you're good to go.
+
+Use `open htmlcov/index.html`
+to view the generated report in your browser.
+Green lines of source ran,
+red lines were not covered by the test suite.
 
 ## recap
 
