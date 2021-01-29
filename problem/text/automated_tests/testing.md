@@ -232,9 +232,9 @@ with `root < n / 2`.
 
 Simply checking a length might suffice for your purposes:
 
-    self.assertEqual(2, len(count_states_starting_with('North ')))
+    self.assertEqual(2, len(states_starting_with('North ')))
 
-Here we could `.assertEqual(['NC', 'ND'], count_...())`
+Here we could `.assertEqual(['NC', 'ND'], states_...())`
 but with an argument of `'N'`, simply checking we get `8` results
 starts to look more convenient.
 It is a cheap way of saying, "yep, I eye-balled the results and
