@@ -298,6 +298,10 @@ which lacks a tightly focused `test_world()`.
 Do I care? No. This small test suite is Just Fine.
 It was easy to write, it tests what matters,
 and it exercises all the code.
+If `world` never causes you trouble, then leave things as they are.
+If it _does_ start exhibiting Heisenbugs that you want to
+focus on, track down, and prevent from recurring,
+then you will be motivated to create a small unit test just for it.
 
 Suppose we inject a code defect:
 
@@ -485,6 +489,67 @@ like this:
 
     Name = namedtuple('Name', 'first last')
     Addr = namedtuple('Addr', 'address_line city state zipcode')
+
+## happy path
+
+Often I will write tests that just exercise the happy path,
+be satisfied, and stop there.
+
+If you notice errors that aren't picked up by your tests,
+that may motivate testing more corner cases
+or exercising more error handlers.
+
+To go a bit farther down that path,
+I heartily recommend this
+[module](https://pypi.org/project/hypothesis/):
+
+    import hypothesis
+
+It will automatically generate more example inputs
+than you would have created by hand.
+You may find it will manage to break your code,
+presenting you with an example input that triggers a bug.
+Or it might declare your code "correct".
+
+There is a nice "minimization" applied to broken examples,
+where it will search for smaller numbers or shorter strings
+that still exhibit same bug.
+This leads to conveniently compact unit test inputs.
+Incorporate the example into your test suite,
+to ensure the code never regresses to the point
+of exhibiting that bug again.
+
+## mocking
+
+Much has been written on the topics of
+Dependency Injection and mocks.
+I have poor habits in this department,
+so I have little to teach here.
+
+Mocking lets you decouple deps so you have a true unit test.
+For example, your function might make DB queries.
+A mock DB lets you avoid a large, potentially buggy RDBMS codebase,
+avoid the danger of having rows change beneath you,
+and avoid the expense of wiping and initializing DB tables.
+Or your function might hit RESTful endpoints,
+and again you want tests to succeed / fail independent of
+whatever changes might happen to that external endpoint.
+
+Mocks also permit Gantt chart decoupling.
+We can develop client code for next year's server
+by hitting a mock of that server.
+
+I'm focused on only devoting effort where it saves effort,
+and I have not yet found the mocking argument super convincing.
+I feel it's a technique I need to explore further.
+
+One approach I have found,
+that gives something like a mock DB "for free",
+is testing of target code that accesses mysql or postgres
+via the sqlalchemy portability layer.
+If code does not need vendor-specific syntax features,
+then swapping in a sqlite backend can be a good way to
+decouple test results from a potentially changing persistent datastore.
 
 ## measurement
 
