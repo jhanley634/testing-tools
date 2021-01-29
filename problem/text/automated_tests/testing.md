@@ -33,6 +33,14 @@ Long-running tests have value, as well,
 but segregate them into their own test suite.
 Jenkins is happy to patiently run that suite for you in the background.
 
+There are some big advantages of automated tests
+over ad hoc interactive debugging:
+
+1. a test is forever, it keeps running, keeps verifying
+2. a test is cheap to run, the setup is part of it, so is the good / bad check
+3. a test is cheap for your teammate to run, and vice versa -- we benefit from _everyone's_ tests
+4. a test is a good teaching opportunity, on par with the documentation
+
 ### must execute anyway
 
 I accept this as axiomatic:
@@ -306,7 +314,7 @@ then you will be motivated to create a small unit test just for it.
 In a similar vein, suppose we marked `_world()` a private helper.
 A test suite might choose to focus on testing public functions,
 ignoring anything _private.
-If there's trouble,
+If trouble later develops,
 again that would motivate writing small unit tests
 that focus on the trouble.
 
@@ -435,7 +443,7 @@ the zero-th element of the `None` result.
 But there is Another Way.
 If the check is so essential that every caller
 will _have_ to perform the check anyway,
-might as well put it in the called library.
+might as well put the check in the called library.
 The library can helpfully `raise NotFoundError()` -- that is _part_
 of the Public API it exports, much as the return type is.
 
@@ -628,7 +636,7 @@ Use `conda` (or `pip`) to install the `coverage` package,
 add the above commands to a convenient `make` target,
 and you're good to go.
 
-Use `open htmlcov/index.html`
+Use `$ open htmlcov/index.html`
 to view the generated report in your browser.
 Green lines of source ran,
 red lines were not covered by the test suite.
