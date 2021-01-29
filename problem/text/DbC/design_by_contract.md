@@ -253,7 +253,7 @@ and will do a fine job of reporting the details.
 
 Perhaps you have two implementations to try.
 If `bake()` fails, perhaps you could call `fry()`.
-Or you have two XML parsers, each with their own rough edges, so
+Or maybe you have two XML parsers, each with their own rough edges, so
 error from one might not imply you'll get same error from the other.
 In such a case you legitimately can "handle" the error,
 by catching an trying it the other way,
