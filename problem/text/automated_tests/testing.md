@@ -614,6 +614,30 @@ an `always_false` function, to deliberately trigger that condition.
 Checks for "no free disk space" and "out of memory" also fall
 into that same category of "hard to provoke" during a unit test.
 
+### testability
+
+While writing tests, if you find yourself
+bumping into  such "hard to trigger" issues,
+well, you've kind of lost the battle already.
+
+> Testability is a requirement.
+
+When authoring the original target code,
+you should have been paying closer attention.
+It's never too late,
+there's still time to refactor,
+to break things apart so the innards are exposed for testing.
+
+One reason we avoid nested `def` is the inner function
+is completely inaccessible for testing.
+Another reason is that coupling of shared namespace
+is a bit like using global variables,
+making it harder to reason about the code.
+
+We avoid having one module call another's _private() functions.
+But you should never feel bad about having a test
+access _private symbols -- that is perfectly OK, and encouraged!
+
 ### making a measurement
 
 To run it, rather than `python -m unittest` we will use:
