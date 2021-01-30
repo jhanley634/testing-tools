@@ -54,6 +54,7 @@ Especially if it is a line in an error handler.
 With java / C the compiler can maybe help point out
 type safety issues, potential null deref and the like.
 With python, at best you'll be told about parse fail.
+
 You _have_ to run the code.
 
 ### get the test for free
@@ -161,7 +162,7 @@ but it's still helpful.
 And we can infer a test from the math definition of a root.
 Let's use a helper:
 
-    def is_small_relative_error(a: float, b: float, epsilon: 1e-9) -> bool:
+    def is_small_relative_error(a: float, b: float, epsilon=1e-9) -> bool:
         if a == 0:
             return abs(b) < epsilon
         assert a > 0
@@ -245,7 +246,7 @@ Simply checking a length might suffice for your purposes:
 Here we could `.assertEqual(['NC', 'ND'], states_...())`
 but with an argument of `'N'`, simply checking we get `8` results
 starts to look more convenient.
-It is a cheap way of saying, "yep, I eye-balled the results and
+It is a cheap way of saying, "yep, I eyeballed the results and
 they looked good, now I am baking it in so I will notice any changes."
 
 Sometimes we anticipate growth, so an inequality is more suitable:
@@ -272,7 +273,7 @@ It might even be fine now, if the getter is specified
 to consume a dataset that is forever frozen in time, a 2010 snapshot.
 But as new residents move in, the test will need a succession of updates.
 Hence the `.assertGreater()` used above,
-which is weaker than verifing correct pop (how would it even do that?)
+which is weaker than verifying correct pop (how would it even do that?)
 but stronger than accepting answers like
 there is "one" or "one thousand" residents.
 Keep business logic out of tests,
@@ -375,6 +376,12 @@ Answer: see a Green run of tests, make your change, run tests again.
 If it's Green, maybe things are OK, and you can make further changes.
 If it's Red, you _definitely_ know you broke something,
 go figure it out before you wreak further havoc.
+
+If you're faced with refactoring test-less code,
+consider breaking the refactor into these steps:
+
+1. Write just enough tests to cover the affected target code.
+2. Refactor that target code.
 
 ## design
 
