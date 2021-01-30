@@ -95,6 +95,9 @@ Some folks prefer `pytest`.
 I find the stacktrace formatting it does by default is verbose and unhelpful,
 but to each his own.
 Choose your favorite, they'll both work the same way.
+I tend to start with unittest and move to pytest if needed,
+since a TestCase will run under anything,
+unlike a suite intended for pytest.
 
 One advantage pytest offers is "marks".
 They help us with choosing to run one type of test or another,
