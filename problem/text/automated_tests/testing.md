@@ -290,6 +290,16 @@ test what we care about.
 If you see spurious failures from a brittle test, consider fixing it.
 But also consider removing it, since it is wasting rather than saving time.
 
+## verify exception
+
+Tell your test suite to check that an exception is thrown in this way:
+
+    with self.assertRaises(ValueError):
+        math.sqrt(-9)
+
+If you like you can
+tack this on: `.assertRaises(ValueError, msg='math domain error')`.
+
 ## unit vs. integration
 
 Consider this setup, greatly simplified from a more complex program:
