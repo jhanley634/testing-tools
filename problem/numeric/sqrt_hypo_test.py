@@ -58,6 +58,7 @@ def _walk_bit_to_right():
         print(float.hex(n).ljust(24), _hex64(_float_to_bits(n)), ' ', n)
         n /= 2
 
+
 def _get_bigger(n=1.7976931348e+308, factor=1.000000000000001):
     """Fills in more and more 1s in the high-order bit positions."""
     while n < float('inf'):
@@ -89,7 +90,7 @@ if __name__ == '__main__':
     # would be 3.40282346639e+38, stored as 0x7f7fffff.
     assert big_float == 1.7976931348621742e+308
     assert big_float.hex() == '0x1.ffffffffffd3ap+1023'
-    assert 1.7976931348623157e+308.hex()  == '0x1.fffffffffffffp+1023'
+    assert 1.7976931348623157e+308.hex() == '0x1.fffffffffffffp+1023'
 
     assert ϵ ** 26 == 1e-312
 
