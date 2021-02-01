@@ -1,6 +1,10 @@
 
 all: \
   out/db_perf.pdf \
+  out/db_memory.html \
+
+%.html: %.md
+	pandoc -o $@ $<
 
 %.pdf: ../%.md
 	pandoc -t beamer -H ../reviewing/header.tex -o $@ $<
