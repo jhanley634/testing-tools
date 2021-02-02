@@ -7,17 +7,17 @@ Suppose you are informed that a database is running low on memory.
 How would you diagnose it?
 First figure out which case you are in:
 
-1. You are SysAd, or
+1. You are the SysAd, or
 2. Amazon Aurora is.
 
 ## local admin
 
 You have `sudo` root access,
-and installed with `apt install postgres`.
+and installed the DB with `apt install postgres`.
 Use `ps axuww | grep postgres` to see half a dozen background daemons.
 Pick a PID, like 123, and use `ps wwup 123` to see
 the same thing with column headings.
-This is the identical process you would use
+This is the identical procedure you would use
 for noticing whether any _other_ daemon was leaking memory.
 Output at the top of `top` can also be useful.
 
@@ -36,8 +36,8 @@ and how much is in use.
 
 It is worth noting that tmpfs can malloc.
 Running `$ mount` will reveal such filesystems.
-Use `$ df -h /tmp` to see total size,
-`du` and `ls` for finer grained assessment.
+Use `$ df -h /tmp` to see total size.
+Use `du` and `ls` for finer grained assessment.
 An `rm` of large file corresponds to `free()`'ing
 some malloc'd space.
 
@@ -85,7 +85,7 @@ For a tighter focus on the source of those connections, use
     SELECT    COUNT(*), client_addr
     FROM      pg_stat_activity
     GROUP BY  client_addr
-    ORDER BY  1, 2;
+    ORDER BY  1 DESC, 2;
 
 ## remediation
 
@@ -106,20 +106,20 @@ As it executes its query plan, it will periodically poll
 for a "cancel" message, and exit gracefully.
 If you notice that does not succeed within a second or two,
 you can resort to the slightly more violent
-`SELECT pg_terminate_backend(123);`
-which delivers a signal to the process that won't be ignored.
+`SELECT pg_terminate_backend(123);`.
+That shall deliver a signal to the process, and it won't be ignored.
 
 ### extreme measures
 
 A DB client will commonly re-connect upon having a session terminated.
-If you need to ensure that doesn't happen,
+If you need to ensure that will no longer happen,
 consider changing the DB credentials to some new password.
 
 Once the incident is better understood and mitigated,
 you will likely want to change the password back.
 Alternately you may wish to whisper the new password
 into the ear of several k8s deployments,
-verifying that they get back and they don't harm the DB.
+verifying that they get back in and do not harm the DB.
 Any miscreant pods would still be locked out
 if they don't receive the updated creds.
 
