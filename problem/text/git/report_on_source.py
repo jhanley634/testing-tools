@@ -38,8 +38,9 @@ class FileReporter:
             self._show_file_contents(lines)
 
     def _shortlog(self):
-        # cmd = f'git shortlog -s {self.infile}'  # Doesn't work?!?
-        cmd = f'git log --pretty=%ae {self.infile} | sort | uniq -c'
+        # cmd = f'git shortlog -s {self.infile.name}'
+        folder = self.infile.parent
+        cmd = f'cd {folder} && git log --pretty=%ae {self.infile.name} | sort | uniq -c'
         log = check_output(cmd, shell=True).decode()
 
         for line in log.splitlines():
