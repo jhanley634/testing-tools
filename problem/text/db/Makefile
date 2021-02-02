@@ -3,7 +3,7 @@ all: \
   out/db_perf.pdf \
   out/db_memory.html \
 
-%.html: %.md
+%.html: ../%.md
 	pandoc -o $@ $<
 
 %.pdf: ../%.md
