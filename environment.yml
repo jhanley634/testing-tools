@@ -2,31 +2,31 @@ name: testing-tools
 channels:
   - conda-forge
 dependencies:
-  - alembic >= 1.5.3
+  - alembic >= 1.5.8
   - astor >= 0.8.1
   - beautifulsoup4 >= 4.9.3
-  - bokeh >= 2.2.3
+  - bokeh >= 2.3.0
   - boltons >= 20.2.1
-  - cartopy >= 0.17.0
+  - cartopy >= 0.18.0
   - click >= 7.1.2
   - colormath >= 3.0.0
   - cvxopt >= 1.2.5
-  - cython >= 0.29.14
+  - cython >= 0.29.22
   - dicttoxml >= 1.7.4
   - dill >= 0.3.3
-  - flake8 >= 3.8.4
+  - flake8 >= 3.9.0
   - flask >= 1.1.1
   - folium >= 0.12.0
   - geocoder >= 1.38.1
   - geopy >= 2.1.0
   - html5lib >= 1.1
-  - hypothesis >= 6.1.0
-  - isort >= 5.7.0
-  - lxml >= 4.6.2
-  - matplotlib >= 3.3.2
-  - networkx >= 2.5
-  - numba >= 0.51.2
-  - pandas >= 1.1.4
+  - hypothesis >= 6.8.4
+  - isort >= 5.8.0
+  - lxml >= 4.6.3
+  - matplotlib >= 3.4.1
+  - networkx >= 2.5.1
+  - numba >= 0.53.1
+  - pandas >= 1.2.3
   - pillow >= 6.1.0
   - pip >= 21.0.1
   - pyarrow >= 1.0.1
@@ -34,19 +34,19 @@ dependencies:
   - quantities >= 0.12.4
   - requests >= 2.25.1
   - ruamel.yaml >= 0.16.12
-  - scikit-learn >= 0.23.2
+  - scikit-learn >= 0.24.1
   - seaborn >= 0.11.0
   - sqlalchemy < 1.4  # not yet ready for 2.0 changes
-  - tqdm >= 4.56.0
+  - tqdm >= 4.59.0
   - unyt >= 2.8.0
   - yapf >= 0.30.0
   - pip:
     - colorbrewer >= 0.2.0
     - distlib >= 0.3.1
     - flask-api >= 2.0
-    - imgkit >= 1.0.2
+    - imgkit >= 1.1.0
     - redis >= 3.5.3
     - sqlacodegen >= 2.3.0
-    - streamlit >= 0.75.0
+    - streamlit >= 0.79.0
     - tspy >= 0.1.1.1
     - uszipcode >= 0.2.4
