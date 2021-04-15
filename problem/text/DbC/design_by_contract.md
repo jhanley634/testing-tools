@@ -264,4 +264,3 @@ A special case of this approach is to retry
 calling the _same_ function more than once,
 in the hopes that a future call will offer a different result.
 There are pitfalls here.
-

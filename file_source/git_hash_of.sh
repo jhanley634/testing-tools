@@ -35,4 +35,3 @@ do
      cat "$FILE") |
 	sha1sum
 done
-

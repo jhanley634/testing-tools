@@ -65,7 +65,7 @@ Return *nothing*, no computed result, nada. Blow up!
     a = f()
     b = g(a)
     c = h(b)
- 
+
 \blank
 or
 \blank

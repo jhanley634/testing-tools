@@ -11,7 +11,7 @@ The loss function is the number
 of extra addresses that the ACL admits.
 That will be zero when N <= K,
 so the problem is only interesting
-if N /32's won't fit within the K slots. 
+if N /32's won't fit within the K slots.
 
 ## example
 given K=1 and three IPs:

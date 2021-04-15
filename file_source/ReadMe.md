@@ -12,5 +12,3 @@ deb_parse
 Populates $FILE_SOURCE/files.sqlite.
 
 usage:
-
-    
