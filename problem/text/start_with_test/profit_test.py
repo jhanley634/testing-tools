@@ -6,6 +6,7 @@ def find_profit_quadratic(prices):
     profit = 0
     for i, buy in enumerate(prices):
         for j in range(i, len(prices)):
+            assert j >= i
             sell = prices[j]
             profit = max(profit, sell - buy)
     return profit
@@ -36,6 +37,3 @@ class ProfitTest(unittest.TestCase):
                        find_profit_quadratic]:
 
                 self.assertEqual(expected, fn(prices))
-
-import math
-math.sqrt()

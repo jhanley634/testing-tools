@@ -92,6 +92,7 @@ If the target code regresses, it gets flagged right away.
         profit = 0
         for i, buy in enumerate(prices):
             for j in range(i, len(prices)):
+                assert j >= i
                 sell = prices[j]
                 profit = max(profit, sell - buy)
         return profit
@@ -194,10 +195,10 @@ Another example:
 Sometimes it is _impossible_ for a function to
 complete its task, and to correctly satisfy the post-condition.
 
-E.g DB lock, or network connection went away.
+E.g. DB lock, or network connection went away.
 
 What should we do then?
-Return a sentinel profit of -1 ?
+Return a sentinel profit of -1 ? No!
 
 Prefer to `raise` a `ValueError` or similar exception.
 
@@ -222,9 +223,19 @@ it's possible we could update _other_ regions successfully.
 Naïve processing would simply let the exception
 bubble up the call stack.
 If it happens often enough to be troublesome,
-the loop at state level might "recover"
+the loop at state level might recover
 by considering current zipcode un-updateable,
 and simply move on to next zipcode.
+
+
+# summary
+\blank
+
+Start your edit-debug cycle by writing a test.
+\blank
+
+Functions have pre- and post- conditions.
+Raise an exception if you can't deliver on the promise.
 
 
 <!---

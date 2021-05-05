@@ -5,7 +5,10 @@ OUT = \
  start_with_a_test.html \
  start_with_a_test.pdf \
 
-all: $(OUT)
+all: $(OUT) test
+
+test:
+	python -m unittest profit_test.py
 
 %.html: %.md
 	pandoc -o $@ $<
