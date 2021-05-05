@@ -30,6 +30,7 @@ class ProfitTest(unittest.TestCase):
         for expected, prices in [
             (5, [12, 10, 15]),
             (5, [12, 10, 11, 15, 14]),
+            (5, [40, 12, 10, 15]),
             (0, [15, 14, 12, 12, 12]),
             (0, [12]),
         ]:
