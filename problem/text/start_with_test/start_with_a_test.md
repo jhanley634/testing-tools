@@ -1,8 +1,4 @@
 
-<!--- Copyright 2021, John Hanley
-MIT licensed -- see end.
---->
-
 ---
 author: John Hanley
 title: Start with a test!
@@ -11,11 +7,16 @@ date: Tuesday, May 11th, 2021
 
 # Start with a test!
 
+<!--- Copyright 2021, John Hanley
+MIT licensed -- see end.
+--->
+
 ## hello
 
 You have been writing code for some little while at this point.
 
 Does it tend to start like this?
+\blank
 
     #include <stdio.h>
 
@@ -25,6 +26,7 @@ Does it tend to start like this?
 
     }
 
+\blank
 (Implicit declaration of function 'puts' is invalid in C99.)
 
 
@@ -56,10 +58,11 @@ Given a history of daily closing prices for an NYSE ticker symbol,
 find the maximum possible profit.
 
 E.g. `[12, 10, 15]` suggests a profit of 5.
+\blank
 
     def find_profit(prices):
         ...
-        return max_profit
+        return profit
 
     if __name__ == '__main__':
         print(find_profit([12, 10, 15]))
@@ -74,11 +77,65 @@ E.g. `[12, 10, 15]` suggests a profit of 5.
         def test_profit(self):
             self.assertEqual(5, find_profit([12, 10, 15]))
 
+\blank
 Run with: `python -m unittest profit_test.py`
 
 Notice that an automated test is _self evaluating_ --
 it knows the right answer.
-If the target code regresses, we will know right away.
+If the target code regresses, it gets flagged right away.
+
+
+# implementation -- brute force
+
+    def find_profit_quadratic(prices):
+        profit = 0
+        for i, buy in enumerate(prices):
+            for j in range(i, len(prices)):
+                sell = prices[j]
+                profit = max(profit, sell - buy)
+        return profit
+
+\blank
+This has $O(n^2)$ time complexity :-(
+
+# implementation -- linear
+
+    def find_profit(prices):
+        buy = min(prices)
+        del prices[:prices.index(buy)]
+        sell = max(prices)
+        return sell - buy
+
+
+# run it!
+
+    import unittest
+
+    class ProfitTest(unittest.Testcase):
+
+        def test_profit(self):
+            prices = [12, 10, 15]
+            self.assertEqual(5, find_profit_quadratic(prices))
+            self.assertEqual(5, find_profit(prices))
+
+# run it some more
+
+    import unittest
+
+    class ProfitTest(unittest.Testcase):
+
+        def test_profit(self):
+            for expected, prices in [
+                (5, [12, 10, 15]),
+                (5, [12, 10, 11, 15, 14]),
+                (0, [12, 12, 12, 12, 12]),
+                (0, [12]),
+            ]:
+                self.assertEqual(expected, find_profit_quadratic(prices))
+                self.assertEqual(expected, find_profit(prices))
+
+
+# DbC
 
 <!---
 Copyright 2021 John Hanley.
