@@ -25,7 +25,7 @@ Does it tend to start like this?
 
     }
 
-(implicit declaration of function 'puts' is invalid in C99)
+(Implicit declaration of function 'puts' is invalid in C99.)
 
 
 # hello
@@ -41,6 +41,44 @@ More verbosely:
 
     if __name__ == '__main__':
         main()
+
+Run with: `python hello.py`
+
+You have to run the code _anyway_,
+you _will_ be going through an edit-debug cycle.
+
+(Why the "goop"? For clean imports.)
+
+
+# buy low, sell high
+
+Given a history of daily closing prices for an NYSE ticker symbol,
+find the maximum possible profit.
+
+E.g. `[12, 10, 15]` suggests a profit of 5.
+
+    def find_profit(prices):
+        ...
+        return max_profit
+
+    if __name__ == '__main__':
+        print(find_profit([12, 10, 15]))
+
+
+# hello test
+
+    import unittest
+
+    class ProfitTest(unittest.Testcase):
+
+        def test_profit(self):
+            self.assertEqual(5, find_profit([12, 10, 15]))
+
+Run with: `python -m unittest profit_test.py`
+
+Notice that an automated test is _self evaluating_ --
+it knows the right answer.
+If the target code regresses, we will know right away.
 
 <!---
 Copyright 2021 John Hanley.
