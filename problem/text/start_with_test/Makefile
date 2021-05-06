@@ -4,11 +4,16 @@ OUT = \
  hello.o \
  start_with_a_test.html \
  start_with_a_test.pdf \
+ schedule.pdf \
 
 all: $(OUT) test
 
 test:
 	python -m unittest profit_test.py
+
+schedule.pdf:
+	./schedule.py > schedule.html
+	wkhtmltopdf schedule.html $@
 
 %.html: %.md
 	pandoc -o $@ $<

@@ -145,7 +145,7 @@ This has $O(n^2)$ time complexity :-(
 Design by Contract is a way of thinking about functions,
 so they are correct, and composable.
 
-$f(g(x))$, or $f o g$, is $f$ composed with $g$.
+$f(g(x))$, or $f \circ g$, is $f$ composed with $g$.
 
 This turns out to be quite important.
 Consider e.g.
