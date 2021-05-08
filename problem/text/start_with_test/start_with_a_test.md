@@ -90,11 +90,10 @@ If the target code regresses, it gets flagged right away.
 
 # implementation -- brute force
 
-We want:
+We want:  $$\max\limits_{j \ge i} \; price_j - price_i$$
 
-    $\max\limits_{j \ge i} \;price_j - price_i$
-
-The python comes straight from the math notation.
+The code comes straight from the math notation.
+\vfill
 
     def find_profit_quadratic(prices):
         profit = 0
@@ -105,7 +104,7 @@ The python comes straight from the math notation.
                 profit = max(profit, sell - buy)
         return profit
 
-\blank
+\vfill
 This has $O(n^2)$ time complexity :-(
 
 # implementation -- linear
