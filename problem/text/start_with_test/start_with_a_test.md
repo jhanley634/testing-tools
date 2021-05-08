@@ -7,6 +7,8 @@ date: Tuesday, May 11th, 2021
 
 # Start with a test!
 
+(also: DbC)
+
 <!--- Copyright 2021, John Hanley
 MIT licensed -- see end.
 --->
@@ -87,6 +89,12 @@ If the target code regresses, it gets flagged right away.
 
 
 # implementation -- brute force
+
+We want:
+
+    $\max\limits_{j \ge i} \;price_j - price_i$
+
+The python comes straight from the math notation.
 
     def find_profit_quadratic(prices):
         profit = 0
@@ -227,6 +235,24 @@ If it happens often enough to be troublesome,
 the loop at state level might recover
 by considering current zipcode un-updateable,
 and simply move on to next zipcode.
+
+# three kinds of assertion
+
+- pre-condition (input), `assert 0 <= learning_rate <= 1`
+
+----
+
+- invariant, `assert j >= i`
+- post-condition, `assert root >= 0`
+
+----
+
+These three are all about correctness of the code.
+
+Additionally, we might want to signal certain errors:
+
+    if len(rows) == 0:
+        raise LookupError('sorry, zero rows found')
 
 
 # summary

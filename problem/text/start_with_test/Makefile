@@ -11,7 +11,7 @@ all: $(OUT) test
 test:
 	python -m unittest profit_test.py
 
-schedule.pdf:
+schedule.pdf: start_with_a_test.md
 	./schedule.py > schedule.html
 	wkhtmltopdf schedule.html $@
 
