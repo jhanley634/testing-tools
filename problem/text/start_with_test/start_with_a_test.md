@@ -5,6 +5,7 @@ title: Start with a test!
 date: Tuesday, May 11th, 2021
 ---
 
+
 # Start with a test!
 
 (also: DbC)
@@ -12,6 +13,27 @@ date: Tuesday, May 11th, 2021
 <!--- Copyright 2021, John Hanley
 MIT licensed -- see end.
 --->
+
+
+# puzzler
+
+    #include <stdio.h>
+    main() {
+      long long P = 1,
+                E = 2,
+                T = 5,
+                A = 61,
+                L = 251,
+                N = 3659,
+                R = 271173410,
+                G = 1479296389,
+                x[] = { G * R * E * E * T ,
+                        P * L * A * N * E * T };
+      puts((char*)x);
+    }
+
+\hfill --https://codegolf.stackexchange.com/questions/22533
+
 
 ## hello
 \blank
