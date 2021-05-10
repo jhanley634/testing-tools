@@ -275,14 +275,14 @@ and simply move on to next zipcode.
 
 - pre-condition (input), `assert 0 <= learning_rate <= 1`
 
-----
+    ----
 
 - invariant, `assert j >= i`
 - post-condition, `assert root >= 0`
 
-----
-
+\vfill
 These three are all about correctness of the code.
+\blank
 
 Additionally, we might want to signal certain errors:
 
