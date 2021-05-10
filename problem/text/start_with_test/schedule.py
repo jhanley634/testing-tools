@@ -13,7 +13,7 @@ def _get_headings(infile=Path('start_with_a_test.md')):
 
 def report(minutes_per_slide=3):
     i = 1
-    stamp = dt.datetime.strptime('2021-05-11 12:35', '%Y-%m-%d %H:%M')
+    stamp = dt.datetime.strptime('2021-05-11 12:30', '%Y-%m-%d %H:%M')
     for heading in _get_headings():
         i += 1
         hh_mm = stamp.strftime('%H:%M')

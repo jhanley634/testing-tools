@@ -32,10 +32,24 @@ MIT licensed -- see end.
       puts((char*)x);
     }
 
-\hfill --https://codegolf.stackexchange.com/questions/22533
+\hfill {\tiny --- https://codegolf.stackexchange.com/questions/22533}
+
+# answer
+
+    x[] = { G * R * E * E * T ,
+            P * L * A * N * E * T };
+    puts((char*)x);
+
+    (lldb) p/x x
+    (long long [2]) $1 = ([0] = 0x6f57206f6c6c6548,
+                          [1] = 0x0000000021646c72)
+    (lldb) x/16c &x
+    0x7ffeefbff7a0: Hello World!\0\0\0\0
+    (lldb) x &x[1]
+    0x7ffeefbff7a8: 72 6c 64 21 00 00 00 00  rld!....
 
 
-## hello
+# hello C
 \blank
 
 You have been writing code for some little while at this point.
@@ -55,7 +69,7 @@ Does it tend to start like this?
 (Implicit declaration of function 'puts' is invalid in C99.)
 
 
-# hello
+# hello python
 
 Or start like this?
 
