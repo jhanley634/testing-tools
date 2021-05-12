@@ -34,6 +34,7 @@ MIT licensed -- see end.
 
 \hfill {\tiny --- https://codegolf.stackexchange.com/questions/22533}
 
+
 # answer
 
     x[] = { G * R * E * E * T ,
@@ -273,7 +274,7 @@ and simply move on to next zipcode.
 
 # three kinds of assertion
 
-- pre-condition (input), `assert 0 <= learning_rate <= 1`
+- pre-condition (input), `assert 0 < learning_rate <= 1`
 
     ----
 
