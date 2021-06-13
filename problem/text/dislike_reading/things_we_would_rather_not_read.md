@@ -40,6 +40,34 @@ Without attempting to execute it,
 I will decide if I'm convinced of those two things.
 
 
+# lint
+
+Here's a trivial difficulty:
+
+    def double(n):
+        return 2* n
+
+Yes, the Turing machine computes the Right Thing.
+
+No, it does not conform to the Requirements,
+not for a project with stated goals of adhering to
+[PEP-8](https://www.python.org/dev/peps/pep-0008/#whitespace-in-expressions-and-statements).
+On the one hand we have whitespace slightly off.
+On the other, the Author is making it clear
+that she did not care enough about the Reader
+to run a `flake8` linter before submitting PR.
+When that's true, then a large PR will typically
+have many similar issues, and they become distracting.
+Which leads to a lower quality review,
+fewer substantive issues uncovered.
+
+It's not hard to write standards-conforming code.
+Let the linter teach you.
+Soon you'll be writing that way without even thinking about it.
+
+(And as far as `import` ordering goes,
+don't give it a 2nd thought.
+Just run `isort` and be done with it.)
 
 
 
