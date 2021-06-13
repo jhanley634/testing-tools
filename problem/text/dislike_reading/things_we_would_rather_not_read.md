@@ -70,6 +70,27 @@ don't give it a 2nd thought.
 Just run `isort` and be done with it.)
 
 
+# sometimes initialized
+
+    def deal_with(items):
+        for item in items:
+            if complex_predicate():
+                x = get_new_x()
+            process(item, x)
+
+Maybe this is Correct.
+Maybe `x` _always_ exists by the time we process an item.
+But you're making me nervous.
+I'm concerned we're going to raise
+
+    NameError: name 'x' is not defined
+
+Please, just assign `x = None` up top,
+and then there's one less thing to worry about.
+
+
+
+
 
 <!---
 Copyright 2021 John Hanley.
