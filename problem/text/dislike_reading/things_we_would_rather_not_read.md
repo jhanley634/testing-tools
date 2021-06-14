@@ -89,6 +89,16 @@ Please, just assign `x = None` up top,
 and then there's one less thing to worry about.
 
 
+# catalog of attributes
+
+    class Foo:
+
+        def __init__(self):
+            self.a = 1
+            self.b = 1
+
+        def increment(self, n):
+            self.c = n + self.a
 
 
 

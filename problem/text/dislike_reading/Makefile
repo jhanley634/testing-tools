@@ -1,14 +1,14 @@
 
 OUT = \
- things_we_would_rather_not_read.html \
- things_we_would_rather_not_read.pdf \
+ out/things_we_would_rather_not_read.html \
+ out/things_we_would_rather_not_read.pdf \
 
 all: $(OUT)
 
-%.html: %.md
+out/%.html: %.md
 	pandoc -o $@ $<
 
-%.pdf: %.md
+out/%.pdf: %.md
 	pandoc -t beamer -H ../reviewing/header.tex --pdf-engine=xelatex -o $@ $<
 
 clean:
