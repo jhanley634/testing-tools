@@ -1,21 +1,29 @@
 
 ---
 author: John Hanley
-title: Race Graphs
+title: Race Logic
 date: Friday, July 16th, 2021
 ---
 
 
-# Race Graphs
+# Race Logic
 
 <!--- Copyright 2021, John Hanley
 MIT licensed -- see end.
 --->
 
+overview of https://dl.acm.org/doi/pdf/10.1145/3460223
+In-Sensor Classification
+With Boosted Race Trees
+
+by Tzimpragos et al.
+
 # Moore's law
 
 Things are no longer getting faster,
 just denser.
+
+![Moore's law](http://xlabs.ai/wp-content/uploads/2014/11/moore2.png)
 
 
 # Thermal management
