@@ -26,14 +26,55 @@ just denser.
 ![Moore's law](http://xlabs.ai/wp-content/uploads/2014/11/moore2.png)
 
 
-# Thermal management
+# Thermal management -- heat
 
 More bit flips means more $I^2 R$ heating
+
+![toaster](toaster.jpg){height=2.3cm}
+
+![short circuit](short-circuit.jpg){height=2.3cm}
+
+
+# Thermal management -- register
+
+![one-bit register, D flip-flop](
+https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/D-Type_Transparent_Latch.svg/2560px-D-Type_Transparent_Latch.svg.png){
+height=2cm}
+
+![NAND gate](https://upload.wikimedia.org/wikipedia/commons/9/9b/PMOS-NAND-gate.svg){height=3.7cm}
+
+
+# Thermal management -- gate
+
+![NAND gate](https://content.instructables.com/ORIG/FVP/M39M/I8FR2WRE/FVPM39MI8FR2WRE.jpg)
 
 
 # Delay encoding
 
 There's more than one way to store small integers.
+
+"The key idea behind race logic is to encode values as a _delay_ from some reference."
+
+
+# Computing with delay encoding
+
+"basic temporal operators MAX, MIN, and ADD-CONSTANT ...
+efficiently solve a class of dynamic programming algorithms"
+
+![logic building blocks](max-min.png)
+
+
+# Reverse race trees
+
+A decision tree, e.g. an XGBoost model,
+can be implemented as a tree of signals racing from leaves to root.
+
+At each node the first arriving signal wins, with others suppressed.
+
+
+# Reverse race trees
+
+![decision tree](decision-tree.png){height=8cm}
 
 
 <!---
