@@ -74,7 +74,52 @@ At each node the first arriving signal wins, with others suppressed.
 
 # Reverse race trees
 
-![decision tree](decision-tree.png){height=8cm}
+![decision tree](decision-tree.png){height=7.6cm}
+
+
+# end-to-end architecture
+
+4.1. From sensor to delay coded input
+
+"Because sensory input is analog in nature, most sensors begin with
+a measured voltage or current, which is then converted to a digital
+output with the use of ADCs.
+ADCs traditionally return digital binary values; however, given that
+information in the time domain is now useful for computation, the
+design of these components can be significantly simplified.
+For instance, the costly time-to-digital conversion (TDC) in the ADCs
+is redundant and can be skipped.
+Examples of sensing systems that can provide directly time-encoded
+outputs, without TDCs, include
+
+1. Dynamic Vision Sensors (DVS),
+2. Asynchronous Time-based Image Sensors (ATIS),
+3. Time To First Spike (TTFS) and
+4. Time-of-Flight (ToF) cameras, and
+5. AER (Address Event Representation) Ear2 sound sensors."
+
+
+# Implementation
+
+"We also build a Python-based development flow,
+which attaches to the popular scikit-learn library and leverages the
+power of hardware templates and PyRTL -- a Python embedded hardware
+design language -- to generate synthesizable RTL code.
+More specifically, once the model is trained, the tool analyzes the
+importance of input features, explores the learners’ performance
+against lower resolution data, proceeds with votes quantization,
+generates either a customized hardware design or a configuration file,
+and performs cross-checking verification.
+To obtain the desired implementation results, we use open-source tools
+and a publicly available 14 nm standard cell library.
+The operational voltage and frequency are 0.55 V and 1,000 MHz, respectively."
+
+# Implementation
+
+![implementation](implementation.png){height=7.6cm}
+
+
+# Discussion
 
 
 <!---
