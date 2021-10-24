@@ -19,12 +19,7 @@
 # other dealings in the software.
 from collections import defaultdict
 
-from problem.amzn.k8s.util_resource import (
-    PodParser,
-    _get_resources,
-    get_deployments,
-    get_running_pods,
-)
+from util_resource import PodParser, _get_resources, get_deployments, get_running_pods
 
 
 def _get_singleton_deployments():

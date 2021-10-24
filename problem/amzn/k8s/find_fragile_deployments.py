@@ -19,7 +19,7 @@
 # other dealings in the software.
 from typing import Set
 
-from problem.amzn.k8s.util_resource import PodParser, get_deployments, get_running_pods
+from util_resource import PodParser, get_deployments, get_running_pods
 
 
 def find_fragile_deployments() -> Set[str]:
