@@ -45,7 +45,7 @@ def _get_deployments():
         yield line.split()[0]
 
 
-def report_on_fragile_deployments():
+def find_fragile_deployments() -> set(str):
     """Shows pods from same deployment that are running on same node."""
     # We prefer that 2 pods be scheduled on 2 distinct nodes, in case one node bounces.
     p = Parser(_get_deployments())
@@ -64,7 +64,7 @@ def report_on_fragile_deployments():
         seen.add(depl_node)
 
     if not fragile_depl:
-        return
+        return fragile_depl
     # Now suggest a command that reveals pod IDs, preparatory to one or more
     # $ kubernetes delete pod XYZ
     # commands. Then we should re-run the report to verify
@@ -72,7 +72,8 @@ def report_on_fragile_deployments():
     # when it respawned replacement pods.
     regex = '|'.join(sorted(fragile_depl))
     print(f'\nkubectl get pods -A -o wide | egrep "{regex}"')
+    return fragile_depl
 
 
 if __name__ == '__main__':
-    report_on_fragile_deployments()
+    find_fragile_deployments()
