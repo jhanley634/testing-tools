@@ -5,6 +5,10 @@
 .DS_Store
 .hypothesis/
 .idea/
+.pyre/
+.pyre_configuration
+.pytype/
+.watchmanconfig
 TAGS
 __pycache__
 deps/deps.jl
