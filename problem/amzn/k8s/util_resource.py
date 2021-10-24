@@ -20,7 +20,7 @@
 Utility functions for retrieving kubernetes resources (nodes, pods).
 """
 from subprocess import check_output
-from typing import List
+from typing import Iterable, List, Tuple
 
 
 def _get_resources(resource_type) -> List[str]:
@@ -28,3 +28,14 @@ def _get_resources(resource_type) -> List[str]:
     # We discard the heading line.
     cmd = f'kubectl get {resource_type} | egrep -v "^NAME "'
     return check_output(cmd, shell=True).decode().splitlines()
+
+
+def _get_running_pods() -> Iterable[Tuple[str, str]]:
+    """Generator for mapping each pod to its scheduled node.
+    """
+    for line in _get_resources('pods -o wide'):
+        # name ready status restarts age ip node ...
+        pod, _, status, _, _, _, node, *_ = line.split()
+        if status != 'Running':  # Skip the 'Completed' cron jobs.
+            continue
+        yield pod, node

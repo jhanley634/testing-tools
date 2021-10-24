@@ -19,7 +19,7 @@
 # other dealings in the software.
 from typing import Set
 
-from problem.amzn.k8s.util_resource import _get_resources
+from problem.amzn.k8s.util_resource import _get_resources, _get_running_pods
 
 
 class Parser:
@@ -46,11 +46,7 @@ def find_fragile_deployments() -> Set[str]:
     p = Parser(_get_deployments())
     fragile_depl = set()
     seen = set()
-    for line in _get_resources('pods -o wide'):
-        # name ready status restarts age ip node ...
-        pod, _, status, _, _, _, node, *_ = line.split()
-        if status != 'Running':  # Skip the 'Completed' cron jobs.
-            continue
+    for pod, node in _get_running_pods():
         depl = p.depl(pod)
         depl_node = (depl, node)
         if depl_node in seen:

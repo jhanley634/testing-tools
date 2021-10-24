@@ -19,7 +19,7 @@
 # other dealings in the software.
 from collections import defaultdict
 
-from problem.amzn.k8s.util_resource import _get_resources
+from problem.amzn.k8s.util_resource import _get_resources, _get_running_pods
 
 
 def _get_singleton_deployments():
@@ -43,8 +43,8 @@ def count_singletons_per_node():
     """
     sing_depls = set(_get_singleton_deployments())
     count = defaultdict(int)
-    for line in _get_resources('pods -o wide'):
-        pod, _, status, _, _, _, node, *_ = line.split()
+    for pod, node in _get_running_pods():
+        ''
 
 
 if __name__ == '__main__':
