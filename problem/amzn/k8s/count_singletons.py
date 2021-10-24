@@ -19,7 +19,12 @@
 # other dealings in the software.
 from collections import defaultdict
 
-from problem.amzn.k8s.util_resource import _get_resources, _get_running_pods
+from problem.amzn.k8s.util_resource import (
+    PodParser,
+    _get_resources,
+    get_deployments,
+    get_running_pods,
+)
 
 
 def _get_singleton_deployments():
@@ -41,10 +46,22 @@ def count_singletons_per_node():
     and N fails. Then twice as many user-visible failures occurred as necessary.
     Ideally the max-per-node would be no more than 1 greater than min-per-node.
     """
+    p = PodParser(get_deployments())
     sing_depls = set(_get_singleton_deployments())
     count = defaultdict(int)
-    for pod, node in _get_running_pods():
-        ''
+    for pod, node in get_running_pods():
+        if p.depl(pod) in sing_depls:
+            count[node] += 1
+
+    node_col_width = 1 + max(map(len, count.keys()))
+    count = dict(sorted(count.items(), key=_by_value))
+    for node, n in count.items():
+        print(node.ljust(node_col_width), n)
+
+
+def _by_value(item):
+    k, v = item
+    return v, k
 
 
 if __name__ == '__main__':

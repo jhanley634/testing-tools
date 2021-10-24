@@ -17,10 +17,30 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 """
-Utility functions for retrieving kubernetes resources (nodes, pods).
+Utilities for retrieving kubernetes resources (nodes, pods).
 """
 from subprocess import check_output
 from typing import Iterable, List, Tuple
+
+
+class PodParser:
+    """Maps pod names to deployment names.
+
+    Typically this a matter of stripping Pod + ReplicaSet suffixes,
+    so foo-aaa-bbb --> foo,
+    but sometimes there will be more than just a parent ReplicaSet, leading
+    to foo-aaa-bbb-ccc --> foo.
+    Note that the name of deployment foo may itself contain hyphenated words.
+    """
+
+    def __init__(self, deployments):
+        self.deployments = set(deployments)
+
+    def depl(self, pod):
+        words = pod.split('-')
+        while words and '-'.join(words) not in self.deployments:
+            words.pop()
+        return '-'.join(words)
 
 
 def _get_resources(resource_type) -> List[str]:
@@ -30,7 +50,13 @@ def _get_resources(resource_type) -> List[str]:
     return check_output(cmd, shell=True).decode().splitlines()
 
 
-def _get_running_pods() -> Iterable[Tuple[str, str]]:
+def get_deployments() -> Iterable[str]:
+    """Generates k8s deployment names."""
+    for line in _get_resources('deployments'):
+        yield line.split()[0]
+
+
+def get_running_pods() -> Iterable[Tuple[str, str]]:
     """Generator for mapping each pod to its scheduled node.
     """
     for line in _get_resources('pods -o wide'):

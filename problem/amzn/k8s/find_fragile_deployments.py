@@ -19,34 +19,16 @@
 # other dealings in the software.
 from typing import Set
 
-from problem.amzn.k8s.util_resource import _get_resources, _get_running_pods
-
-
-class Parser:
-
-    def __init__(self, deployments):
-        self.deployments = set(deployments)
-
-    def depl(self, pod):
-        words = pod.split('-')
-        while words and '-'.join(words) not in self.deployments:
-            words.pop()
-        return '-'.join(words)
-
-
-def _get_deployments():
-    """Generates k8s deployment names."""
-    for line in _get_resources('deployments'):
-        yield line.split()[0]
+from problem.amzn.k8s.util_resource import PodParser, get_deployments, get_running_pods
 
 
 def find_fragile_deployments() -> Set[str]:
     """Shows pods from same deployment that are running on same node."""
     # We prefer that 2 pods be scheduled on 2 distinct nodes, in case one node bounces.
-    p = Parser(_get_deployments())
+    p = PodParser(get_deployments())
     fragile_depl = set()
     seen = set()
-    for pod, node in _get_running_pods():
+    for pod, node in get_running_pods():
         depl = p.depl(pod)
         depl_node = (depl, node)
         if depl_node in seen:
