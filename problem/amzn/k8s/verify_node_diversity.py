@@ -20,15 +20,40 @@
 from subprocess import check_output
 
 
+class Parser:
+
+    def __init__(self, deployments):
+        self.deployments = set(deployments)
+
+    def dep(self, pod):
+        words = pod.split('-')
+        while words and not '-'.join(words) in self.deployments:
+            words.pop()
+        return '-'.join(words)
+
+
+def _get_thing(thing):
+    """Pass in e.g. 'deployments'."""
+    # We discard the heading line.
+    # The sort ensures that a "more specific" like foo-bar-123 will precede foo-123.
+    cmd = f'kubectl get {thing} | egrep -v "^NAME " | sort -r'
+    return check_output(cmd, shell=True).decode().splitlines()
+
+
 def _get_deployments():
-    """Generator for k8s deployment names."""
-    cmd = 'kubectl get deployments'
-    lines = check_output(cmd, shell=True).splitlines()
-    print(type(lines), lines)
+    """Returns k8s deployment names."""
+    for line in _get_thing('deployments'):
+        yield line.split()[0]
 
 
 def report():
-    _get_deployments()
+    p = Parser(_get_deployments())
+    node_to_dep = {}
+    for line in _get_thing('pods -o wide'):
+        # name ready status restarts age ip node ...
+        name, _, _, _, _, _, node = line.split()
+        dep = p.dep(name)
+        print(dep, name)
 
 
 if __name__ == '__main__':
