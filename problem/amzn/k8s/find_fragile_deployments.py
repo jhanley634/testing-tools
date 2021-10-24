@@ -17,7 +17,9 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
-from subprocess import check_output
+from typing import Set
+
+from problem.amzn.k8s.util_resource import _get_resources
 
 
 class Parser:
@@ -32,20 +34,13 @@ class Parser:
         return '-'.join(words)
 
 
-def _get_resources(resource_type):
-    """Pass in e.g. 'deployments'."""
-    # We discard the heading line.
-    cmd = f'kubectl get {resource_type} | egrep -v "^NAME "'
-    return check_output(cmd, shell=True).decode().splitlines()
-
-
 def _get_deployments():
-    """Returns k8s deployment names."""
+    """Generates k8s deployment names."""
     for line in _get_resources('deployments'):
         yield line.split()[0]
 
 
-def find_fragile_deployments() -> set(str):
+def find_fragile_deployments() -> Set[str]:
     """Shows pods from same deployment that are running on same node."""
     # We prefer that 2 pods be scheduled on 2 distinct nodes, in case one node bounces.
     p = Parser(_get_deployments())

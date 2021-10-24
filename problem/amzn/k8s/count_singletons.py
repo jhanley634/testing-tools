@@ -17,6 +17,18 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
+from collections import defaultdict
+
+from problem.amzn.k8s.util_resource import _get_resources
+
+
+def _get_singleton_deployments():
+    """Generates singleton deployment names."""
+    singleton = '1/1'  # definition of a singleton (or at least a Running singleton)
+    for line in _get_resources('deployments'):
+        depl, ready, *_ = line.split()
+        if ready == singleton:  # NB: this nicely discards headings
+            yield depl
 
 
 def count_singletons_per_node():
@@ -29,6 +41,10 @@ def count_singletons_per_node():
     and N fails. Then twice as many user-visible failures occurred as necessary.
     Ideally the max-per-node would be no more than 1 greater than min-per-node.
     """
+    sing_depls = set(_get_singleton_deployments())
+    count = defaultdict(int)
+    for line in _get_resources('pods -o wide'):
+        pod, _, status, _, _, _, node, *_ = line.split()
 
 
 if __name__ == '__main__':
