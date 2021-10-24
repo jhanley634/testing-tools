@@ -27,30 +27,31 @@ class Parser:
 
     def depl(self, pod):
         words = pod.split('-')
-        while words and not '-'.join(words) in self.deployments:
+        while words and '-'.join(words) not in self.deployments:
             words.pop()
         return '-'.join(words)
 
 
-def _get_thing(thing):
+def _get_resources(resource_type):
     """Pass in e.g. 'deployments'."""
     # We discard the heading line.
-    cmd = f'kubectl get {thing} | egrep -v "^NAME "'
+    cmd = f'kubectl get {resource_type} | egrep -v "^NAME "'
     return check_output(cmd, shell=True).decode().splitlines()
 
 
 def _get_deployments():
     """Returns k8s deployment names."""
-    for line in _get_thing('deployments'):
+    for line in _get_resources('deployments'):
         yield line.split()[0]
 
 
-def report():
+def report_on_fragile_deployments():
     """Shows pods from same deployment that are running on same node."""
     # We prefer that 2 pods be scheduled on 2 distinct nodes, in case one node bounces.
     p = Parser(_get_deployments())
+    fragile_depl = set()
     seen = set()
-    for line in _get_thing('pods -o wide'):
+    for line in _get_resources('pods -o wide'):
         # name ready status restarts age ip node ...
         pod, _, status, _, _, _, node, *_ = line.split()
         if status != 'Running':  # Skip the 'Completed' cron jobs.
@@ -59,8 +60,19 @@ def report():
         depl_node = (depl, node)
         if depl_node in seen:
             print(depl_node)
+            fragile_depl.add(depl)
         seen.add(depl_node)
+
+    if not fragile_depl:
+        return
+    # Now suggest a command that reveals pod IDs, preparatory to one or more
+    # $ kubernetes delete pod XYZ
+    # commands. Then we should re-run the report to verify
+    # that better (more diverse) nodes were chosen by k8s
+    # when it respawned replacement pods.
+    regex = '|'.join(sorted(fragile_depl))
+    print(f'\nkubectl get pods -A -o wide | egrep "{regex}"')
 
 
 if __name__ == '__main__':
-    report()
+    report_on_fragile_deployments()
