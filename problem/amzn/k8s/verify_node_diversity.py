@@ -55,6 +55,6 @@ def report():
         dep = p.dep(name)
         print(dep, name)
 
-
+group_by_month.py
 if __name__ == '__main__':
     report()
