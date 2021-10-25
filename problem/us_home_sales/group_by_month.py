@@ -6,8 +6,8 @@ import datetime as dt
 
 import matplotlib
 matplotlib.use('Agg')  # noqa E402
-import matplotlib.pyplot as plt
-import pandas as pd
+import matplotlib.pyplot as plt  # noqa E402
+import pandas as pd  # noqa E402
 
 
 def group_by_month(infile='/tmp/us_sales.csv'):
@@ -31,12 +31,13 @@ def report():
         mean = total[y_m] / count[y_m]
         day = dt.datetime.strptime(y_m, '%Y-%m')
         print(f"{y_m}   {mean:0.2f}")
-        rows.append(dict(y_m=y_m, mean=mean))
+        rows.append(dict(y_m=day, mean=mean))
 
     df = pd.DataFrame(rows)
     print(df)
 
     plt.scatter(df.y_m, df['mean'])
+    plt.xticks(rotation=45, ha='right')
     plt.savefig(Path('~/Desktop/plot.png').expanduser())
 
 
