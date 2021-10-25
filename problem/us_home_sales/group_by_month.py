@@ -4,6 +4,7 @@ from pathlib import Path
 import csv
 import datetime as dt
 
+from matplotlib.dates import MonthLocator, DateFormatter
 import matplotlib
 matplotlib.use('Agg')  # noqa E402
 import matplotlib.pyplot as plt  # noqa E402
@@ -28,16 +29,21 @@ def report():
 
     rows = []
     for y_m in sorted(total.keys()):
-        mean = total[y_m] / count[y_m]
+        avg = total[y_m] / count[y_m]
         day = dt.datetime.strptime(y_m, '%Y-%m')
-        print(f"{y_m}   {mean:0.2f}")
-        rows.append(dict(y_m=day, mean=mean))
+        print(f"{y_m}   {avg:0.2f}")
+        rows.append(dict(y_m=day, avg=avg))
 
     df = pd.DataFrame(rows)
     print(df)
 
-    plt.scatter(df.y_m, df['mean'])
+    fig, ax = plt.subplots()
+    plt.scatter(df.y_m, df.avg)
+    ax.xaxis.set_major_locator(MonthLocator())
+    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+    ax.fmt_xdata = DateFormatter('%Y-%m-%d %H:%M:%S')
     plt.xticks(rotation=45, ha='right')
+    fig.autofmt_xdate()
     plt.savefig(Path('~/Desktop/plot.png').expanduser())
 
 
