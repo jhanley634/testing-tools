@@ -25,7 +25,7 @@ class Parser:
     def __init__(self, deployments):
         self.deployments = set(deployments)
 
-    def dep(self, pod):
+    def depl(self, pod):
         words = pod.split('-')
         while words and not '-'.join(words) in self.deployments:
             words.pop()
@@ -35,8 +35,7 @@ class Parser:
 def _get_thing(thing):
     """Pass in e.g. 'deployments'."""
     # We discard the heading line.
-    # The sort ensures that a "more specific" like foo-bar-123 will precede foo-123.
-    cmd = f'kubectl get {thing} | egrep -v "^NAME " | sort -r'
+    cmd = f'kubectl get {thing} | egrep -v "^NAME "'
     return check_output(cmd, shell=True).decode().splitlines()
 
 
@@ -47,13 +46,20 @@ def _get_deployments():
 
 
 def report():
+    """Shows pods from same deployment that are running on same node."""
+    # We prefer that 2 pods be scheduled on 2 distinct nodes, in case one node bounces.
     p = Parser(_get_deployments())
-    node_to_dep = {}
+    seen = set()
     for line in _get_thing('pods -o wide'):
         # name ready status restarts age ip node ...
-        name, _, _, _, _, _, node = line.split()
-        dep = p.dep(name)
-        print(dep, name)
+        pod, _, status, _, _, _, node, *_ = line.split()
+        if status != 'Running':  # Skip the 'Completed' cron jobs.
+            continue
+        depl = p.depl(pod)
+        depl_node = (depl, node)
+        if depl_node in seen:
+            print(depl_node)
+        seen.add(depl_node)
 
 group_by_month.py
 if __name__ == '__main__':
