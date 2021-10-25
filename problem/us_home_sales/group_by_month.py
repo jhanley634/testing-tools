@@ -4,7 +4,7 @@ from pathlib import Path
 import csv
 import datetime as dt
 
-from matplotlib.dates import MonthLocator, DateFormatter
+from matplotlib.dates import DateFormatter
 import matplotlib
 matplotlib.use('Agg')  # noqa E402
 import matplotlib.pyplot as plt  # noqa E402
@@ -39,10 +39,11 @@ def report():
 
     fig, ax = plt.subplots()
     plt.scatter(df.y_m, df.avg)
-    ax.xaxis.set_major_locator(MonthLocator())
+
+    # cf https://matplotlib.org/stable/gallery/ticks_and_spines/date_demo_convert.html
     ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
-    ax.fmt_xdata = DateFormatter('%Y-%m-%d %H:%M:%S')
     plt.xticks(rotation=45, ha='right')
+
     fig.autofmt_xdate()
     plt.savefig(Path('~/Desktop/plot.png').expanduser())
 
