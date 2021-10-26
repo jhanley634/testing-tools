@@ -11,10 +11,11 @@ import matplotlib.pyplot as plt  # noqa E402
 import pandas as pd  # noqa E402
 
 
+
 def group_by_month(infile='/tmp/us_sales.csv'):
     with open(infile) as fin:
-        csvfile = csv.DictReader(fin)
-        for row in csvfile:
+        sheet = csv.DictReader(fin)
+        for row in sheet:
             date = row['saledate']
             y_m = date[:7]
             yield y_m, row['saleprice']
