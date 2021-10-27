@@ -16,11 +16,10 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
-
 import math
 import unittest
 
-from problem.stores_and_cust.sd_space import SdSpace
+from problem.eda.stores_and_cust.sd_space import SdSpace
 
 
 class SdSpaceTest(unittest.TestCase):
