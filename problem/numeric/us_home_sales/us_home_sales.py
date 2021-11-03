@@ -30,14 +30,16 @@ from problem.util.web_file import WebFile
 
 def _get_sales_subset(url='https://www.sector6.net/2021/11/us_home_sales.csv.xz'):
     df = pd.read_csv(WebFile(url).file())
-    assert 30 == len(df.dtypes), len(df.dtypes)
-    df = df[df.saleprice < 4_000_000]
-    df = df[df.saledate < '2017-02-01'].reset_index()
+    assert 30 == len(df.dtypes)
+    assert '2017-01-03' == df.saledate.min()
+    assert '2018-08-02' == df.saledate.max()
+    assert 99_500_000 == df.saleprice.max()
+
+    df = df[df.saledate < '2017-02-01']
+    df = df[df.saleprice < 9_000_000].reset_index()
+
     cols = 'saledate saleprice areabuilding bathcount'.split()
     df = df[cols]
-
-    max = df.saleprice.max()
-    assert 2_215_000 == max, max
 
     return df
 
