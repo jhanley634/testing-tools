@@ -5,6 +5,7 @@
 .DS_Store
 .hypothesis/
 .idea/
+.ipynb_checkpoints/
 .pyre/
 .pyre_configuration
 .pytype/
