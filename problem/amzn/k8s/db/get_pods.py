@@ -75,11 +75,15 @@ class Pod:
         assert ' '.join(p.keys()) == 'apiVersion kind metadata spec status'
 
     @property
-    def name(self):
+    def app_name(self):
         try:
             return self.p['metadata']['labels']['app']
         except KeyError:
             return self.p['metadata']['labels']['job-name']  # for a cron job
+
+    @property
+    def pod_id(self):
+        return self.p['metadata']['name']
 
     @property
     def namespace(self):
@@ -118,7 +122,7 @@ def main(node_name_width=42, verbose=False):
         print(pod.start_time, ' ',
               pod.node_name.ljust(node_name_width),
               node_availability_zone(pod.node_name), ' ',
-              pod.name)
+              pod.pod_id)
 
 
 if __name__ == '__main__':
