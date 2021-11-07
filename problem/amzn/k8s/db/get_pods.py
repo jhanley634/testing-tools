@@ -17,12 +17,33 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
+from functools import lru_cache
 from io import StringIO
 from pathlib import Path
 from subprocess import check_output
 import json
 
 from ruamel.yaml import YAML
+
+
+@lru_cache
+def _get_node_attrs(in_file=Path('/tmp/node_az_and_memory.json')) -> dict:
+    with open(in_file) as fin:
+        return json.load(fin)
+
+
+def _get_az_and_memory(node_name: str):
+    az_kib = _get_node_attrs().get(node_name, 'unknown_AZ 0')
+    az, kib = az_kib.split()
+    return az, int(kib)
+
+
+def node_availability_zone(node_name: str):
+    return _get_az_and_memory(node_name)[0]
+
+
+def node_installed_kib(node_name: str):
+    return _get_az_and_memory(node_name)[1]
 
 
 class Pods:
@@ -90,11 +111,14 @@ class Pod:
         return self.p['status']['startTime']
 
 
-def main(verbose=False):
+def main(node_name_width=42, verbose=False):
     pods = Pods()
     for item in pods.items:
         pod = Pod(item)
-        print(pod.start_time, pod.node_name, pod.name)
+        print(pod.start_time, ' ',
+              pod.node_name.ljust(node_name_width),
+              node_availability_zone(pod.node_name), ' ',
+              pod.name)
 
 
 if __name__ == '__main__':

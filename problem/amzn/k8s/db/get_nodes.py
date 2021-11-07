@@ -123,10 +123,10 @@ class Node:
 
 
 def write_json_node_attributes(nodes: Nodes, out_file=Path('/tmp/node_az_and_memory.json')):
-    attrs = []
+    attrs = {}
     for n in nodes.items:
         n = Node(n)
-        attrs.append({n.name: f'{n.availability_zone} {n.installed_kib_ram}'})
+        attrs[n.name] = f'{n.availability_zone} {n.installed_kib_ram}'
 
     with open(out_file, 'w') as fout:
         json.dump(attrs, fout, indent=4)
