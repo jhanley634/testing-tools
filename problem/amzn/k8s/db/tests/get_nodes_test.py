@@ -1,5 +1,4 @@
 
-
 # Copyright 2021 John Hanley.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -17,9 +16,30 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
+from functools import wraps
+import os
+import sys
 import unittest
 
 from problem.amzn.k8s.db.get_nodes import Node, Nodes, display_image_size, main
+
+
+def devnull(func):
+    """Decorator to silence a chatty function.
+
+    Errors sent to stderr will still be displayed normally.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        tty = sys.stdout
+        with open(os.devnull, 'w') as sys.stdout:
+
+            func(*args, **kwargs)  # Shhhh! Be very very quiet.
+
+        sys.stdout = tty  # Now we're back to normal.
+
+    return wrapper
+
 
 # Usage:
 #   cd ../testing-tools/ && python -m unittest problem/amzn/k8s/db/tests/*_test.py
@@ -35,6 +55,7 @@ class GetNodesTest(unittest.TestCase):
     def test_nodes(self):
         self.assertGreaterEqual(len(self.nodes.items), 25)
 
+    @devnull
     def test_exercise_main(self):
         main(verbose=True)
 
