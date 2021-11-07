@@ -88,7 +88,11 @@ class Node:
         return int(m.group(1))
 
     @property
-    def free_kib_ram(self):
+    def allocatable_kib_ram(self):
+        """This is installed minus kernel overhead.
+
+        The figure does not change as new containers spawn and old ones die.
+        """
         m = self._kib_re.search(self._status['allocatable']['memory'])
         return int(m.group(1))
 
@@ -123,8 +127,22 @@ def display_image_size(n: Node):
     pp(n.image_size)
 
 
+def display_nodes(c: Cluster, os_width=19, inst_width=13):
+    # Usage:
+    #   $ ./get_nodes.py | sort
+    for item in c.items:
+        n = Node(item)
+        print(n.availability_zone,
+              n.os_image.ljust(os_width),
+              n.instance_type.ljust(inst_width),
+              f'{n.installed_kib_ram:9d}',
+              n.name)
+
+
 def main(verbose=False):
     c = Cluster()
+    display_nodes(c)
+
     n = Node(c.items[0])
     if verbose:
         print(n.name, n.os_image, n.instance_type, n.availability_zone)
