@@ -53,6 +53,15 @@ class GetPodsTest(unittest.TestCase):
                 self.assertRegexpMatches(requests['cpu'], millicore_re)
                 self.assertRegexpMatches(requests['memory'], ram_re)
 
+    def test_cron_jobs(self):
+        cron_jobs = []
+        for pod in self.pods.items:
+            pod = Pod(pod)
+            if pod.app_name != pod.p['metadata']['labels'].get('app'):
+                cron_jobs.append(pod)
+
+        self.assertGreaterEqual(len(cron_jobs), 5)
+
     @devnull
     def test_exercise_main(self):
         main(verbose=True)
