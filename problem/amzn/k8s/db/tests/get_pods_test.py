@@ -50,8 +50,8 @@ class GetPodsTest(unittest.TestCase):
             requests = pod.requests
             self.assertEqual(2, len(requests))
             if requests['cpu']:
-                self.assertRegexpMatches(requests['cpu'], millicore_re)
-                self.assertRegexpMatches(requests['memory'], ram_re)
+                self.assertRegex(requests['cpu'], millicore_re)
+                self.assertRegex(requests['memory'], ram_re)
 
     def test_cron_jobs(self):
         cron_jobs = []

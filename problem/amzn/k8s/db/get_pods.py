@@ -78,42 +78,42 @@ class Pod:
     @property
     def app_name(self):
         try:
-            return self.p['metadata']['labels']['app']
+            return glom(self.p, 'metadata.labels.app')
         except KeyError:
-            return self.p['metadata']['labels']['job-name']  # for a cron job
+            return glom(self.p, 'metadata.labels.job-name')  # for a cron job
 
     @property
     def pod_id(self):
-        return self.p['metadata']['name']
+        return glom(self.p, 'metadata.name')
 
     @property
     def namespace(self):
-        return self.p['metadata']['namespace']
+        return glom(self.p, 'metadata.namespace')
 
     @property
     def node_name(self):
         """What node is this pod currently scheduled on?
         """
-        return self.p['spec']['nodeName']
+        return glom(self.p, 'spec.nodeName')
 
     @property
     def requests(self):
         try:
-            container = self.p['spec']['initContainers'][0]
+            container = glom(self.p, 'spec.initContainers')[0]
         except KeyError:
             return dict(cpu=None,
                         memory=None)
-        r = container['resources']['requests']
+        r = glom(container, 'resources.requests')
         assert ' '.join(r.keys()) == 'cpu memory'
         return r  # e.g. {'cpu': '100m', 'memory': '128Mi'}
 
     @property
     def phase(self):
-        return self.p['status']['phase']
+        return glom(self.p, 'status.phase')
 
     @property
     def start_time(self):
-        return self.p['status']['startTime']
+        return glom(self.p, 'status.startTime')
 
 
 def main(node_name_width=42, verbose=False):
