@@ -19,27 +19,20 @@
 import unittest
 
 from problem.amzn.k8s.db.devnull import devnull
-from problem.amzn.k8s.db.get_nodes import Node, Nodes, display_image_size, main
-
-# Usage:
-#   cd ../testing-tools/ && python -m unittest problem/amzn/k8s/db/tests/*_test.py
-#
-#   rm -f /tmp/nodes.yaml &&
-#   coverage erase && coverage run -m unittest problem/amzn/k8s/db/tests/*_test.py &&
-#   coverage report && coverage html
+from problem.amzn.k8s.db.get_pods import Pod, Pods, main
 
 
-class GetNodesTest(unittest.TestCase):
+class GetPodsTest(unittest.TestCase):
 
-    nodes = Nodes()
+    pods = Pods()
 
-    def test_nodes(self):
-        self.assertGreaterEqual(len(self.nodes.items), 25)
+    def test_pods(self):
+        self.assertGreaterEqual(len(self.pods.items), 25)
+
+    def test_pod(self):
+        pod = Pod(self.pods.items[0])
+        self.assertEqual('Running', pod.phase)
 
     @devnull
     def test_exercise_main(self):
         main(verbose=True)
-
-        node = Node(self.nodes.items[0])
-        display_image_size(node)
-        self.assertGreaterEqual(node.allocatable_kib_ram, 15_806_488)

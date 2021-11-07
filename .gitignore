@@ -3,6 +3,7 @@
 *.jl.mem
 *.py~~
 .DS_Store
+.coverage
 .hypothesis/
 .idea/
 .ipynb_checkpoints/
@@ -13,5 +14,6 @@
 TAGS
 __pycache__
 deps/deps.jl
+htmlcov/
 problem/text/db/out/*.pdf
 problem/text/reviewing/out/*.pdf

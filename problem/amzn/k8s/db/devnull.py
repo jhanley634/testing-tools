@@ -1,4 +1,5 @@
 
+from functools import wraps
 # Copyright 2021 John Hanley.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -16,30 +17,22 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
-import unittest
-
-from problem.amzn.k8s.db.devnull import devnull
-from problem.amzn.k8s.db.get_nodes import Node, Nodes, display_image_size, main
-
-# Usage:
-#   cd ../testing-tools/ && python -m unittest problem/amzn/k8s/db/tests/*_test.py
-#
-#   rm -f /tmp/nodes.yaml &&
-#   coverage erase && coverage run -m unittest problem/amzn/k8s/db/tests/*_test.py &&
-#   coverage report && coverage html
+import os
+import sys
 
 
-class GetNodesTest(unittest.TestCase):
+def devnull(func):
+    """Decorator to silence a chatty function.
 
-    nodes = Nodes()
+    Errors sent to stderr will still be displayed normally.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        tty = sys.stdout
+        with open(os.devnull, 'w') as sys.stdout:
 
-    def test_nodes(self):
-        self.assertGreaterEqual(len(self.nodes.items), 25)
+            func(*args, **kwargs)  # Shhhh! Be very very quiet.
 
-    @devnull
-    def test_exercise_main(self):
-        main(verbose=True)
+        sys.stdout = tty  # Now we're back to normal.
 
-        node = Node(self.nodes.items[0])
-        display_image_size(node)
-        self.assertGreaterEqual(node.allocatable_kib_ram, 15_806_488)
+    return wrapper
