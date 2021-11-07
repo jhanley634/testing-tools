@@ -16,10 +16,11 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
+import re
 import unittest
 
 from problem.amzn.k8s.db.devnull import devnull
-from problem.amzn.k8s.db.get_pods import Pod, Pods, main
+from problem.amzn.k8s.db.get_pods import Pod, Pods, main, node_installed_kib
 
 
 class GetPodsTest(unittest.TestCase):
@@ -32,6 +33,25 @@ class GetPodsTest(unittest.TestCase):
     def test_pod(self):
         pod = Pod(self.pods.items[0])
         self.assertEqual('Running', pod.phase)
+        self.assertGreaterEqual(node_installed_kib(pod.node_name), 16_011_280)
+
+    def test_app_name(self):
+        millicore_re = re.compile(r'^\d+m$')
+        ram_re = re.compile(r'^\d+Mi$')
+
+        ns = None
+        for pod in self.pods.items:
+            pod = Pod(pod)
+            ns = ns or pod.namespace
+            self.assertEqual(ns, pod.namespace)
+            self.assertGreaterEqual(len(pod.app_name), 4)
+            self.assertGreaterEqual(len(pod.pod_id), 21)
+
+            requests = pod.requests
+            self.assertEqual(2, len(requests))
+            if requests['cpu']:
+                self.assertRegexpMatches(requests['cpu'], millicore_re)
+                self.assertRegexpMatches(requests['memory'], ram_re)
 
     @devnull
     def test_exercise_main(self):
