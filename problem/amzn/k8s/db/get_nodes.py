@@ -18,7 +18,9 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 from pathlib import Path
+from pprint import pp
 from subprocess import check_output
+import json
 import re
 
 from ruamel.yaml import YAML
@@ -120,11 +122,20 @@ class Node:
         return sorted(name_to_size, key=self._get_first_key)
 
 
-def display_image_size(n: Node):
+def write_json_node_attributes(nodes: Nodes, out_file=Path('/tmp/node_az_and_memory.json')):
+    attrs = []
+    for n in nodes.items:
+        n = Node(n)
+        attrs.append({n.name: f'{n.availability_zone} {n.installed_kib_ram}'})
+
+    with open(out_file, 'w') as fout:
+        json.dump(attrs, fout, indent=4)
+
+
+def display_image_size(node: Node):
     # Usage:
     #   $ ./get_nodes.py | tr -d '[' | tr ']' ',' | sort -nk2 | column -t
-    from pprint import pp
-    pp(n.image_size)
+    pp(node.image_size)
 
 
 def display_nodes(nodes: Nodes, os_width=19, inst_width=13):
@@ -140,9 +151,11 @@ def display_nodes(nodes: Nodes, os_width=19, inst_width=13):
 
 
 def main(verbose=False):
-    display_nodes(Nodes())
+    nodes = Nodes()
+    write_json_node_attributes(nodes)
+    display_nodes(nodes)
 
-    n = Node(Nodes().items[0])
+    n = Node(nodes.items[0])
     if verbose:
         print(n.name, n.os_image, n.instance_type, n.availability_zone,
               n.installed_kib_ram, n.cores)
