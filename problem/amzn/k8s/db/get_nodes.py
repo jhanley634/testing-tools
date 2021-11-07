@@ -92,14 +92,45 @@ class Node:
         m = self._kib_re.search(self._status['allocatable']['memory'])
         return int(m.group(1))
 
+    @staticmethod
+    def _get_first_key(d: dict) -> str:
+        # Gets the _only_ key, in fact.
+        return list(d.keys())[0]
 
-if __name__ == '__main__':
+    @property
+    def image_size(self):
+        """Returns a mapping, from (abbreviated) name --> size.
+
+        This is simply number of bytes in the image reported by the ECR repo;
+        it is quite different from how much a container currently has malloc'd.
+        """
+        images = self._status['images']
+        for image in images:
+            assert list(image.keys()) == ['names', 'sizeBytes']
+            assert len(image['names']) == 2
+            assert '/' in image['names'][0]
+            assert '/' in image['names'][1]
+
+        name_to_size = [{image['names'][1].split('/')[-1]: int(image['sizeBytes'])}
+                        for image in images]
+        return sorted(name_to_size, key=self._get_first_key)
+
+
+def display_image_size(n: Node):
+    # Usage:
+    #   $ ./get_nodes.py | tr -d '[' | tr ']' ',' | sort -nk2 | column -t
+    from pprint import pp
+    pp(n.image_size)
+
+
+def main(verbose=False):
     c = Cluster()
     n = Node(c.items[0])
-    print(n.name, n.os_image, n.instance_type, n.availability_zone)
-    print(n.free_kib_ram)
-    print(n.installed_kib_ram, n.cores)
+    if verbose:
+        print(n.name, n.os_image, n.instance_type, n.availability_zone)
+        print(n.free_kib_ram)
+        print(n.installed_kib_ram, n.cores)
 
-    # status = n.n['status']
-    # from pprint import pp
-    # breakpoint()
+
+if __name__ == '__main__':
+    main()
