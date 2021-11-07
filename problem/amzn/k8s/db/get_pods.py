@@ -17,20 +17,22 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
+from io import StringIO
 from pathlib import Path
 from subprocess import check_output
-import re
+import json
 
 from ruamel.yaml import YAML
 
 
 class Pods:
 
-    def __init__(self, cache=Path('/tmp/pods.yaml')):
+    def __init__(self, cache=Path('/tmp/pods.json')):
         if not cache.exists():
             self.k8s_get_pods(cache)
         with open(cache) as fin:
-            d = YAML().load(fin)
+            d = json.load(fin)  # typical parse time: 80 msec
+
         assert d['apiVersion'] == 'v1'
         assert d['kind'] == 'List'
         self.items = d['items']
@@ -38,22 +40,61 @@ class Pods:
     def k8s_get_pods(self, out_file):
         cmd = 'kubectl get pods -o yaml'
         txt = check_output(cmd.split()).decode()
+        d = YAML().load(StringIO(txt))  # load() parsing is on the slow side.
         with open(out_file, 'w') as fout:
-            fout.write(txt)
+            json.dump(d, fout)
 
 
 class Pod:
 
     def __init__(self, p: dict):
-        self.p = dict(p)  # ruamel's ordereddict --> dict
+        self.p = p
+        assert p['apiVersion'] == 'v1'
+        assert p['kind'] == 'Pod'
+        assert ' '.join(p.keys()) == 'apiVersion kind metadata spec status'
 
     @property
     def name(self):
-        return self.p['metadata']['name']
+        try:
+            return self.p['metadata']['labels']['app']
+        except KeyError:
+            return self.p['metadata']['labels']['job-name']  # for a cron job
+
+    @property
+    def namespace(self):
+        return self.p['metadata']['namespace']
+
+    @property
+    def node_name(self):
+        """What node is this pod currently scheduled on?
+        """
+        return self.p['spec']['nodeName']
+
+    @property
+    def requests(self):
+        try:
+            container = self.p['spec']['initContainers'][0]
+        except KeyError:
+            return dict(cpu=None,
+                        memory=None)
+        r = container['resources']['requests']
+        assert ' '.join(r.keys()) == 'cpu memory'
+        return r  # e.g. {'cpu': '100m', 'memory': '128Mi'}
+
+    @property
+    def phase(self):
+        return self.p['status']['phase']
+
+    @property
+    def start_time(self):
+        return self.p['status']['startTime']
 
 
 def main(verbose=False):
     pods = Pods()
+    for item in pods.items:
+        pod = Pod(item)
+        print(pod.start_time, pod.node_name, pod.name)
 
 
 if __name__ == '__main__':
