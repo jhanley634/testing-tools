@@ -23,6 +23,7 @@ from subprocess import check_output
 import json
 import re
 
+from glom import glom
 from ruamel.yaml import YAML
 
 
@@ -51,11 +52,11 @@ class Node:
 
     @property
     def name(self):
-        return self.n['metadata']['name']
+        return glom(self.n, 'metadata.name')
 
     @property
     def _labels(self):
-        return self.n['metadata']['labels']
+        return glom(self.n, 'metadata.labels')
 
     @property
     def instance_type(self):
@@ -74,19 +75,19 @@ class Node:
     def os_image(self):
         """Typical return value: 'Ubuntu 20.04 LTS'
         """
-        assert self._status['nodeInfo']['architecture'] == 'amd64'
-        assert self._status['nodeInfo']['operatingSystem'] == 'linux'
-        return self._status['nodeInfo']['osImage']
+        assert glom(self.n, 'status.nodeInfo.architecture') == 'amd64'
+        assert glom(self.n, 'status.nodeInfo.operatingSystem') == 'linux'
+        return glom(self.n, 'status.nodeInfo.osImage')
 
     @property
     def cores(self):
-        return int(self._status['capacity']['cpu'])
+        return int(glom(self.n, 'status.capacity.cpu'))
 
     _kib_re = re.compile(r'^([0-9]+)Ki$')
 
     @property
     def installed_kib_ram(self):
-        m = self._kib_re.search(self._status['capacity']['memory'])
+        m = self._kib_re.search(glom(self.n, 'status.capacity.memory'))
         return int(m.group(1))
 
     @property
@@ -95,7 +96,7 @@ class Node:
 
         The figure does not change as new containers spawn and old ones die.
         """
-        m = self._kib_re.search(self._status['allocatable']['memory'])
+        m = self._kib_re.search(glom(self.n, 'status.allocatable.memory'))
         return int(m.group(1))
 
     @staticmethod
@@ -130,6 +131,7 @@ def write_json_node_attributes(nodes: Nodes, out_file=Path('/tmp/node_az_and_mem
 
     with open(out_file, 'w') as fout:
         json.dump(attrs, fout, indent=4)
+        fout.write('\n')
 
 
 def display_image_size(node: Node):
