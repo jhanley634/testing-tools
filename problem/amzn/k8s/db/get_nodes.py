@@ -24,7 +24,7 @@ import re
 from ruamel.yaml import YAML
 
 
-class Cluster:
+class Nodes:
 
     def __init__(self, cache=Path('/tmp/nodes.yaml')):
         if not cache.exists():
@@ -127,10 +127,10 @@ def display_image_size(n: Node):
     pp(n.image_size)
 
 
-def display_nodes(c: Cluster, os_width=19, inst_width=13):
+def display_nodes(nodes: Nodes, os_width=19, inst_width=13):
     # Usage:
     #   $ ./get_nodes.py | sort
-    for item in c.items:
+    for item in nodes.items:
         n = Node(item)
         print(n.availability_zone,
               n.os_image.ljust(os_width),
@@ -140,14 +140,12 @@ def display_nodes(c: Cluster, os_width=19, inst_width=13):
 
 
 def main(verbose=False):
-    c = Cluster()
-    display_nodes(c)
+    display_nodes(Nodes())
 
-    n = Node(c.items[0])
+    n = Node(Nodes().items[0])
     if verbose:
-        print(n.name, n.os_image, n.instance_type, n.availability_zone)
-        print(n.free_kib_ram)
-        print(n.installed_kib_ram, n.cores)
+        print(n.name, n.os_image, n.instance_type, n.availability_zone,
+              n.installed_kib_ram, n.cores)
 
 
 if __name__ == '__main__':
