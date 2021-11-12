@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env pythonw
 #
 # Copyright 2021 John Hanley.
 #
@@ -18,6 +18,7 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 from sklearn.linear_model import LinearRegression
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -53,6 +54,10 @@ def price_regression():
     predicted = lr.predict(x_test)
     np.sum(np.abs(y_test - predicted)) / len(y_test)
 
+    matplotlib.use('MacOSX')
+    # supported values are ['GTK3Agg', 'GTK3Cairo', 'MacOSX', 'nbAgg', 'Qt4Agg',
+    #   'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo', 'TkAgg', 'TkCairo', 'WebAgg', 'WX',
+    #   'WXAgg', 'WXCairo', 'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template']
     fig, ax = plt.subplots()
     ax.scatter(y_test, predicted)
     ax.set_xlabel('test (observed) price')
