@@ -37,7 +37,8 @@ def _get_sales_subset(url='https://www.sector6.net/2021/11/us_home_sales.csv.xz'
     assert 99_500_000 == df.saleprice.max()
 
     df = df[df.saledate < '2017-02-01']
-    df = df[df.saleprice < 9_000_000].reset_index()
+    df = df[df.saleprice < 9_000_000]
+    df = df[df.saleprice < 1_000_000].reset_index()
 
     # cols = 'saledate saleprice areabuilding bathcount'.split()
     # df = df[cols]
