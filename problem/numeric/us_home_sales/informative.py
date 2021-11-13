@@ -30,8 +30,8 @@ from problem.numeric.us_home_sales.us_home_sales import _get_sales_subset
 def find_informative_attrs():
     df = _get_sales_subset()
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(
-        df[['areabuilding', 'bathcount']], df.saleprice)
-    model = XGBRegressor(max_depth=2, n_estimators=30)
+        df.copy().drop(['saleprice'], axis=1), df.saleprice)
+    model = XGBRegressor(max_depth=12, n_estimators=300)
     kfold = KFold(n_splits=5)
     results = cross_val_score(model, x_train, y_train, cv=kfold)
     print("Accuracy: %.2f%% (%.2f%%)" % (results.mean() * 100, results.std() * 100))

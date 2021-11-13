@@ -39,8 +39,12 @@ def _get_sales_subset(url='https://www.sector6.net/2021/11/us_home_sales.csv.xz'
     df = df[df.saledate < '2017-02-01']
     df = df[df.saleprice < 9_000_000].reset_index()
 
-    cols = 'saledate saleprice areabuilding bathcount'.split()
-    df = df[cols]
+    # cols = 'saledate saleprice areabuilding bathcount'.split()
+    # df = df[cols]
+    roof_col_suffixes = 'covering geometry condition_rating solar_panel'
+    drop_cols = [f'cape_roof_{col}'
+                 for col in roof_col_suffixes.split()]
+    df = df.drop(['saledate', 'attomid', 'cape_pool_enclosure'] + drop_cols, axis=1).reset_index()
 
     return df
 
