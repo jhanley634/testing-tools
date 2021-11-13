@@ -14,22 +14,22 @@ dependencies:
   - cython >= 0.29.24
   - dicttoxml >= 1.7.4
   - dill >= 0.3.4
-  - flake8 >= 3.9.0
+  - flake8 >= 4.0.1
   - flask >= 2.0.2
   - flask-restx >= 0.5.1
   - folium >= 0.12.0
   - geocoder >= 1.38.1
-  - geopy >= 2.1.0
+  - geopy >= 2.2.0
   - glom >= 20.11.0
   - html5lib >= 1.1
   - hypothesis >= 6.24.2
   - ipython >= 7.29.0
   - isort >= 5.10.1
-  - jupyter >= 0.4.9.1
+  - jupyter >= 1.0.0
   - lxml >= 4.6.4
-  - matplotlib >= 3.4.1
+  - matplotlib >= 3.4.3
   - networkx >= 2.6.3
-  - numba >= 0.53.1
+  - numba >= 0.54.1
   - pandas >= 1.2.5
   - pillow >= 8.4.0
   - pip >= 21.3.1
@@ -41,7 +41,7 @@ dependencies:
   - redis-py >= 3.5.3
   - requests >= 2.26.0
   - ruamel.yaml >= 0.17.17
-  - scikit-learn >= 0.24.1
+  - scikit-learn >= 1.0.1
   - scipy >= 1.7.2
   - seaborn >= 0.11.2
   - sqlacodegen >= 2.3.0
@@ -51,6 +51,7 @@ dependencies:
   - tqdm >= 4.62.3
   - unyt >= 2.8.0
   - yapf >= 0.31.0
+  - xgboost >= 1.5.0
   - pip:
     - colorbrewer >= 0.2.0
     - distlib >= 0.3.3
