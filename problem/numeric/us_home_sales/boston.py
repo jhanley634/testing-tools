@@ -18,8 +18,9 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 #
-# from sklearn.datasets import load_boston
+from sklearn.metrics import mean_squared_error
 import pandas as pd
+import xgboost as xgb
 
 
 # cf https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html
@@ -28,14 +29,16 @@ def _load_boston():
     raw_df = pd.read_csv(data_url, sep=r'\s+', skiprows=22, header=None)
     # data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
     # target = raw_df.values[1::2, 2]
+    assert (1012, 11) == raw_df.shape
     return raw_df
 
 
 # from https://www.datacamp.com/community/tutorials/xgboost-in-python
 def predict_boston_home_prices():
-    boston = _load_boston()
-    assert (1012, 11) == boston.shape
-    print(boston)
+    data = _load_boston()
+    x, y = data.iloc[:,:-1],data.iloc[:,-1]
+    data_dmatrix = xgb.DMatrix(data=X,label=y)
+
 
 
 if __name__ == '__main__':
