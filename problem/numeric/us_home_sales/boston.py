@@ -83,7 +83,8 @@ def predict_boston_home_prices():
                               learning_rate=0.1,
                               max_depth=5,
                               alpha=10,
-                              n_estimators=10)
+                              n_estimators=10,
+                              )
     xg_reg.fit(x_train, y_train)
     preds = xg_reg.predict(x_test)
     rmse = np.sqrt(mean_squared_error(y_test, preds))
@@ -93,7 +94,8 @@ def predict_boston_home_prices():
               'colsample_bytree': 0.3,
               'learning_rate': 0.1,
               'max_depth': 5,
-              'alpha': 10}
+              'alpha': 10,
+              }
     cv_results = xgb.cv(dtrain=data_dmatrix,
                         params=params,
                         nfold=3,
@@ -110,6 +112,9 @@ def predict_boston_home_prices():
     matplotlib.use('MacOSX')
     xgb.plot_tree(xg_reg,num_trees=0)
     plt.rcParams['figure.figsize'] = [50, 10]
+
+    xgb.plot_importance(xg_reg)
+    plt.rcParams['figure.figsize'] = [5, 5]
     plt.show()
 
 
