@@ -24,6 +24,8 @@ from pathlib import Path
 from more_itertools import peekable
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import requests
@@ -102,6 +104,13 @@ def predict_boston_home_prices():
                         seed=123)
     print(cv_results.head())
     print((cv_results['test-rmse-mean']).tail(1))
+
+    xg_reg = xgb.train(params=params, dtrain=data_dmatrix, num_boost_round=10)
+
+    matplotlib.use('MacOSX')
+    xgb.plot_tree(xg_reg,num_trees=0)
+    plt.rcParams['figure.figsize'] = [50, 10]
+    plt.show()
 
 
 if __name__ == '__main__':
