@@ -22,6 +22,9 @@ from io import StringIO
 from pathlib import Path
 
 from more_itertools import peekable
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+import numpy as np
 import pandas as pd
 import requests
 import xgboost as xgb
@@ -71,7 +74,18 @@ def predict_boston_home_prices():
     data.to_csv(Path('~/Desktop').expanduser() / 't.csv')
     x, y = data.iloc[:, :-1], data.iloc[:, -1]
     data_dmatrix = xgb.DMatrix(data=x, label=y)
-    print(data_dmatrix)
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=123)
+    xg_reg = xgb.XGBRegressor(objective='reg:linear',
+                              colsample_bytree=0.3,
+                              learning_rate=0.1,
+                              max_depth=5,
+                              alpha=10,
+                              n_estimators=10)
+    xg_reg.fit(x_train, y_train)
+    preds = xg_reg.predict(x_test)
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+    print("RMSE: %f" % (rmse))
 
 
 if __name__ == '__main__':
