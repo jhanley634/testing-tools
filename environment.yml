@@ -22,12 +22,13 @@ dependencies:
   - geopy >= 2.2.0
   - glom >= 20.11.0
   - html5lib >= 1.1
-  - hypothesis >= 6.24.2
+  - hypothesis >= 6.26.0
   - ipython >= 7.29.0
   - isort >= 5.10.1
   - jupyter >= 1.0.0
   - lxml >= 4.6.4
   - matplotlib >= 3.4.3
+  - more-itertools >= 8.11.0
   - networkx >= 2.6.3
   - numba >= 0.54.1
   - pandas >= 1.2.5
@@ -46,7 +47,7 @@ dependencies:
   - seaborn >= 0.11.2
   - sqlacodegen >= 2.3.0
   - sqlalchemy < 1.4  # not yet ready for 2.0 changes
-  - statsmodels >= 0.13.0
+  - statsmodels >= 0.13.1
   - streamlit >= 1.2.0
   - tqdm >= 4.62.3
   - unyt >= 2.8.0
