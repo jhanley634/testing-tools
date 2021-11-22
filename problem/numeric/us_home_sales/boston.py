@@ -35,7 +35,7 @@ def _decode_lines(resp):
         yield line.decode()
 
 
-def _read_data_lines(boston_url="http://lib.stat.cmu.edu/datasets/boston"):
+def _read_data_lines(boston_url='http://lib.stat.cmu.edu/datasets/boston'):
     """Impedance matches from stanzas to CSV lines.
 
     A .csv file is expected to have lines, that is, a newline after each row.
@@ -85,7 +85,23 @@ def predict_boston_home_prices():
     xg_reg.fit(x_train, y_train)
     preds = xg_reg.predict(x_test)
     rmse = np.sqrt(mean_squared_error(y_test, preds))
-    print("RMSE: %f" % (rmse))
+    assert 6.263944 == round(rmse, 6), rmse
+
+    params = {'objective': 'reg:squarederror',
+              'colsample_bytree': 0.3,
+              'learning_rate': 0.1,
+              'max_depth': 5,
+              'alpha': 10}
+    cv_results = xgb.cv(dtrain=data_dmatrix,
+                        params=params,
+                        nfold=3,
+                        num_boost_round=50,
+                        early_stopping_rounds=10,
+                        metrics='rmse',
+                        as_pandas=True,
+                        seed=123)
+    print(cv_results.head())
+    print((cv_results['test-rmse-mean']).tail(1))
 
 
 if __name__ == '__main__':
