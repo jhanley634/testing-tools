@@ -49,6 +49,7 @@ def gen_synthetic_dataset(num_attrs=3, num_informative_attrs=2,
                           num_rows=10_000, avg=0.0, sigma=1.0) -> pd.DataFrame:
     perm = list(range(num_attrs))
     rnd.shuffle(perm)  # Permutation of attr indices, where 0 & 1 are conjunction.
+    print(perm)
     rows = []
     for _ in range(num_rows):
         d = {_attr_name(j): rnd.gauss(avg, sigma)
@@ -62,9 +63,37 @@ def gen_synthetic_dataset(num_attrs=3, num_informative_attrs=2,
 
 
 def main():
-    df = gen_synthetic_dataset()
-    print(df.describe())
+    data = gen_synthetic_dataset()
 
+    x, y = data.iloc[:, :-1], data.iloc[:, -1]
+    data_dmatrix = xgb.DMatrix(data=x, label=y)
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=123)
+    xg_reg = xgb.XGBRegressor(objective='reg:squarederror',
+                              )
+    xg_reg.fit(x_train, y_train)
+    preds = xg_reg.predict(x_test)
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+    assert rmse < .1, rmse
+
+    params = {'objective': 'reg:squarederror',
+              }
+    cv_results = xgb.cv(dtrain=data_dmatrix,
+                        params=params,
+                        metrics='rmse',
+                        as_pandas=True)
+    print(cv_results.head())
+    print((cv_results['test-rmse-mean']).tail(1))
+
+    xg_reg = xgb.train(params=params, dtrain=data_dmatrix, num_boost_round=10)
+
+    matplotlib.use('MacOSX')
+    xgb.plot_tree(xg_reg, num_trees=0)
+    plt.rcParams['figure.figsize'] = [50, 10]
+
+    xgb.plot_importance(xg_reg)
+    plt.rcParams['figure.figsize'] = [5, 5]
+    plt.show()
 
 if __name__ == '__main__':
     main()
