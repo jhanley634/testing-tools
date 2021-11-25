@@ -18,6 +18,7 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 #
+from itertools import combinations
 import random as rnd
 
 from sklearn.metrics import mean_squared_error
@@ -47,7 +48,9 @@ def _response_function(attr0, attr1, thresh=0.1):
 
 def gen_synthetic_dataset(num_attrs=3, num_informative_attrs=2,
                           num_rows=10_000, avg=0.0, sigma=1.0) -> pd.DataFrame:
-    perm = list(range(num_attrs))
+
+    attr_indexes = list(range(num_attrs))
+    perm = attr_indexes.copy()
     rnd.shuffle(perm)  # Permutation of attr indices, where 0 & 1 are conjunction.
     print(perm)
     rows = []
@@ -56,7 +59,11 @@ def gen_synthetic_dataset(num_attrs=3, num_informative_attrs=2,
              for j in range(num_attrs)}
         inf_attrs = [d[_attr_name(perm[j])]
                      for j in range(num_informative_attrs)]
-        d['informative_sum'] = sum(inf_attrs)
+        for a, b in combinations(attr_indexes, 2):
+            d[f'sum_{_attr_name(a)}_{_attr_name(b)}'] = (
+                    d[_attr_name(a)]
+                    + d[_attr_name(b)]
+            )
         d['y'] = _response_function(*inf_attrs)
         rows.append(d)
 
@@ -81,20 +88,18 @@ def main():
               }
     cv_results = xgb.cv(dtrain=data_dmatrix,
                         params=params,
-                        metrics='rmse',
-                        as_pandas=True)
-    print(cv_results.head())
-    print((cv_results['test-rmse-mean']).tail(1))
+                        )
+    print(cv_results)
 
     xg_reg = xgb.train(params=params, dtrain=data_dmatrix, num_boost_round=10)
 
     matplotlib.use('MacOSX')
-    xgb.plot_tree(xg_reg, num_trees=0)
-    plt.rcParams['figure.figsize'] = [50, 10]
+    _, ax = plt.subplots(nrows=2)
+    xgb.plot_tree(xg_reg, num_trees=0, ax=ax[0])
 
-    xgb.plot_importance(xg_reg)
-    plt.rcParams['figure.figsize'] = [5, 5]
+    xgb.plot_importance(xg_reg, ax=ax[1])
     plt.show()
+
 
 if __name__ == '__main__':
     main()
