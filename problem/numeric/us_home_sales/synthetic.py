@@ -46,7 +46,7 @@ def _response_function(attr0, attr1, thresh=0.1):
     return attr0 + attr1
 
 
-def gen_synthetic_dataset(num_attrs=3, num_informative_attrs=2,
+def gen_synthetic_dataset(num_attrs=20, num_informative_attrs=2,
                           num_rows=10_000, avg=0.0, sigma=1.0) -> pd.DataFrame:
 
     attr_indexes = list(range(num_attrs))
