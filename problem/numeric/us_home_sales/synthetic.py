@@ -56,6 +56,7 @@ def gen_synthetic_dataset(num_attrs=3, num_informative_attrs=2,
              for j in range(num_attrs)}
         inf_attrs = [d[_attr_name(perm[j])]
                      for j in range(num_informative_attrs)]
+        d['informative_sum'] = sum(inf_attrs)
         d['y'] = _response_function(*inf_attrs)
         rows.append(d)
 
