@@ -72,15 +72,14 @@ def gen_synthetic_dataset(num_attrs=20, num_informative_attrs=2,
 
 def main():
     data = gen_synthetic_dataset()
-
     x, y = data.iloc[:, :-1], data.iloc[:, -1]
     data_dmatrix = xgb.DMatrix(data=x, label=y)
 
     params = {
         'objective': 'reg:squarederror',
-        'booster': 'dart',
+        'booster': 'gbtree',  # 'dart',
     }
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=123)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
     xg_reg = xgb.XGBRegressor(**params)
     xg_reg.fit(x_train, y_train)
     preds = xg_reg.predict(x_test)
@@ -88,16 +87,14 @@ def main():
     print('RMSE:', rmse)
     assert rmse < .6, rmse
 
-    cv_results = xgb.cv(dtrain=data_dmatrix,
-                        params=params)
+    cv_results = xgb.cv(dtrain=data_dmatrix, params=params)
     print(cv_results)
 
-    xg_reg = xgb.train(params=params, dtrain=data_dmatrix, num_boost_round=10)
+    xg_reg = xgb.train(dtrain=data_dmatrix, params=params)
 
     matplotlib.use('MacOSX')
     _, ax = plt.subplots(nrows=2)
     xgb.plot_tree(xg_reg, num_trees=0, ax=ax[0])
-
     xgb.plot_importance(xg_reg, ax=ax[1])
     plt.show()
 
