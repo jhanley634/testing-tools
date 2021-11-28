@@ -69,12 +69,13 @@ def _response_function(attr0, attr1, *, thresh=0.1):
 
 
 def gen_synthetic_dataset(num_attrs=20, num_informative_attrs=2,
-                          num_rows=20_000, avg=0.0, sigma=1.0) -> pd.DataFrame:
+                          num_rows=20_000, avg=0.0, sigma=1.0, permute=True) -> pd.DataFrame:
 
     attr_indexes = list(range(num_attrs))
     perm = attr_indexes.copy()
-    rnd.shuffle(perm)  # Permutation of attr indices, where 0 & 1 are conjunction.
-    print(perm)
+    if permute:
+        rnd.shuffle(perm)  # Permutation of attr indices, where 0 & 1 are conjunction.
+        print(perm)
     rows = []
     for _ in range(num_rows):
         d = {_attr_name(j): rnd.gauss(avg, sigma)
