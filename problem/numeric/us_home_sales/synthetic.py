@@ -30,6 +30,28 @@ import pandas as pd
 import xgboost as xgb
 
 
+def _band_indicator(n: float, scale=0.2) -> float:
+    """Zeros out alternate bands of the input.
+
+    Here, zeroed bands are e.g. [0 .. .2), [.4 .. .6), etc.
+    """
+    s = int(n / scale)
+    if s % 2 == 0:
+        return 0
+    return 1
+
+
+def _get_two_informative_attr_names(xg_reg) -> (str, str):
+    v_k = reversed(sorted((v, k)
+                          for k, v in xg_reg.get_fscore().items()))
+    names = [k
+             for v, k in v_k]
+    assert names[0].startswith('sum_attr')
+    assert names[1].startswith('attr')
+    assert names[2].startswith('attr')
+    return names[1], names[2]
+
+
 def _attr_name(n: int) -> str:
     """Maps num -> name.
 
@@ -47,7 +69,7 @@ def _response_function(attr0, attr1, *, thresh=0.1):
 
 
 def gen_synthetic_dataset(num_attrs=20, num_informative_attrs=2,
-                          num_rows=10_000, avg=0.0, sigma=1.0) -> pd.DataFrame:
+                          num_rows=20_000, avg=0.0, sigma=1.0) -> pd.DataFrame:
 
     attr_indexes = list(range(num_attrs))
     perm = attr_indexes.copy()
@@ -93,9 +115,14 @@ def main():
     xg_reg = xgb.train(dtrain=data_dmatrix, params=params)
 
     matplotlib.use('MacOSX')
-    _, ax = plt.subplots(nrows=2)
+    _, ax = plt.subplots(nrows=3)
     xgb.plot_tree(xg_reg, num_trees=0, ax=ax[0])
+
     xgb.plot_importance(xg_reg, ax=ax[1])
+
+    inf0, inf1 = _get_two_informative_attr_names(xg_reg)
+    plt.scatter(x_test[inf0], [_band_indicator(x1) * y
+                               for x1, y in zip(x_test[inf1], y_test)])
     plt.show()
 
 
