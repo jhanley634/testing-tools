@@ -7,7 +7,7 @@ dependencies:
   - alembic >= 1.7.5
   - astor >= 0.8.1
   - beautifulsoup4 >= 4.10.0
-  - bokeh >= 2.4.1
+  - bokeh >= 2.4.2
   - boltons >= 21.0.0
   - cartopy >= 0.20.1
   - click >= 7.1.2
@@ -25,15 +25,16 @@ dependencies:
   - glom >= 20.11.0
   - html5lib >= 1.1
   - hypothesis >= 6.27.0
-  - ipython >= 7.29.0
+  - ipython >= 7.30.0
   - isort >= 5.10.1
   - jupyter >= 1.0.0
   - lxml >= 4.6.4
   - matplotlib >= 3.4.3
-  - more-itertools >= 8.11.0
+  - more-itertools >= 8.12.0
   - networkx >= 2.6.3
   - numba >= 0.54.1
   - pandas >= 1.2.5
+  - pandas-profiling >= 3.0.0
   - pillow >= 8.4.0
   - pip >= 21.3.1
   - pyarrow >= 6.0.0
@@ -46,7 +47,7 @@ dependencies:
   - requests >= 2.26.0
   - ruamel.yaml >= 0.17.17
   - scikit-learn >= 1.0.1
-  - scipy >= 1.7.2
+  - scipy >= 1.7.3
   - seaborn >= 0.11.2
   - sqlacodegen >= 2.3.0
   - sqlalchemy < 1.4  # not yet ready for 2.0 changes

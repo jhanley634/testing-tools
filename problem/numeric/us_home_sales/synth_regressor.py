@@ -18,6 +18,9 @@
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
 #
+from pathlib import Path
+
+from pandas_profiling import ProfileReport
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 import matplotlib
@@ -26,8 +29,15 @@ import matplotlib.pyplot as plt
 from problem.numeric.us_home_sales.synthetic import gen_synthetic_dataset
 
 
-def main():
+def main(out_folder=Path('~/Desktop').expanduser()):
+
     data = gen_synthetic_dataset(permute=False)
+
+    fspec = out_folder / 'synth_profile.html'
+    if not fspec.exists():
+        profile = ProfileReport(data, title='Pandas Profiling Report')
+        profile.to_file(fspec)
+
     x, y = data.iloc[:, :-1], data.iloc[:, -1]
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
     regr = DecisionTreeRegressor(max_depth=4)
@@ -36,7 +46,6 @@ def main():
     y_pred = regr.predict(x_test)
 
     matplotlib.use('MacOSX')
-    _, _ = plt.subplots(nrows=1)
     plt.scatter(x_test.attr000, y_pred, color='cornflowerblue', label='predicted', linewidth=2)
     plt.xlabel('data')
     plt.ylabel('target')
