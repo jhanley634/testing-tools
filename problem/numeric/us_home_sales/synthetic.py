@@ -61,9 +61,12 @@ def _attr_name(n: int) -> str:
     return f'attr{n:03d}'
 
 
-def _response_function(attr0, attr1, *, thresh=0.1):
-    if (attr0 < thresh
-            or attr1 < thresh):
+THRESH = 0.1
+
+
+def _response_function(attr0, attr1):
+    if (attr0 < THRESH
+            or attr1 < THRESH):
         return 0.0
     return attr0 + attr1
 
@@ -80,13 +83,16 @@ def gen_synthetic_dataset(num_attrs=20, num_informative_attrs=2,
     for _ in range(num_rows):
         d = {_attr_name(j): rnd.gauss(avg, sigma)
              for j in range(num_attrs)}
-        inf_attrs = [d[_attr_name(perm[j])]
-                     for j in range(num_informative_attrs)]
         for a, b in combinations(attr_indexes, 2):
             d[f'sum_{_attr_name(a)}_{_attr_name(b)}'] = (
                     d[_attr_name(a)]
                     + d[_attr_name(b)]
             )
+        for j in range(num_attrs):
+            indicator_name = f'ind{j:03d}'
+            d[indicator_name] = int(d[_attr_name(j)] > THRESH)  # an indicator is 0 or 1
+        inf_attrs = [d[_attr_name(perm[j])]
+                     for j in range(num_informative_attrs)]
         d['y'] = _response_function(*inf_attrs)
         rows.append(d)
 
