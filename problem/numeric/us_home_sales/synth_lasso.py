@@ -53,7 +53,7 @@ def main():
         data = pd.read_csv(url, header=None).values
         x, y = data[:, :-1], data[:, -1]
 
-    model = Lasso()
+    model = Lasso(alpha=.01)
     cv = RepeatedKFold()  # (n_splits=10, n_repeats=3, random_state=42)
     scores = absolute(cross_val_score(model, x_train, y_train,
                                       scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1))
