@@ -1,6 +1,7 @@
 
-from enum import Enum, auto
 import re
+
+WrapperDescriptor = type(object.__init__)
 
 
 def _get_op_pairs():
@@ -40,4 +41,17 @@ class ExprParser:
                 raise
 
     def to_postfix(self) -> str:
-        return ''
+
+        def to_str(token):
+            if isinstance(token, WrapperDescriptor):
+                txt = ' UNKNOWN '
+                for k, v in self.op_to_fn.items():
+                    if v == token:
+                        txt = k  # e.g. '+' or '*'
+                return txt
+            else:
+                return f'{token}'
+
+        tokens = [to_str(token)
+                  for token, _ in self._get_tokens()]
+        return ' '.join(tokens)
