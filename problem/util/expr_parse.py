@@ -43,20 +43,10 @@ class ExprParser:
 
     def to_postfix(self) -> str:
 
-        def to_str(token):
-            if isinstance(token, WrapperDescriptor):
-                txt = ' UNKNOWN '
-                for k, v in self.op_to_fn.items():
-                    if v == token:
-                        txt = k  # e.g. '+' or '*'
-                return txt
-            else:
-                return f'{token}'
-
         expr = []  # a postfix expression
         stack = deque()  # stuff we've not gotten around to yet
         for token, prec in self._get_tokens():
-            prec = self.op_to_precedence.get(to_str(token))
+            prec = self.op_to_precedence.get(self._to_str(token))
             # print(prec, token)
             if isinstance(token, int):
                 expr.append(token)
@@ -74,7 +64,7 @@ class ExprParser:
                 else:
                     print(8, expr)
                     print(9, stack)
-                    while stack and self.op_to_precedence.get(to_str(stack[-1]), 99) < prec:
+                    while stack and self.op_to_precedence.get(self._to_str(stack[-1]), 99) < prec:
                         expr.append(stack.pop())
             else:
                 stack.append(token)
@@ -82,4 +72,30 @@ class ExprParser:
         while stack:
             expr.append(stack.pop())
 
-        return ' '.join(map(to_str, expr))
+        return ' '.join(map(self._to_str, expr))
+
+    def _to_str(self, token):
+        if isinstance(token, WrapperDescriptor):
+            txt = ' UNKNOWN '
+            for k, v in self.op_to_fn.items():
+                if v == token:
+                    txt = k  # e.g. '+' or '*'
+            return txt
+        else:
+            return f'{token}'
+
+    def evaluate_postfix(self, expr: str):
+        assert '(' not in expr, expr
+        assert ')' not in expr, expr
+
+        stack = []
+        for tok in expr.split():
+            if tok.isnumeric():
+                stack.append(float(int(tok)))
+            else:
+                op = self.op_to_fn[self._to_str(tok)]
+                stack.append(op(stack.pop(),
+                                stack.pop()))
+
+        assert 1 == len(stack), (len(stack), stack)
+        return stack.pop()
