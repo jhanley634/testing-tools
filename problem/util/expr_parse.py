@@ -1,4 +1,5 @@
 
+# Copyright 2022 John Hanley. MIT licensed.
 from collections import deque
 import re
 
@@ -27,13 +28,15 @@ class ExprParser:
     op_to_fn = {
         op: pair[1] for op, pair in _get_op_pairs()}
 
-    sane_charset_re = re.compile(r'^[()+*/^0-9 -]+$')
+    sane_charset_re = re.compile(r'^[()+*/^0-9 .e-]+$')
 
     def __init__(self, infix: str):
         assert self.sane_charset_re.search(infix), infix
         assert (infix.count('(')
                 == infix.count(')')), infix
         self.infix = f'({infix})'
+
+    _float_re = re.compile(r'^[e\d.]$')
 
     def _get_tokens(self):
         i = 0
@@ -45,13 +48,18 @@ class ExprParser:
                 pass
             elif fn:
                 yield fn, self.op_to_precedence[ch]
-            elif ch.isnumeric():  # Parse a positive integer
-                acc = int(ch)
-                while i < len(self.infix) and self.infix[i].isnumeric():
-                    acc *= 10
-                    acc += int(self.infix[i])
+            elif self._float_re.search(ch):  # Parse a non-negative real number
+                flt = [ch]
+                while i < len(self.infix) and self._float_re.search(self.infix[i]):
+                    flt.append(self.infix[i])
+                    if self.infix[i] == 'e' and self.infix[i + 1] == '-':  # tiny number
+                        i += 1
+                        flt.append(self.infix[i])
                     i += 1
-                yield acc, None
+                n = float(''.join(flt))
+                if n == int(n) and abs(n) < 1e6:
+                    n = int(n)
+                yield n, None
             elif ch in '()':
                 yield ch, None
             else:
@@ -76,7 +84,7 @@ class ExprParser:
                     expr.append(stack.pop())
                 stack.append(token)
             else:
-                assert isinstance(token, int), token
+                assert isinstance(token, (int, float)), token
                 expr.append(token)
 
         assert 0 == len(stack), stack
@@ -93,14 +101,22 @@ class ExprParser:
         else:
             return f'{token}'
 
+    @staticmethod
+    def _is_numeric(tok: str) -> bool:
+        try:
+            float(tok)
+            return True
+        except ValueError:
+            return False
+
     def evaluate_postfix(self, expr: str):
         assert '(' not in expr, expr
         assert ')' not in expr, expr
 
         stack = []
         for tok in expr.split():
-            if tok.isnumeric():
-                stack.append(float(int(tok)))
+            if self._is_numeric(tok):
+                stack.append(float(tok))
             else:
                 op = self.op_to_fn[self._to_str(tok)]
                 b = stack.pop()
