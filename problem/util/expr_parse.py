@@ -70,7 +70,7 @@ class ExprParser:
         expr = []  # a postfix expression
         stack = deque()  # stuff we've not gotten around to yet
         for token, prec in self._get_tokens():
-            prec = self.op_to_precedence.get(self._to_str(token))
+            prec = self.op_to_precedence.get(token)
             # print(prec, token)
             if token == '(':
                 stack.append(token)
@@ -80,7 +80,7 @@ class ExprParser:
                 tok = stack.pop()
                 assert tok == '('
             elif prec:
-                while self.op_to_precedence[self._to_str(stack[-1])] > prec:
+                while self.op_to_precedence[stack[-1]] > prec:
                     expr.append(stack.pop())
                 stack.append(token)
             else:
@@ -89,10 +89,7 @@ class ExprParser:
 
         assert 0 == len(stack), stack
 
-        return ' '.join(map(self._to_str, expr))
-
-    def _to_str(self, token):
-        return f'{token}'
+        return ' '.join(map(str, expr))
 
     @staticmethod
     def _is_numeric(tok: str) -> bool:
@@ -111,7 +108,7 @@ class ExprParser:
             if self._is_numeric(tok):
                 stack.append(float(tok))
             else:
-                op = self.op_to_fn[self._to_str(tok)]
+                op = self.op_to_fn[tok]
                 b = stack.pop()
                 a = stack.pop()
                 stack.append(op(a, b))
