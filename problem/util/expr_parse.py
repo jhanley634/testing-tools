@@ -36,14 +36,22 @@ class ExprParser:
         self.infix = f'({infix})'
 
     def _get_tokens(self):
-        for ch in self.infix:
+        i = 0
+        while i < len(self.infix):
+            ch = self.infix[i]
+            i += 1
             fn = self.op_to_fn.get(ch)
             if ch == ' ':
                 pass
             elif fn:
                 yield fn, self.op_to_precedence[ch]
-            elif ch.isnumeric():
-                yield int(ch), None
+            elif ch.isnumeric():  # Parse a positive integer
+                acc = int(ch)
+                while i < len(self.infix) and self.infix[i].isnumeric():
+                    acc *= 10
+                    acc += int(self.infix[i])
+                    i += 1
+                yield acc, None
             elif ch in '()':
                 yield ch, None
             else:
