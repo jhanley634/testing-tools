@@ -7,9 +7,10 @@ WrapperDescriptor = type(object.__init__)
 
 def _get_op_pairs():
     yield from {
-        '+': (3, float.__add__),
+        '(': (0, None),
+        '+': (1, float.__add__),
         '*': (2, float.__mul__),
-        '^': (1, float.__pow__),
+        '^': (3, float.__pow__),
     }.items()
 
 
@@ -24,8 +25,9 @@ class ExprParser:
 
     def __init__(self, infix: str):
         assert self.sane_charset_re.search(infix), infix
-        self.infix = infix
-        # self.infix = infix.replace(' ', '')
+        assert (infix.count('(')
+                == infix.count(')')), infix
+        self.infix = f'({infix})'
 
     def _get_tokens(self):
         for ch in self.infix:
@@ -35,42 +37,35 @@ class ExprParser:
             elif fn:
                 yield fn, self.op_to_precedence[ch]
             elif ch.isnumeric():
-                yield int(ch), 0
+                yield int(ch), None
             elif ch in '()':
-                yield ch, 0
+                yield ch, None
             else:
                 raise
 
     def to_postfix(self) -> str:
-
+        # based on https://algotree.org/algorithms/stack_based/infix_to_postfix
         expr = []  # a postfix expression
         stack = deque()  # stuff we've not gotten around to yet
         for token, prec in self._get_tokens():
             prec = self.op_to_precedence.get(self._to_str(token))
             # print(prec, token)
-            if isinstance(token, int):
-                expr.append(token)
-            elif token == '(':
+            if token == '(':
                 stack.append(token)
             elif token == ')':
-                assert stack[-1] != ')', stack  # Prohibit '()', and also ')'.
-                while stack and stack[-1] != ')':
-                    tok = stack.pop()
-                    if tok != '(':
-                        expr.append(tok)
+                while stack[-1] != '(':
+                    expr.append(stack.pop())
+                tok = stack.pop()
+                assert tok == '('
             elif prec:
-                if len(stack) == 0 or stack[-1] == '(':
-                    stack.append(token)
-                else:
-                    print(8, expr)
-                    print(9, stack)
-                    while stack and self.op_to_precedence.get(self._to_str(stack[-1]), 99) < prec:
-                        expr.append(stack.pop())
-            else:
+                while self.op_to_precedence[self._to_str(stack[-1])] > prec:
+                    expr.append(stack.pop())
                 stack.append(token)
+            else:
+                assert isinstance(token, int), token
+                expr.append(token)
 
-        while stack:
-            expr.append(stack.pop())
+        assert 0 == len(stack), stack
 
         return ' '.join(map(self._to_str, expr))
 
