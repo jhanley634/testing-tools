@@ -2,7 +2,7 @@
 # Copyright 2022 John Hanley. MIT licensed.
 import unittest
 
-from problem.util.expr_parse import ExprParser, _div
+from problem.util.expr_parse import ExprParser
 
 
 def _munge_exp(s: str) -> str:
@@ -16,14 +16,14 @@ class ExprParserTest(unittest.TestCase):
         p = ExprParser('3 + ((7 - 5) / 2)')
         self.assertEqual([('(', None),
                           (3, None),
-                          (float.__add__, 1),
+                          ('+', 1),
                           ('(', None),
                           ('(', None),
                           (7, None),
-                          (float.__sub__, 1),
+                          ('-', 1),
                           (5, None),
                           (')', None),
-                          (_div, 2),
+                          ('/', 2),
                           (2, None),
                           (')', None),
                           (')', None),

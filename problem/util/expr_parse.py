@@ -47,7 +47,7 @@ class ExprParser:
             if ch == ' ':
                 pass
             elif fn:
-                yield fn, self.op_to_precedence[ch]
+                yield ch, self.op_to_precedence[ch]
             elif self._float_re.search(ch):  # Parse a non-negative real number
                 flt = [ch]
                 while i < len(self.infix) and self._float_re.search(self.infix[i]):
@@ -92,14 +92,7 @@ class ExprParser:
         return ' '.join(map(self._to_str, expr))
 
     def _to_str(self, token):
-        if isinstance(token, WrapperDescriptor) or token is _div:
-            txt = ' UNKNOWN '
-            for k, v in self.op_to_fn.items():
-                if v == token:
-                    txt = k  # e.g. '+' or '*'
-            return txt
-        else:
-            return f'{token}'
+        return f'{token}'
 
     @staticmethod
     def _is_numeric(tok: str) -> bool:
