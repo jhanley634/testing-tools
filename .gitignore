@@ -3,6 +3,10 @@
 *.jl.mem
 *.py~~
 .DS_Store
+.RData
+.Rhistory
+.Rprofile
+.Rproj.user
 .coverage
 .hypothesis/
 .idea/
@@ -17,3 +21,6 @@ deps/deps.jl
 htmlcov/
 problem/text/db/out/*.pdf
 problem/text/reviewing/out/*.pdf
+renv.lock
+renv/
+testing-tools.Rproj
