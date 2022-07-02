@@ -13,3 +13,10 @@ if (FALSE) {
 
 fspec <- "../covid-19-data/us-states.csv"
 states <- read.csv(fspec)
+
+g <- ggplot(states, aes(x = date, y = cases)) +
+  geom_point() +
+  scale_x_date(breaks = seq(as.Date("2019-01-01"),
+                            as.Date("2023-01-01"),
+                            by = "91 days"))
+g

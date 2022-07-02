@@ -15,6 +15,7 @@
 .pyre_configuration
 .pytype/
 .watchmanconfig
+Rplots.pdf
 TAGS
 __pycache__
 deps/deps.jl
