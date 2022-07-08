@@ -1,8 +1,14 @@
 
 renv::status()
 
-# This brings in a couple three packages:
-#   R6 cli crayon dplyr ellipsis fansi generics glue lifecycle magrittr
+# This brings in several packages:
+# askpass brew brio cachem clipr commonmark cpp11 credentials curl devtools
+#   diffobj fastmap fs gert gh gitcreds httr ini memoise mime openssl pkgbuild
+#   pkgload praise prettyunits rappdirs rcmdcheck roxygen2 rstudioapi
+#   rversions sessioninfo sys testthat usethis waldo whisker xopen zip
+install.packages("devtools")
+
+# R6 cli crayon dplyr ellipsis fansi generics glue lifecycle magrittr
 #   pillar pkgconfig purrr rlang tibble tidyselect utf8 vctrs
 install.packages("dplyr")
 
