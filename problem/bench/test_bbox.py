@@ -20,15 +20,14 @@
 
 """Compares numpy running times against python interpreter.
 """
-
 import os
 import timeit
 import unittest
 
+import numpy as np
 import PIL.Image
 import PIL.ImageColor
 import PIL.ImageDraw2
-import numpy as np
 
 
 def get_marked_image(mark_coord=None, radius=20, im_size=(200, 100)):

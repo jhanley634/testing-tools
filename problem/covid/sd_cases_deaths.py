@@ -17,20 +17,19 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
-
 import datetime as dt
 
-from altair import datum
-from covid.us_cases_deaths import delta, get_cases_and_deaths, get_chart, smooth
-import altair as alt
+from altair import Chart, datum
 import streamlit as st
+
+from problem.covid.us_cases_deaths import delta, get_cases_and_deaths, get_chart, smooth
 
 
 def _get_annotation(df):
     # https://en.wikipedia.org/wiki/Sturgis_Motorcycle_Rally
     rally = 1e3 * dt.datetime.strptime('2020-08-07', '%Y-%m-%d').timestamp()
     ten_days = 10 * 1e3 * 86400
-    annotation = alt.Chart(df).mark_text(
+    annotation = Chart(df).mark_text(
         align='left',
         baseline='middle',
         fontSize=20,

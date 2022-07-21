@@ -53,6 +53,7 @@ dependencies:
   - sqlalchemy < 1.4  # not yet ready for 2.0 changes
   - statsmodels >= 0.13.1
   - streamlit >= 1.2.0
+  - svgwrite >= 1.4.3
   - tqdm >= 4.62.3
   - unyt >= 2.8.0
   - xgboost >= 1.5.0
