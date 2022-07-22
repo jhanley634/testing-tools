@@ -27,8 +27,29 @@ insert into matches values (102, 1, 2, 7, 6);
 insert into matches values (103, 1, 2, 3, 4);
 insert into matches values (104, 3, 4, 8, 9);
 
-select m.*, p.group_id
+drop view  if exists  match_winner;
+create view match_winner as
+select
+    match_id,
+    case
+    when first_score = second_score then
+        case
+        when first_player < second_player
+        then first_player
+        else second_player
+        end
+    when first_score > second_score then first_player
+    else second_player
+    end as winner_id
 from matches m
-join players p on m.first_player = p.player_id
 order by m.match_id
+;
+
+select
+    p.group_id,
+    coalesce(min(mw.winner_id), p.player_id) as winner_id
+from players p
+left join match_winner mw on p.player_id = mw.winner_id
+group by p.group_id
+order by p.group_id
 ;

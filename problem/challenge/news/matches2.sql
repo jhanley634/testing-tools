@@ -49,9 +49,9 @@ order by m.match_id
 ;
 select
     p.group_id,
-    min(mw.winner_id) as winner_id
+    coalesce(min(mw.winner_id), p.player_id) as winner_id
 from players p
-join match_winner mw on p.player_id = mw.winner_id
+left join match_winner mw on p.player_id = mw.winner_id
 group by p.group_id
 order by p.group_id
 ;
