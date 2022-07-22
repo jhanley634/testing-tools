@@ -11,10 +11,15 @@ class NewsTest(unittest.TestCase):
         self.assertTrue(True)
 
 
+def hypo_news():
+    print(6)
+
+
 def main():
     ''
 
 
 if __name__ == '__main__':
-    unittest.main()
+    hypo_news()
+    unittest.main(exit=False)
     typer.run(main)
