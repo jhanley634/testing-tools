@@ -30,20 +30,28 @@ insert into matches values(13, 65, 45, 10, 10);
 insert into matches values(5, 30, 65, 3, 15);
 insert into matches values(42, 45, 65, 8, 4);
 
-select m.*, p.group_id
+drop view  if exists  match_winner;
+create view match_winner as
+select
+    match_id,
+    case
+    when first_score = second_score then
+        case
+        when first_player < second_player
+        then first_player
+        else second_player
+        end
+    when first_score > second_score then first_player
+    else second_player
+    end as winner_id
 from matches m
-join players p on m.first_player = p.player_id
 order by m.match_id
 ;
-
-drop view  if exists  winning_score;
-create view winning_score as
 select
     p.group_id,
-    coalesce(max(first_score, second_score), 0) as win_score
+    min(mw.winner_id) as winner_id
 from players p
-left join matches m on m.first_player = p.player_id
+join match_winner mw on p.player_id = mw.winner_id
 group by p.group_id
 order by p.group_id
 ;
-select * from winning_score;
