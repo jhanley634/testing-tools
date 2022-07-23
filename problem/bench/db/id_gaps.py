@@ -17,7 +17,6 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
-
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from uszipcode import SearchEngine
@@ -29,7 +28,7 @@ class GapFinder:
         self.engine = engine
 
     def _get_ids(self):
-        select = "SELECT zipcode  FROM simple_zipcode  ORDER BY 1"
+        select = 'SELECT zipcode  FROM simple_zipcode  ORDER BY 1'
         with self.engine.connect() as conn:
             for id_, in conn.execute(text(select)):
                 yield int(id_)
@@ -54,7 +53,7 @@ class GapFinder:
 
 if __name__ == '__main__':
     """example usage:
-    
+
     $ ./id_gaps.py | cat -n | sort -nk2
     """
     GapFinder(SearchEngine().engine).measure_gaps()
