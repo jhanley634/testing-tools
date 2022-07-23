@@ -17,7 +17,7 @@
 # other liability, whether in an action of contract, tort or otherwise,
 # arising from, out of or in connection with the software or the use or
 # other dealings in the software.
-
+from collections import defaultdict
 from pathlib import Path
 import datetime as dt
 
@@ -52,6 +52,16 @@ def get_cases_and_deaths(in_file='us.csv', state=''):
         rows.append(dict(date=row.date, stat='cases', val=max(row.cases, 1)))
         rows.append(dict(date=row.date, stat='deaths', val=max(row.deaths, 1)))
     return pd.DataFrame(rows)
+
+
+def tidy(df):
+    rows = defaultdict(dict)
+    for i, row in df.iterrows():
+        rows[row.date][row.stat] = row.val
+    df = pd.DataFrame(rows).T
+    assert sorted(df.columns) == ['cases', 'deaths']
+    assert df.dropna().shape == df.shape
+    return df
 
 
 def smooth(df, span=7):
