@@ -67,7 +67,7 @@ def _tidy_slow(df):
 def tidy(df: pd.DataFrame):
     df.to_csv('/tmp/covid-messy.csv', index=False)
     df = df.pivot(index='date', columns='stat', values='val')
-    df = pd.DataFrame(df.to_records())  # lose the stat/date idx
+    df.columns.name = None  # was 'stat'
     df['date'] = pd.to_datetime(df.date)
     df = df.set_index('date')
     # d = np.datetime64(dt.datetime(2020, 1, 25)); print(df.loc[d])
