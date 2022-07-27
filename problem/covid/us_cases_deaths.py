@@ -54,11 +54,25 @@ def get_cases_and_deaths(in_file='us.csv', state=''):
     return pd.DataFrame(rows)
 
 
-def tidy(df):
+def _tidy_slow(df):
     rows = defaultdict(dict)
     for i, row in df.iterrows():
         rows[row.date][row.stat] = row.val
     df = pd.DataFrame(rows).T
+    assert sorted(df.columns) == ['cases', 'deaths']
+    assert df.dropna().shape == df.shape
+    return df
+
+
+def tidy(df: pd.DataFrame):
+    df.to_csv('/tmp/covid-messy.csv', index=False)
+    df = df.pivot(index='date', columns='stat', values='val')
+    df = pd.DataFrame(df.to_records())  # lose the stat/date idx
+    df['date'] = pd.to_datetime(df.date)
+    df = df.set_index('date')
+    # d = np.datetime64(dt.datetime(2020, 1, 25)); print(df.loc[d])
+    assert 3 == df.loc['2020-01-25']['cases']
+    df.to_csv('/tmp/covid-tidy.csv')
     assert sorted(df.columns) == ['cases', 'deaths']
     assert df.dropna().shape == df.shape
     return df
