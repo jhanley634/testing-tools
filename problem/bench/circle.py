@@ -17,7 +17,7 @@ def circle(r_px: int = 100, v_skip=20, margin: float = 1.2,
                        stroke_width=6,
                        stroke='black'))
     x0 = (margin - 1) * r
-    y0 = 2 * margin * r
+    y0 = 2.9 * r
     dwg.add(dwg.line((x0, y0), (x0 + math.pi * r, y0)).stroke('black', width=6))
     print(dwg.tostring())  # works well with: $ tidy -wrap 200 -indent -xml
 

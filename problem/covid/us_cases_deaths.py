@@ -45,13 +45,15 @@ def get_cases_and_deaths(in_file='us.csv', state=''):
     df = pd.read_csv(_get_nyt_covid19_top_dir() / in_file)
     df.date = pd.to_datetime(df.date)
 
-    rows = []
-    for i, row in df.iterrows():
+    return pd.DataFrame(_get_filtered_rows(df, state))
+
+
+def _get_filtered_rows(df, state):
+    for _, row in df.iterrows():
         if state and row.state != state:
             continue
-        rows.append(dict(date=row.date, stat='cases', val=max(row.cases, 1)))
-        rows.append(dict(date=row.date, stat='deaths', val=max(row.deaths, 1)))
-    return pd.DataFrame(rows)
+        yield dict(date=row.date, stat='cases', val=max(row.cases, 1))
+        yield dict(date=row.date, stat='deaths', val=max(row.deaths, 1))
 
 
 def _tidy_slow(df):
