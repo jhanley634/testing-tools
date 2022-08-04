@@ -9,13 +9,29 @@ import pandas as pd
 import seaborn as sns
 import typer
 
-from problem.covid.us_cases_deaths import get_filtered_cases_and_deaths, tidy
+from problem.covid.us_cases_deaths import get_cases_and_deaths
+
+
+def _get_daily_cases_and_deaths():
+    df = get_cases_and_deaths()
+    df.cases = df.cases.diff().shift(-1)
+    df.deaths = df.deaths.diff().shift(-1)
+    df = df.dropna()
+    df.cases = df.cases.astype(np.int32)
+    df.deaths = df.deaths.astype(np.int32)
+
+    # clip a March 2022 negative deaths figure
+    df.cases = df.cases.clip(lower=0)
+    df.deaths = df.deaths.clip(lower=0)
+
+    df = df.set_index('date')
+    return df
 
 
 def predict(out_file=Path('~/Desktop/lag.png')):
     out_file = Path(out_file).expanduser()
 
-    df = tidy(get_filtered_cases_and_deaths())
+    df = _get_daily_cases_and_deaths()
     train, test = _split(df)
     assert len(train) >= 224
 
@@ -36,13 +52,15 @@ def predict(out_file=Path('~/Desktop/lag.png')):
     train['cases'] /= 1e2
     sns.scatterplot(data=train)
     plt.xticks(rotation=45)
-    plt.gca().set_ylim((0, 1e6))
+    y_limit = 6_000
+    plt.gca().set_ylim((0, y_limit))
 
     plt.sca(axs[1])
     test['cases'] /= 1e2
     test['pred_deaths'] = y_pred
     sns.scatterplot(data=test)
     plt.xticks(rotation=45)
+    plt.gca().set_ylim((0, y_limit))
     plt.savefig(out_file)
     plt.show()
 
