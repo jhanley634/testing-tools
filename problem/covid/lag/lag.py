@@ -9,13 +9,13 @@ import pandas as pd
 import seaborn as sns
 import typer
 
-from problem.covid.us_cases_deaths import get_cases_and_deaths, tidy
+from problem.covid.us_cases_deaths import get_filtered_cases_and_deaths, tidy
 
 
 def predict(out_file=Path('~/Desktop/lag.png')):
     out_file = Path(out_file).expanduser()
 
-    df = tidy(get_cases_and_deaths())
+    df = tidy(get_filtered_cases_and_deaths())
     train, test = _split(df)
     assert len(train) >= 224
 

@@ -36,7 +36,7 @@ def _get_nyt_covid19_top_dir():
     return sibling_repo.resolve()
 
 
-def get_cases_and_deaths(in_file='us.csv', state=''):
+def get_cases_and_deaths(in_file='us.csv'):
     #            date    cases  deaths
     # 0    2020-01-21        1       0
     # ..          ...      ...     ...
@@ -44,8 +44,13 @@ def get_cases_and_deaths(in_file='us.csv', state=''):
 
     df = pd.read_csv(_get_nyt_covid19_top_dir() / in_file)
     df.date = pd.to_datetime(df.date)
+    return df
 
-    return pd.DataFrame(_get_filtered_rows(df, state))
+
+def get_filtered_cases_and_deaths(in_file='us.csv', state=''):
+    return pd.DataFrame(
+        _get_filtered_rows(get_cases_and_deaths(in_file),
+                           state))
 
 
 def _get_filtered_rows(df, state):
@@ -116,7 +121,7 @@ def get_chart(df, scale_type='linear'):
 
 
 def main():
-    df = get_cases_and_deaths()
+    df = get_filtered_cases_and_deaths()
     st.altair_chart(get_chart(df))
     st.altair_chart(get_chart(df, 'log'))
     delta(df)

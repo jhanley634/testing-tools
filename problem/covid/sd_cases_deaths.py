@@ -22,7 +22,12 @@ import datetime as dt
 from altair import Chart, datum
 import streamlit as st
 
-from problem.covid.us_cases_deaths import delta, get_cases_and_deaths, get_chart, smooth
+from problem.covid.us_cases_deaths import (
+    delta,
+    get_chart,
+    get_filtered_cases_and_deaths,
+    smooth,
+)
 
 
 def _get_annotation(df):
@@ -45,7 +50,7 @@ def _get_annotation(df):
 
 
 def main():
-    df = get_cases_and_deaths('us-states.csv', 'South Dakota')
+    df = get_filtered_cases_and_deaths('us-states.csv', 'South Dakota')
     df['label'] = '.'
     st.altair_chart(get_chart(df) + _get_annotation(df))
     st.altair_chart(get_chart(df, 'log') + _get_annotation(df))
