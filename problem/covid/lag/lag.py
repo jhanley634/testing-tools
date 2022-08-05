@@ -2,7 +2,10 @@
 # Copyright 2022 John Hanley. MIT licensed.
 from pathlib import Path
 
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.svm import LinearSVR
+from sklearn.tree import DecisionTreeRegressor
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -40,7 +43,8 @@ def predict(out_file=Path('~/Desktop/lag.png')):
     # x_train = np.array(StandardScaler().fit_transform(train.cases))
     x_train = np.array(train.cases)
     y_train = np.array(train.deaths)
-    model = LinearRegression()
+
+    model = RandomForestRegressor()
     model.fit(x_train.reshape(-1, 1), y_train)
 
     x_test = np.array(test.cases)
@@ -62,11 +66,10 @@ def predict(out_file=Path('~/Desktop/lag.png')):
     plt.xticks(rotation=45)
     plt.gca().set_ylim((0, y_limit))
     plt.savefig(out_file)
-    plt.show()
 
-    print(f'R2: {model.score(x_test.reshape(-1, 1), y_test)}')
-    print(f'MSE: {np.mean((y_test - y_pred)**2)}')
-    print(f'MAE: {np.mean(np.abs(y_test - y_pred))}')
+    print(f'R2: {model.score(x_test.reshape(-1, 1), y_test):.3f}')
+    print(f'MSE: {np.mean((y_test - y_pred)**2):.3f}')
+    print(f'MAE: {np.mean(np.abs(y_test - y_pred)):.3f}')
 
 
 def _split(df: pd.DataFrame, split_date='2020-09-01'):
