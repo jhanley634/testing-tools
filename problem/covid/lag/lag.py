@@ -20,6 +20,7 @@ def _get_daily_cases_and_deaths(lag=21):
     df.deaths = df.deaths.diff().shift(-1)
     df = df.dropna()  # Trim the final row.
     df['mortality'] = df.deaths / df.cases
+    df['mortality'] = df.mortality.clip(lower=0)
     df = df.dropna()  # Drop 20 more, from before March 2020.
     df.cases = df.cases.astype(np.int32)
     df.deaths = df.deaths.astype(np.int32)
@@ -32,7 +33,17 @@ def _get_daily_cases_and_deaths(lag=21):
     df = df.dropna()
 
     df = df.set_index('date')
+    _plot_mortality_rate(df)
     return df
+
+
+def _plot_mortality_rate(df):
+    df = df.reset_index()
+    df = pd.concat([df.date, df.mortality], axis='columns')
+    print(df)
+    sns.scatterplot(data=df)
+    plt.xticks(rotation=45)
+    plt.show()
 
 
 def predict():
