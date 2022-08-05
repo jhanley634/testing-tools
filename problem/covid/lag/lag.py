@@ -11,8 +11,10 @@ import typer
 
 from problem.covid.us_cases_deaths import get_cases_and_deaths
 
+OUT_DIR = Path('~/Desktop/').expanduser()
 
-def _get_daily_cases_and_deaths():
+
+def _get_daily_cases_and_deaths(lag=21):
     df = get_cases_and_deaths()
     df.cases = df.cases.diff().shift(-1)
     df.deaths = df.deaths.diff().shift(-1)
@@ -26,15 +28,16 @@ def _get_daily_cases_and_deaths():
     df.cases = df.cases.clip(lower=0)
     df.deaths = df.deaths.clip(lower=0)
 
+    df[f'lag_{lag}'] = df.cases.shift(lag) / 1e2
+    df = df.dropna()
+
     df = df.set_index('date')
     return df
 
 
-def predict(out_file=Path('~/Desktop/lag.png')):
-    out_file = Path(out_file).expanduser()
-
+def predict():
     df = _get_daily_cases_and_deaths()
-    train, test = _split(df)
+    train, test = _split(df, '2021-03-01')
     assert len(train) >= 204
 
     # dates = df.index.get_level_values(0)
@@ -45,6 +48,11 @@ def predict(out_file=Path('~/Desktop/lag.png')):
 
     model = RandomForestRegressor()
     model.fit(x_train, y_train)
+    _plot_predicted_deaths(train, test, model)
+
+
+def _plot_predicted_deaths(train, test, model,
+                           out_file=OUT_DIR / 'lag.png'):
 
     x_test = np.array(test.drop(columns=['deaths']))
     y_test = np.array(test.deaths)
@@ -74,9 +82,12 @@ def predict(out_file=Path('~/Desktop/lag.png')):
     print(f'R2: {model.score(x_test, y_test):.3f}')
     print(f'MSE: {np.mean((y_test - y_pred)**2):.3f}')
     print(f'MAE: {np.mean(np.abs(y_test - y_pred)):.3f}')
+    print('')
+    print(model.feature_importances_)
+    print(train.tail(2))
 
 
-def _split(df: pd.DataFrame, split_date='2021-03-01'):
+def _split(df: pd.DataFrame, split_date):
     train = df.query(f'date < "{split_date}"')
     test = df.query(f'date >= "{split_date}"')
     assert len(df) == len(train) + len(test)  # no rows left behind
