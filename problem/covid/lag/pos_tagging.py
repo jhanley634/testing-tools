@@ -6,7 +6,6 @@ import os.path
 import re
 
 from html2text import html2text
-import regex
 import requests
 import spacy
 import typer
@@ -42,18 +41,24 @@ def _get_fspec(url, folder='/tmp'):
 
 
 def fetch_articles():
-    skip_to_content_re = regex.compile(r'.*?<main id="site-content">')
+    skip_to_content_re = re.compile(r'^.*?<main id="site-content">')
 
     nlp = spacy.load('en_core_web_sm')  # $ python -m spacy download en_core_web_sm
 
     for url, title in _article_urls():
-        html = _get_article_text(url)
-        html = skip_to_content_re.sub('', html)
+        html = skip_to_content_re.sub('', _get_article_text(url))
         print('\n\n====\n', url, title)
+        _emphasize_nouns(nlp(html2text(html)))
 
-        doc = nlp(html2text(html))
-        for ent in doc.ents:
-            print(f'\n\n{ent.label_:<12} {ent.text}')
+
+def _emphasize_nouns(doc):
+    for ent in doc.ents:
+        print(f'\n\n{ent.label_:<12} {ent.text}')
+    for tok in doc:
+        word = (tok.text.upper() if tok.pos_ == 'NOUN' else
+                tok.text)
+        print(word, end=tok.whitespace_)
+    print('')
 
 
 if __name__ == '__main__':
