@@ -12,7 +12,6 @@ class NewsArticle:
     def __init__(self, url):
         self.nlp = spacy.load('en_core_web_sm')
         self.html = _get_article_text(url)
-        self.doc = self.nlp(html2text(self.html))
 
     def _get_paragraphs(self):
         soup = BeautifulSoup(self.html, 'html.parser')
@@ -21,7 +20,8 @@ class NewsArticle:
 
     def get_sentences(self):
         for para in self._get_paragraphs():
-            yield from para.split('.')
+            doc = self.nlp(html2text(para))
+            yield from doc.sents
 
 
 def main(url: str):
