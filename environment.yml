@@ -49,13 +49,14 @@ dependencies:
   - scikit-learn >= 1.1.1
   - scipy >= 1.8.1
   - seaborn >= 0.11.2
+  - spacy >= 3.4.1
   - sqlacodegen >= 2.3.0
   - sqlalchemy < 1.4  # not yet ready for 2.0 changes
   - statsmodels >= 0.13.2
   - streamlit >= 1.11.0
   - svgwrite >= 1.4.3
   - tqdm >= 4.64.0
-  - typer >= 0.6.1
+  - typer >= 0.4.2
   - unyt >= 2.9.2
   - xgboost >= 1.5.1
   - yapf >= 0.32.0
