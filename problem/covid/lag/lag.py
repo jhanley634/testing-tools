@@ -14,14 +14,15 @@ from problem.covid.us_cases_deaths import get_cases_and_deaths
 OUT_DIR = Path('~/Desktop/').expanduser()
 
 
-def _get_daily_cases_and_deaths(lag=21):
+def _get_daily_cases_and_deaths(lag: int):
     df = get_cases_and_deaths()
     df.cases = df.cases.diff().shift(-1)
     df.deaths = df.deaths.diff().shift(-1)
     df = df.dropna()  # Trim the final row.
     df['mortality'] = df.deaths / df.cases
-    df['mortality'] = df.mortality.clip(lower=0)
-    df = df.dropna()  # Drop 20 more, from before March 2020.
+    df.mortality = df.mortality.clip(lower=0)
+    df.mortality = df.mortality.rolling(60).mean()
+    df.mortality.fillna(df.mortality.median(), inplace=True)
     df.cases = df.cases.astype(np.int32)
     df.deaths = df.deaths.astype(np.int32)
 
@@ -40,14 +41,15 @@ def _get_daily_cases_and_deaths(lag=21):
 def _plot_mortality_rate(df):
     df = df.reset_index()
     df = pd.concat([df.date, df.mortality], axis='columns')
-    print(df)
+    df = df.set_index('date')
     sns.scatterplot(data=df)
     plt.xticks(rotation=45)
-    plt.show()
+    plt.gca().set_ylim((0, .12))
+    plt.savefig(OUT_DIR / 'mortality.png')
 
 
-def predict():
-    df = _get_daily_cases_and_deaths()
+def predict(lag=14):
+    df = _get_daily_cases_and_deaths(lag)
     train, test = _split(df, '2021-03-01')
     assert len(train) >= 204
 
@@ -59,10 +61,10 @@ def predict():
 
     model = RandomForestRegressor()
     model.fit(x_train, y_train)
-    _plot_predicted_deaths(train, test, model)
+    return _plot_predicted_deaths(train, test, model)
 
 
-def _plot_predicted_deaths(train, test, model,
+def _plot_predicted_deaths(train, test, model, verbose=False,
                            out_file=OUT_DIR / 'lag.png'):
 
     x_test = np.array(test.drop(columns=['deaths']))
@@ -91,11 +93,14 @@ def _plot_predicted_deaths(train, test, model,
     plt.savefig(out_file)
 
     print(f'R2: {model.score(x_test, y_test):.3f}')
-    print(f'MSE: {np.mean((y_test - y_pred)**2):.3f}')
     print(f'MAE: {np.mean(np.abs(y_test - y_pred)):.3f}')
-    print('')
-    print(model.feature_importances_)
-    print(train.tail(2))
+    if verbose:
+        print(f'MSE: {np.mean((y_test - y_pred) ** 2):.3f}')
+        print('')
+        print(model.feature_importances_)
+        print(train.tail(2))
+
+    return np.mean(np.abs(y_test - y_pred))
 
 
 def _split(df: pd.DataFrame, split_date):
