@@ -14,7 +14,7 @@ from problem.covid.us_cases_deaths import get_cases_and_deaths
 OUT_DIR = Path('~/Desktop/').expanduser()
 
 
-def _get_daily_cases_and_deaths(lag: int):
+def get_daily_cases_and_deaths(lag: int):
     df = get_cases_and_deaths()
     df.cases = df.cases.diff().shift(-1)
     df.deaths = df.deaths.diff().shift(-1)
@@ -49,7 +49,7 @@ def _plot_mortality_rate(df):
 
 
 def predict(lag=14):
-    df = _get_daily_cases_and_deaths(lag)
+    df = get_daily_cases_and_deaths(lag)
     train, test = _split(df, '2021-03-01')
     assert len(train) >= 204
 
