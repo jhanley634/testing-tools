@@ -7,6 +7,7 @@
 .Rhistory
 .Rprofile
 .Rproj.user
+.bsp/
 .coverage
 .hypothesis/
 .idea/
@@ -24,4 +25,5 @@ problem/text/db/out/*.pdf
 problem/text/reviewing/out/*.pdf
 renv.lock
 renv/
+target/
 testing-tools.Rproj
