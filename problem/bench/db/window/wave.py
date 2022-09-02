@@ -41,6 +41,7 @@ def _query(name):
             ), 3) AS mov_avg
         FROM {name}
         WHERE stamp BETWEEN '2022-01-01' AND '2022-01-21'
+        ORDER BY stamp
 ;
     """
 
