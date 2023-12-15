@@ -27,15 +27,15 @@ from ruamel.yaml import YAML
 
 def _get_packages_with_versions(fin):
     d = YAML().load(fin)
-    for dep in d['dependencies']:
+    for dep in d["dependencies"]:
         if isinstance(dep, dict):
-            yield from dep['pip']
+            yield from dep["pip"]
         else:
             yield dep  # e.g. 'seaborn >= 0.9.0'
 
 
 def _get_package_names_and_versions(fin):
-    name_ver_re = re.compile(r'^([\w\.-]+).* ([\d\.]+)$')  # ignores >=, ==
+    name_ver_re = re.compile(r"^([\w\.-]+).* ([\d\.]+)$")  # ignores >=, ==
     for pkg_with_ver in _get_packages_with_versions(fin):
         m = name_ver_re.search(pkg_with_ver)
         if m:
@@ -43,31 +43,34 @@ def _get_package_names_and_versions(fin):
 
 
 def _find_file(file):
-    for pfx in ['', '../', '../../']:
+    for pfx in ["", "../", "../../"]:
         if os.path.exists(pfx + file):
             return pfx + file
-    matches = glob.glob('*/' + file)
+    matches = glob.glob("*/" + file)
     if matches:
         return matches[0]
     return file  # Failure case, file does not exist, report diagnostic.
 
 
-def report(file='environment.yml'):
+def report(file="environment.yml"):
     file = _find_file(file)
     with open(file) as fin:
         name_to_ver = dict(_get_package_names_and_versions(fin))
 
-    name_ver_re = re.compile(r'^([\w\.-]+)\s+([\d\.]+)$')
-    cmd = ['bash', '-c', 'source ~/miniconda3/etc/profile.d/conda.sh; conda list; pip list']
-    lines = subprocess.check_output(cmd).decode().split('\n')
+    name_ver_re = re.compile(r"^([\w\.-]+)\s+([\d\.]+)$")
+    cmd = [
+        "bash",
+        "-c",
+        "source ~/miniconda3/etc/profile.d/conda.sh; conda list; pip list",
+    ]
+    lines = subprocess.check_output(cmd).decode().split("\n")
     for line in lines:
         m = name_ver_re.search(line.rstrip())
         if m:
             name, ver = m.groups()
-            if (name in name_to_ver
-                    and ver != name_to_ver[name]):
-                print(f'  - {name} >= {ver}')
+            if name in name_to_ver and ver != name_to_ver[name]:
+                print(f"  - {name} >= {ver}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     report()
