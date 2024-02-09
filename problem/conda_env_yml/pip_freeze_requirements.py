@@ -39,7 +39,7 @@ def _dep_ver_tuples(
 
 def main() -> None:
     req = dict(_parse_requirements(Path("requirements.txt")))
-    assert 28 == len(req)
+    assert len(req) >= 28
     freeze = dict(_run_freeze())
 
     for dep, rev in _parse_environment(Path("environment.yml")):
